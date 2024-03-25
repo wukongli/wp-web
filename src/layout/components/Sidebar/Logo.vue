@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('网盘高速下载平台');
+const title = ref('网盘高速下载');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>

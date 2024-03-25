@@ -9,6 +9,23 @@ export function login(username, password, code, uuid) {
     uuid,
   };
   return request({
+    url: '/loginNoPwd',
+    headers: {
+      isToken: false,
+    },
+    method: 'post',
+    data: data,
+  });
+}
+// admin登录方法
+export function adminLogin(username, password, code, uuid) {
+  const data = {
+    username: username,
+    password: password,
+    code,
+    uuid,
+  };
+  return request({
     url: '/login',
     headers: {
       isToken: false,
