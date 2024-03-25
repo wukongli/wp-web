@@ -13,7 +13,7 @@
           type="text"
           size="large"
           auto-complete="off"
-          placeholder="请输入激活码"
+          placeholder="请输入账号"
         >
           <template #prefix
             ><svg-icon icon-class="user" class="el-input__icon input-icon"
@@ -117,7 +117,7 @@ function handleLogin() {
   proxy.$refs.loginRef.validate((valid) => {
     if (valid) {
       loading.value = true;
-      //勾选了需要记住密码设置在 cookie 中设置记住用户名和密码
+      // 勾选了需要记住密码设置在 cookie 中设置记住用户名和密码
       if (loginForm.value.rememberMe) {
         Cookies.set('username', loginForm.value.username, { expires: 30 });
         Cookies.set('password', loginForm.value.password, {
@@ -131,15 +131,14 @@ function handleLogin() {
         Cookies.remove('rememberMe');
       }
       // 调用action的登录方法
-      loginForm.value.password = 123456;
       userStore
-        .login(loginForm.value)
+        .adminLogin(loginForm.value)
         .then(() => {
           router.push({ path: redirect.value || '/' });
         })
         .catch(() => {
           loading.value = false;
-          //重新获取验证码;
+          重新获取验证码;
           if (captchaEnabled.value) {
             getCode();
           }
