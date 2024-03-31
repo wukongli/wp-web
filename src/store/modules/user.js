@@ -1,4 +1,13 @@
-import { login, adminLogin, logout, getInfo } from '@/api/login';
+import {
+  login,
+  adminLogin,
+  logout,
+  getInfo,
+  parseCopyLink as parse,
+  parseLinkReq,
+  getSignReq,
+  getVip,
+} from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.jpg';
 
@@ -23,6 +32,44 @@ const useUserStore = defineStore('user', {
             setToken(res.token);
             this.token = res.token;
             resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    parseCopyLink(parseCopyLink) {
+      const shorturl = parseCopyLink.shorturl;
+      const pwd = parseCopyLink.pwd;
+      const dir = parseCopyLink.dir;
+      const root = parseCopyLink.root;
+      const data = { shorturl, pwd, dir, root };
+      return new Promise((resolve, reject) => {
+        parse(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    parseLink(parseLink) {
+      return new Promise((resolve, reject) => {
+        parseLinkReq(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    getSign(params) {
+      return new Promise((resolve, reject) => {
+        getSignReq(params)
+          .then((res) => {
+            resolve(res);
           })
           .catch((error) => {
             reject(error);
@@ -84,6 +131,17 @@ const useUserStore = defineStore('user', {
             this.permissions = [];
             removeToken();
             resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    getVipStatus() {
+      return new Promise((resolve, reject) => {
+        getVip()
+          .then((res) => {
+            resolve(res);
           })
           .catch((error) => {
             reject(error);

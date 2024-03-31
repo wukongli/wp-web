@@ -85,3 +85,38 @@ export function querySecretKey() {
     timeout: 20000,
   });
 }
+
+export function parseCopyLink(data) {
+  return request({
+    url: '/wp/parseCopyLink',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function parseLinkReq(data) {
+  return request({
+    url: '/wp/parseLink',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function getSignReq(data) {
+  return request({
+    url: '/wp/getSign',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function getVip() {
+  return request({
+    url: '/vip',
+    method: 'get',
+    timeout: 20000,
+  });
+}

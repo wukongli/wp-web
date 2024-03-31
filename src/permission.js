@@ -11,10 +11,9 @@ import usePermissionStore from '@/store/modules/permission';
 
 NProgress.configure({ showSpinner: false });
 
-const whiteList = ['/login', '/register', '/admin/login'];
+const whiteList = ['/login', '/register', '/admin/login', '/index'];
 
 router.beforeEach((to, from, next) => {
-  console.log('路由进入');
   NProgress.start();
   if (getToken()) {
     to.meta.title && useSettingsStore().setTitle(to.meta.title);
@@ -56,8 +55,6 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // 没有token
-    console.log(to);
-    console.log(from);
     if (whiteList.indexOf(to.path) !== -1) {
       // 在免登录白名单，直接进入
       next();
