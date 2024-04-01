@@ -7,6 +7,7 @@ import {
   parseLinkReq,
   getSignReq,
   getVip,
+  getCode
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.jpg';
@@ -137,7 +138,7 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-    getVipStatus() {
+    getVipNum() {
       return new Promise((resolve, reject) => {
         getVip()
           .then((res) => {
@@ -148,6 +149,17 @@ const useUserStore = defineStore('user', {
           });
       });
     },
+    getCodeNum(data){
+      return new Promise((resolve, reject) => {
+        getCode(data)
+            .then((res) => {
+              resolve(res);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+      });
+    }
   },
 });
 

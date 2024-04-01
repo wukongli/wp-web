@@ -31,28 +31,28 @@
 
         <!-- <screenfull id="screenfull" class="right-menu-item hover-effect" /> -->
 
-        <!-- <el-tooltip content="布局大小" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip> -->
+<!--         <el-tooltip content="布局大小" effect="dark" placement="bottom">-->
+<!--          <size-select id="size-select" class="right-menu-item hover-effect" />-->
+<!--        </el-tooltip>-->
       </template>
-      <div class="avatar-container">
+      <div v-if="loginData.login" class="avatar-container">
         <el-dropdown
           @command="handleCommand"
           class="right-menu-item hover-effect"
           trigger="click"
         >
-          <!-- <div class="avatar-wrapper">
+          <div class="avatar-wrapper">
             <img :src="userStore.avatar" class="user-avatar" />
             <el-icon><caret-bottom /></el-icon>
-          </div> -->
+          </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <!-- <router-link to="/user/profile">
+              <router-link to="/user/profile">
                 <el-dropdown-item>个人中心</el-dropdown-item>
-              </router-link> -->
-              <!-- <el-dropdown-item command="setLayout">
+              </router-link>
+              <el-dropdown-item command="setLayout">
                 <span>布局设置</span>
-              </el-dropdown-item> -->
+              </el-dropdown-item>
               <el-dropdown-item divided command="logout">
                 <span>退出登录</span>
               </el-dropdown-item>
@@ -77,11 +77,12 @@ import RuoYiDoc from '@/components/RuoYi/Doc';
 import useAppStore from '@/store/modules/app';
 import useUserStore from '@/store/modules/user';
 import useSettingsStore from '@/store/modules/settings';
-
+import { getToken } from '@/utils/auth';
+import {reactive, ref} from "vue";
 const appStore = useAppStore();
 const userStore = useUserStore();
 const settingsStore = useSettingsStore();
-
+const loginData = reactive({login:false});
 function toggleSideBar() {
   appStore.toggleSideBar();
 }
@@ -117,6 +118,16 @@ const emits = defineEmits(['setLayout']);
 function setLayout() {
   emits('setLayout');
 }
+
+function getLogin(){
+  if (getToken()) {
+    loginData.login = true;
+    console.log(loginData.login);
+  }else{
+    loginData.login= false;
+  }
+}
+getLogin();
 </script>
 
 <style lang="scss" scoped>

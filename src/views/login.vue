@@ -144,15 +144,15 @@ const captchaEnabled = ref(true);
 const register = ref(false);
 const redirect = ref(undefined);
 
-onMounted(() => {
-  userStore.getVipStatus().then((data) => {
-    if (data.code == 200) {
-      if (data.data.length == 0) {
+function getVipNums(){
+  userStore.getVipNum().then((data) => {
+    if (data.code === 200) {
+      if (data.data === 0) {
         hint.show = true;
       }
     }
   });
-});
+}
 function handleBlur() {
   const { url, pwd } = SubmitLink(loginForm.value.username);
   loginForm.value.shorturl = url;
@@ -164,17 +164,20 @@ function handleLogin() {
   proxy.$refs.loginRef.validate((valid) => {
     if (valid) {
       loading.value = true;
-      if (loginForm.value.code == '' || loginForm.value.code == null) {
+      console.log("登录获取的参数数据========");
+      console.log(loginForm.value);
+      if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
         return;
       }
-      localStorage.setItem('code', loginForm.value.code);
+      //过期时间十分钟
+      localStorage.setItem('code', loginForm.value.code,600000);
       router.push({
         name: 'Index',
         path: '/',
         query: {
-          shorturl: url,
-          pwd: pwd,
+          shorturl: loginForm.value.shorturl,
+          pwd: loginForm.value.pwd,
           dir: loginForm.value.dir,
           root: loginForm.value.root,
         },
@@ -203,7 +206,7 @@ function SubmitLink(url) {
     }
 
     if (surl == null || surl === '') {
-      ElMessage.error('未检测到有效百度网盘分享链接，请检查输入的链接');
+      ElMessage.error('百度网盘分享链接有错误，请检查输入的链接 ！');
       return false;
     }
   }
@@ -234,6 +237,8 @@ function handleClose() {
   hint.getCodeVisible = false;
   loading.value = false;
 }
+
+getVipNums();
 </script>
 
 <style lang="scss" scoped>

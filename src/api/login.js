@@ -115,8 +115,18 @@ export function getSignReq(data) {
 
 export function getVip() {
   return request({
-    url: '/vip',
+    url: '/vip/num',
     method: 'get',
     timeout: 20000,
+  });
+}
+
+
+export function getCode(data) {
+  return request({
+    url: '/wp/getCodeNum',
+    method: 'post',
+    timeout: 20000,
+    data: data,
   });
 }
