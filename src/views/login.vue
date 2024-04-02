@@ -93,7 +93,7 @@
       width="30%"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">扫码获取验证码 !!</div>
+      <div class="qr-hint">请扫码关注获取验证码!</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="confirm()" type="primary">确 定</el-button>
@@ -112,7 +112,7 @@ const router = useRouter();
 const { proxy } = getCurrentInstance();
 import useUserStore from '@/store/modules/user';
 const userStore = useUserStore();
-import qrCode from '@/assets/images/profile.jpg';
+import qrCode from '@/assets/images/qrcode.jpg';
 
 const loginForm = ref({
   username: '',
@@ -160,8 +160,8 @@ function handleBlur() {
   loginForm.value.password = pwd;
 }
 
-function handleLogin() {
-  proxy.$refs.loginRef.validate((valid) => {
+async function handleLogin() {
+  proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
       console.log("登录获取的参数数据========");
@@ -170,8 +170,20 @@ function handleLogin() {
         hint.getCodeVisible = true;
         return;
       }
+      //获取下载次数
+      const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
+        return res;
+      })
+      console.log(result);
+      if (result.code === 200) {
+        if (result.data === "验证码不正确") {
+          loading.value = false;
+          ElMessage.error("验证码不正确请重新输入");
+          return;
+        }
+      }
       //过期时间十分钟
-      localStorage.setItem('code', loginForm.value.code,600000);
+      localStorage.setItem('code', loginForm.value.code, 600000);
       router.push({
         name: 'Index',
         path: '/',
@@ -180,6 +192,7 @@ function handleLogin() {
           pwd: loginForm.value.pwd,
           dir: loginForm.value.dir,
           root: loginForm.value.root,
+          codeNum: result.data,
         },
       });
       // 调用action的登录方法
@@ -236,6 +249,10 @@ function confirm() {
 function handleClose() {
   hint.getCodeVisible = false;
   loading.value = false;
+}
+
+function getDownNum(code){
+
 }
 
 getVipNums();

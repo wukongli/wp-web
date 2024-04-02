@@ -7,15 +7,16 @@
     </header>
 
     <div id="content">
-      <el-table v-loading="loading"
+      <el-table
+          v-loading="loadData.tableLoading"
+          element-loading-text="数据正在加载中..."
         :data="loadData.tableData"
         height="calc(100vh - 200px)"
-        @row-click="parseList"
         style="width: 100%; cursor: pointer"
       >
         <el-table-column prop="server_filename" label="文件名">
           <template #default="scope">
-            <div style="display: flex; align-items: center">
+            <div @click="parseList(scope.row)" style="display: flex; align-items: center">
               <img
                 style="with: 50px; height: 50px"
                 v-if="scope.row.isdir == '1'"
@@ -46,9 +47,9 @@
             <el-button
                 v-if="!scope.row.isdir"
                 type="primary"
-                :loading="scope.row.loading"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
+                :loading="scope.loading"
             >{{scope.row.status === 0 ? "下载" : "已下载"}}</el-button>
           </template>
         </el-table-column>
@@ -94,11 +95,9 @@ import img from '@/assets/images/文件夹.png';
 import img1 from '@/assets/images/压缩包.png';
 import img2 from '@/assets/images/文本.png';
 import { ElMessage } from 'element-plus';
-import {ref} from "vue";
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
-const loading = ref(true);
 const loadData = reactive({
   bread: ['< 返回'],
   tableData: [],
@@ -117,8 +116,8 @@ const loadData = reactive({
   realLink: '',
   addWeCharVisible: false,
   limitSpeedVisible: false,
-  codeNum:'',
-  // buttonLoading:false,
+  codeNum:"",
+  tableLoading:false,
 });
 
 function getList(){
@@ -131,11 +130,11 @@ function getList(){
     router.push({ path: '/login' });
     return;
   }
-  loading.value = true;
+  loadData.tableLoading = true;
   userStore
       .parseCopyLink(route.query)
       .then((data) => {
-        loading.value = false;
+        loadData.tableLoading = false;
         if (data.code === 200) {
           if (data.data.errno === 0) {
             const list = data.data.data.list;
@@ -153,7 +152,7 @@ function getList(){
 
 
 function parseList(item) {
-  loading.value = true;
+  loadData.tableLoading = true;
   const { isdir, path } = item;
   if ( parseInt(isdir) === 1) {
     const data = {
@@ -166,7 +165,7 @@ function parseList(item) {
     userStore
       .parseCopyLink(data)
       .then((data) => {
-        loading.value = false;
+        loadData.tableLoading = false;
         if (data.code === 200) {
           if (data.data.errno === 0) {
            const list =  data.data.data.list;
@@ -192,7 +191,6 @@ function parseList(item) {
 function downLoad(item){
   item.loading = true;
   item.disable = true;
-
   loadData.parseLinkParams.code = localStorage.getItem('code');
   loadData.parseLinkParams.fs_id = item.fs_id;
   loadData.fileName = item.server_filename;
@@ -250,7 +248,7 @@ function confirm(item) {
               loadData.limitSpeedVisible = true;
               return;
             }
-            loadData.codeNum = data.data.codeUseNum;
+            loadData.codeNum = parseInt(data.data.codeUseNum) - 1 ;
             loadData.realLink = data.data.realLink;
 
             //发送到下载器
@@ -354,9 +352,10 @@ function goToLogin() {
   router.push({ path: '/login' });
 }
 
-getDownNum();
 getList();
-// getSign();
+getSign();
+getDownNum();
+
 
 // const link = "http://xafj-ct11.baidupcs.com/file/91b0f91ebn12c6f18f03e0f262c4b1a6?bkt=en-4d166c0718877615493400034ec3d900af7c125b1524e0685ba0100481ea704be1b95f2977571d5a&fid=2403359472-250528-1038485029030194&time=1711949196&sign=FDTAXUbGERQlBHSKfWqiu-DCb740ccc5511e5e8fedcff06b081203-NsgI7qt9n6ozVKf8EXJVnwqgp2s%3D&to=217&size=49658533&sta_dx=49658533&sta_cs=0&sta_ft=mp4&sta_ct=7&sta_mt=5&fm2=MH%2CXian%2CAnywhere%2C%2C%E6%B2%B3%E5%8D%97%2Cct&ctime=1594690721&mtime=1709278736&resv0=-1&resv1=0&resv2=rlim&resv3=5&resv4=49658533&vuk=1100859470093&iv=2&vl=1&htype=&randtype=&tkbind_id=0&newver=1&newfm=1&secfm=1&flow_ver=3&pkey=en-48163f4e68ab91cb4ef300953ac870d9cf1c8f2888c23f2243d8b5f2bb5ad9f78696dd8f90018cb6&expires=8h&rt=sh&r=704560051&vbdid=-&fin=9-1+%E5%85%A8%E5%B1%80%E6%A8%A1%E5%BC%8F%E6%8D%95%E8%8E%B7%EF%BC%9AString.prototype.matchAll%28%29.mp4&rtype=1&dp-logid=9041067139289593965&dp-callid=0.1&tsl=0&csl=0&fsl=-1&csign=7tnHtSnPlEiYF84GMXmoq%2FjTvEY%3D&so=1&ut=1&uter=0&serv=1&uc=3200815480&ti=5e666840c78f19733612e84fe6f744ba34e84709dcb0ffc4305a5e1275657320&hflag=30&from_type=3&adg=c_45adf9f16f3874cd83629e8e89c4de62&reqlabel=250528_f_15f41cd129b1c162120101f462001069_-1_7e19e999909e44902f90b2b2cd022ba2&fpath=%E5%89%8D%E7%AB%AF%E4%B8%8B%E8%BD%BD%E8%A7%86%E9%A2%91%2Fmksz444+-+%E4%BC%98%E5%BA%93it%E8%B5%84%E6%BA%90%E7%BD%91844+-+%E5%86%8D%E5%AD%A6JavaScript+ES%286-11%29%E5%85%A8%E7%89%88%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%A4%A7%E5%85%A8&by=themis&resvsflag=1-12-0-1-1-1"
 // let options = {
