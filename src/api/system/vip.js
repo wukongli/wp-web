@@ -17,3 +17,13 @@ export function addPost(data) {
     data: data,
   });
 }
+
+
+
+ export function deleteVip (data){
+  return request({
+    url: '/vip',
+    method: 'delete',
+    params: data,
+  });
+}

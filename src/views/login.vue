@@ -183,7 +183,7 @@ async function handleLogin() {
         }
       }
       //过期时间十分钟
-      localStorage.setItem('code', loginForm.value.code, 600000);
+      Cookies.set('code', loginForm.value.code, { expires: 1 });
       router.push({
         name: 'Index',
         path: '/',

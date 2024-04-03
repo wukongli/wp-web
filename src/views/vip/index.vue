@@ -97,7 +97,8 @@
 </template>
 
 <script setup name="Post">
-import { listVip, addPost } from '@/api/system/vip';
+import { listVip, addPost,deleteVip } from '@/api/system/vip';
+import {ElMessage} from "element-plus";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -173,6 +174,16 @@ function submitForm() {
         getList();
       });
     }
+  });
+}
+
+function handleDelete(item){
+  const data = {
+    idList:item.id
+  }
+  deleteVip(data).then((response) => {
+   ElMessage.success("删除成功")
+    getList();
   });
 }
 
