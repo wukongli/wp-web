@@ -1,9 +1,14 @@
 <template>
   <div class="app-container home">
     <header @click="refresh()">
-      <div v-for="(item, index) in loadData.bread" :key="index">
+      <div class="back-icon">
+        <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
+        <span>返回</span>
+      </div>
+      <div class="back-title" v-for="(item, index) in loadData.bread" :key="index">
         <span>{{ item.replace('/', '') }}</span>
       </div>
+
     </header>
 
     <div id="content">
@@ -12,23 +17,26 @@
           element-loading-text="数据正在加载中..."
         :data="loadData.tableData"
         height="calc(100vh - 200px)"
-        style="width: 100%; cursor: pointer"
+        style="width: 100%; cursor: pointer;font-size: 14px;font-weight:600;"
+          class="wp-table"
       >
-        <el-table-column prop="server_filename" label="文件名">
+        <el-table-column min-width="300px" prop="server_filename" label="文件名">
           <template #default="scope">
             <div @click="parseList(scope.row)" style="display: flex; align-items: center">
-              <img
-                style="with: 50px; height: 50px"
-                v-if="scope.row.isdir == '1'"
-                :src="img"
-                alt=""
-              />
-              <img
-                style="with: 50px; height: 50px"
-                v-if="scope.row.isdir == '0'"
-                :src="img1"
-                alt=""
-              />
+<!--              <span>{{getIconClass(scope.row.server_filename)}}</span>-->
+              <MySvg :iconName="getIconClass(scope.row.server_filename)" size="40"></MySvg>
+<!--              <img-->
+<!--                style="width: 50px; height: 50px"-->
+<!--                v-if="scope.row.isdir == '1'"-->
+<!--                :src="img"-->
+<!--                alt=""-->
+<!--              />-->
+<!--              <img-->
+<!--                style="width: 50px; height: 50px"-->
+<!--                v-if="scope.row.isdir == '0'"-->
+<!--                :src="img1"-->
+<!--                alt=""-->
+<!--              />-->
               <span style="margin-left: 10px">{{
                 scope.row.server_filename
               }}</span>
@@ -41,7 +49,7 @@
           label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
-        <el-table-column label="剩余下载次数" >{{loadData.codeNum}} 次</el-table-column>
+        <el-table-column label="剩余下载次数" >{{parseInt(loadData.codeNum) > 5 ? '无限':loadData.codeNum }} 次</el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
@@ -77,7 +85,7 @@
     <!-- 添加微信弹窗 -->
     <el-dialog title="提示" v-model="loadData.addWeCharVisible" width="30%">
       <div class="qr-title">下载次数已用完，请重新获取验证码!</div>
-      <img class="qr-code" :src="qrCode" alt="" />
+      <img class="qr-code" :src="wechar" alt="" />
       <div class="qr-hint">体验无限下载次数，扫一扫开通权限！</div>
       <template #footer>
         <span class="dialog-footer">
@@ -101,16 +109,17 @@
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
-import img1 from '@/assets/images/压缩包.png';
-import img2 from '@/assets/images/文本.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import qrCode from "@/assets/images/qrcode.jpg";
+import wechar from "@/assets/images/wechar.png";
+// import SvgIcon from "@/components/SvgIcon/index.vue";
+import MySvg from "@/components/icon/Svg.vue";
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 const loadData = reactive({
-  bread: ['< 返回'],
+  bread: [],
   tableData: [],
   query: route.query,
   parseLinkParams: {
@@ -144,8 +153,11 @@ function getList(){
     return;
   }
   loadData.tableLoading = true;
+  const userCode = Cookies.get('code');
+  const result = Object.assign({code:userCode},route.query)
+  console.log(result);
   userStore
-      .parseCopyLink(route.query)
+      .parseCopyLink(result)
       .then((data) => {
         loadData.tableLoading = false;
         if (data.code === 200) {
@@ -173,6 +185,7 @@ function parseList(item) {
       root: '0',
       shorturl: loadData.query.shorturl,
       pwd: loadData.query.pwd,
+      code:Cookies.get("code")
     };
     // 获取文件列表
     userStore
@@ -244,7 +257,8 @@ function getDownNum(){
 }
 async function getSign() {
   const param = {
-    shorturl: loadData.query.shorturl,
+    shorturl: route.query.shorturl,
+    code:Cookies.get("code")
   };
   await userStore
     .getSign(param).then((data) => {
@@ -401,20 +415,22 @@ function goToLogin() {
 getSign();
 getList();
 getDownNum();
-
 function testDownLoad(){
   return new Promise(resolve =>{
     let ws = new WebSocket('ws://localhost:16800/jsonrpc');
     ws.onopen = (event) => {
       if(event.type === 'open'){
-        ws.close();
-        resolve(true);
+        console.log(event);
+        // ws.close();
+        // resolve(true);
       }
     };
     ws.onerror = (event) => {
       if(event.type === 'error'){
-        ws.close();
-        resolve(false);
+        console.log(event);
+
+        // ws.close();
+        // resolve(false);
       }
     };
   });
@@ -423,28 +439,36 @@ function testDownLoad(){
 
 }
 
+testDownLoad();
+
 
 function getIconClass(filename) {
   const filetype = {
-    file_video: ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
-    file_audio: ["wma", "wav", "mp3", "aac", "ra", "ram", "mp2", "ogg", "aif", "mpega", "amr", "mid", "midi", "m4a", "flac"],
-    file_image: ["jpg", "jpeg", "gif", "bmp", "png", "jpe", "cur", "svg", "svgz", "ico", "webp", "tif", "tiff"],
-    file_archive: ["rar", "zip", "7z", "iso"],
-    windows: ["exe"],
-    apple: ["ipa"],
-    android: ["apk"],
-    file_alt: ["txt", "rtf"],
-    file_excel: ["xls", "xlsx", "xlsm", "xlsb", "csv", "xltx", "xlt", "xltm", "xlam"],
-    file_word: ["doc", "docx", "docm", "dotx"],
-    file_powerpoint: ["ppt", "pptx", "potx", "pot", "potm", "ppsx", "pps", "ppam", "ppa"],
-    file_pdf: ["pdf"],
+    "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
+    "icon-audio": ["wma", "wav", "mp3", "aac", "ra", "ram", "mp2", "ogg", "aif", "mpega", "amr", "mid", "midi", "m4a", "flac"],
+    "icon-image": ["jpg", "jpeg", "gif", "bmp", "png", "jpe", "cur", "svg", "svgz", "ico", "webp", "tif", "tiff"],
+    "icon-yasuobao": ["rar", "zip", "7z", "iso"],
+    "icon-exe": ["exe"],
+    "icon-pingguo": ["ipa"],
+    "icon-APK": ["apk"],
+    "icon-txt": ["txt", "rtf"],
+    "icon-xls": ["xls", "xlsx", "xlsm", "xlsb", "csv", "xltx", "xlt", "xltm", "xlam"],
+    "icon-docx": ["doc", "docx", "docm", "dotx"],
+    "icon-ppt": ["ppt", "pptx", "potx", "pot", "potm", "ppsx", "pps", "ppam", "ppa"],
+    "icon-pdfwenjian": ["pdf"]
   };
-  let point = filename.lastIndexOf(".");
-  let t = filename.substring(point + 1);
-  if (t === "") return "";
-  t = t.toLowerCase();
-  for (let icon in filetype) for (let type in filetype[icon]) if (t === filetype[icon][type]) return "fa-" + icon.replace('_', '-');
-  return "";
+  let index = filename.lastIndexOf(".");
+  if (index === -1) return "icon-wenjianjia";
+  let name = filename.substring(index + 1);
+  name = name.toLowerCase();
+  for (let icon in filetype){
+    for (let type in filetype[icon]){
+      if (name === filetype[icon][type]){
+        return icon;
+      }
+    }
+  }
+  return "icon-wenjian";
 }
 </script>
 
@@ -462,27 +486,40 @@ function getIconClass(filename) {
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
-    div {
-      margin-left: 10px;
+    .back-icon{
+      width: 80px;
+      height: 40px;
       float: left;
-      div:hover {
-        color: #1e80ff;
+      margin-left: 20px;
+      svg{
+        float: left;
+        margin-top: 10px;
+      }
+      span{
+        float: left;
+        margin-left: 5px;
+        line-height: 50px;
       }
     }
-  }
-  padding-bottom: 2px;
-  header:hover {
-    background-color: #accbb1;
-  }
-  #content {
 
+    .back-title {
+      margin-left: 10px;
+      float: left;
+    }
+  }
+  //header:hover {
+  //  background-color: #1c84c6;
+  //}
+  .wp-table ::v-deep .el-table__body tr:hover > td {
+    //background-color: #c0ffe7 !important;
+    color:#409EFF;
   }
   .qr-title{
     margin-top: 20px;
     text-align: center;
     font-size: 20px;
     font-weight: bold;
-    color: #e94242;
+    color: #923333;
   }
   .qr-code {
     width: 180px;

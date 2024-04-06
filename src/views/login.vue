@@ -93,7 +93,7 @@
       width="30%"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">请扫码关注获取验证码!</div>
+      <div class="qr-hint">{{hint.message}}</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="confirm()" type="primary">确 定</el-button>
@@ -128,6 +128,7 @@ const loginForm = ref({
 const hint = reactive({
   show: false,
   getCodeVisible: false,
+  message:''
 });
 
 const loginRules = {
@@ -161,6 +162,7 @@ function handleBlur() {
 }
 
 async function handleLogin() {
+  hint.message = "";
   proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
@@ -168,6 +170,7 @@ async function handleLogin() {
       console.log(loginForm.value);
       if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
+        hint.message = "请扫码关注获取验证码!"
         return;
       }
       //获取下载次数
@@ -178,7 +181,8 @@ async function handleLogin() {
       if (result.code === 200) {
         if (result.data === "验证码不正确") {
           loading.value = false;
-          ElMessage.error("验证码不正确请重新输入");
+          hint.getCodeVisible = true;
+          hint.message = "您输入的验证码不正确，请检查后重新输入！"
           return;
         }
       }
@@ -192,7 +196,6 @@ async function handleLogin() {
           pwd: loginForm.value.pwd,
           dir: loginForm.value.dir,
           root: loginForm.value.root,
-          codeNum: result.data,
         },
       });
       // 调用action的登录方法
@@ -232,7 +235,7 @@ function SubmitLink(url) {
     pw = pwd[3];
   }
   if (pw.length !== 0 && pw.length !== 4) {
-    ElMessage.error('提取码错误，请检查');
+    ElMessage.error('验证码错误，请检查！');
     return false;
   }
   return {
@@ -249,10 +252,6 @@ function confirm() {
 function handleClose() {
   hint.getCodeVisible = false;
   loading.value = false;
-}
-
-function getDownNum(code){
-
 }
 
 getVipNums();

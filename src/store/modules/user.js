@@ -39,14 +39,9 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-    parseCopyLink(parseCopyLink) {
-      const shorturl = parseCopyLink.shorturl;
-      const pwd = parseCopyLink.pwd;
-      const dir = parseCopyLink.dir;
-      const root = parseCopyLink.root;
-      const data = { shorturl, pwd, dir, root };
+    parseCopyLink(params) {
       return new Promise((resolve, reject) => {
-        parse(data)
+        parse(params)
           .then((res) => {
             resolve(res);
           })
