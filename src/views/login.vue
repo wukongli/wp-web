@@ -55,7 +55,8 @@
           /></template>
         </el-input>
         <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img" />
+          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
+<!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
       </el-form-item>
       <!-- <el-checkbox -->
@@ -182,7 +183,7 @@ async function handleLogin() {
         if (result.data === "验证码不正确") {
           loading.value = false;
           hint.getCodeVisible = true;
-          hint.message = "您输入的验证码不正确，请检查后重新输入！"
+          hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"
           return;
         }
       }
@@ -323,11 +324,21 @@ getVipNums();
 .login-code {
   width: 33%;
   height: 40px;
+  line-height: 40px;
   float: right;
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-  }
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+  text-decoration: none; /* 默认情况下不显示下划线 */
+  transition: text-decoration 0.3s; /* 添加过渡效果使下划线出现更平滑 */
+  //img {
+  //  cursor: pointer;
+  //  vertical-align: middle;
+  //}
+}
+.login-code:hover{
+  text-decoration: underline; /* 鼠标滑过时显示下划线 */
 }
 .el-login-footer {
   height: 40px;

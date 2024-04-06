@@ -420,17 +420,16 @@ function testDownLoad(){
     let ws = new WebSocket('ws://localhost:16800/jsonrpc');
     ws.onopen = (event) => {
       if(event.type === 'open'){
-        console.log(event);
-        // ws.close();
-        // resolve(true);
+        // console.log(event);
+        ws.close();
+        resolve(true);
       }
     };
     ws.onerror = (event) => {
       if(event.type === 'error'){
-        console.log(event);
-
-        // ws.close();
-        // resolve(false);
+        // console.log(event);
+        ws.close();
+        resolve(false);
       }
     };
   });
@@ -438,9 +437,6 @@ function testDownLoad(){
 
 
 }
-
-testDownLoad();
-
 
 function getIconClass(filename) {
   const filetype = {
