@@ -27,15 +27,9 @@ import Layout from '@/layout';
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect/index.vue'),
-      },
-    ],
+    path: '/',
+    redirect: '/login',
+    component: () => import('@/views/login.vue'),
   },
   {
     path: '/login',
@@ -63,9 +57,9 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    path: '',
+    path: '/index',
     component: Layout,
-    redirect: '/index',
+    redirect: 'noredirect',
     children: [
       {
         path: '/index',

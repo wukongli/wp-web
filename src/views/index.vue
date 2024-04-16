@@ -20,23 +20,10 @@
         style="width: 100%; cursor: pointer;font-size: 14px;font-weight:600;"
           class="wp-table"
       >
-        <el-table-column min-width="300px" prop="server_filename" label="文件名">
+        <el-table-column min-width="280px" prop="server_filename" label="文件名">
           <template #default="scope">
             <div @click="parseList(scope.row)" style="display: flex; align-items: center">
-<!--              <span>{{getIconClass(scope.row.server_filename)}}</span>-->
-              <MySvg :iconName="getIconClass(scope.row.server_filename)" size="40"></MySvg>
-<!--              <img-->
-<!--                style="width: 50px; height: 50px"-->
-<!--                v-if="scope.row.isdir == '1'"-->
-<!--                :src="img"-->
-<!--                alt=""-->
-<!--              />-->
-<!--              <img-->
-<!--                style="width: 50px; height: 50px"-->
-<!--                v-if="scope.row.isdir == '0'"-->
-<!--                :src="img1"-->
-<!--                alt=""-->
-<!--              />-->
+              <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
               <span style="margin-left: 10px">{{
                 scope.row.server_filename
               }}</span>
@@ -53,7 +40,7 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
-                v-if="!scope.row.isdir"
+                v-if="!parseInt(scope.row.isdir)"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
@@ -70,8 +57,7 @@
     </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
-      <div class="down-title">如果您还未安装下载器，请先安装并打开！</div>
-      <div class="down-title">如果您已安装下载器，请打开下载器！</div>
+      <div class="down-title">下载前，请安装下载器并运行！！</div>
       <div class=" down-address" ><span>下载地址：</span >
         <a href="https://wwf.lanzouq.com/b05f548wf密码:hb1i" target="_blank">
           https://wwf.lanzouq.com/b05f548wf
@@ -95,10 +81,22 @@
     </el-dialog>
     <!-- 限速提示弹窗 -->
     <el-dialog title="提示" v-model="loadData.limitSpeedVisible" width="40%">
-      <span>下载解析限速中，管理员正在修复，请稍后再试</span>
+      <img class="qr-code" :src="wechar" alt="" />
+      <div class="qr-hint">下载解析限速中，管理员正在修复，请稍后再试</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="goToLogin()">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 解析出错弹窗 -->
+    <el-dialog title="提示" v-model="loadData.errorDia" width="40%">
+      <img class="qr-code" :src="wechar" alt="" />
+      <div class="qr-hint">解析出错了，请联系管理员</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="loadData.errorDia = false">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -115,6 +113,7 @@ import qrCode from "@/assets/images/qrcode.jpg";
 import wechar from "@/assets/images/wechar.png";
 // import SvgIcon from "@/components/SvgIcon/index.vue";
 import MySvg from "@/components/icon/Svg.vue";
+import {onMounted} from 'vue';
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
@@ -136,22 +135,14 @@ const loadData = reactive({
   realLink: '',
   addWeCharVisible: false,
   limitSpeedVisible: false,
+  errorDia: false,
   codeNum:"",
   tableLoading:false,
-  canDownLoad:false,
-  buttonType:'下 载'
+  fileSize: 2147483648
 });
 
 function getList(){
-  if (
-      !loadData.query.shorturl ||
-      !loadData.query.pwd ||
-      !loadData.query.dir ||
-      !loadData.query.root
-  ) {
-    router.push({ path: '/login' });
-    return;
-  }
+
   loadData.tableLoading = true;
   const userCode = Cookies.get('code');
   const result = Object.assign({code:userCode},route.query)
@@ -165,6 +156,15 @@ function getList(){
             const list = data.data.data.list;
             const title = data.data.data.title;
             loadData.bread.push(title);
+            list.forEach(e=>{
+              e.status = 0;
+              if (parseInt(e.size) > loadData.fileSize){
+                e.disable = true;
+              }
+              // if (parseInt(e.size) > 1024){
+              //   e.disable = true;
+              // }
+            })
             loadData.tableData = list;
             loadData.parseLinkParams.randsk = data.data.data.seckey;
             loadData.parseLinkParams.shareid = data.data.data.shareid;
@@ -193,30 +193,29 @@ function parseList(item) {
       .then((data) => {
         loadData.tableLoading = false;
         if (data.code === 200) {
-          if (data.data.errno === 0) {
+          if ( parseInt(data.data.errno) === 0) {
            const list =  data.data.data.list;
             list.forEach((item)=>{
               // 0 下载，1，下载中
               item.status = 0;
+              if (parseInt(item.size) > loadData.fileSize){
+                item.disable = true;
+              }
             })
             loadData.tableData = list;
             loadData.parseLinkParams.randsk = data.data.data.seckey;
             loadData.parseLinkParams.shareid = data.data.data.shareid;
             loadData.parseLinkParams.uk = data.data.data.uk;
-            console.log(loadData);
           } else {
             loadData.limitSpeedVisible = true;
             return;
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        loadData.errorDia = true;
+      });
   }
-}
-
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function downLoad(item){
@@ -243,13 +242,9 @@ async function downLoad(item){
   confirm(item);
 }
 function getDownNum(){
-  const code = Cookies.get('code');
-  if (code == null || code === '') {
-    router.push({ path: '/login' });
-    return;
-  }
+
   //获取下载次数
-  userStore.getCodeNum({code:code}).then((res) => {
+  userStore.getCodeNum({code:Cookies.get('code')}).then((res) => {
     if (res.code === 200) {
       loadData.codeNum = res.data;
     }
@@ -261,7 +256,7 @@ async function getSign() {
     code:Cookies.get("code")
   };
   await userStore
-    .getSign(param).then((data) => {
+    .getSignData(param).then((data) => {
         if (data.code === 200) {
           if (parseInt(data.data.errno) === 0) {
             loadData.parseLinkParams.timestamp = data.data.data.timestamp;
@@ -376,6 +371,7 @@ async function confirm(item) {
         item.status = 0;
         item.disable = false;
         item.loading = false;
+        loadData.errorDia = true;
       });
 }
 function refresh() {
@@ -390,9 +386,14 @@ function getFilesize(row, column, size) {
   if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K'; //kb
   if (size < Math.pow(num, 3))
     return (size / Math.pow(num, 2)).toFixed(2) + 'M'; //M
-  if (size < Math.pow(num, 4))
-    return (size / Math.pow(num, 3)).toFixed(2) + 'G'; //G
-  return (size / Math.pow(num, 4)).toFixed(2) + 'T'; //T
+  if (size < Math.pow(num, 4)){
+    let fileSize = (size / Math.pow(num, 3)).toFixed(2);
+    if(fileSize > 2){
+      return fileSize + 'G' + ` ( 文件大于2G无法下载 )`; //G
+    }
+    return fileSize + 'G'; //G
+  }
+  return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于2G无法下载)`; //T
 }
 function timestampToTime(row, column, timestamp) {
   // 时间戳为10位需*1000，时间戳为13位不需乘1000
@@ -412,9 +413,28 @@ function timestampToTime(row, column, timestamp) {
 function goToLogin() {
   router.push({ path: '/login' });
 }
-getSign();
-getList();
-getDownNum();
+
+onMounted(() => {
+  if (
+      !loadData.query.shorturl ||
+      !loadData.query.pwd ||
+      !loadData.query.dir ||
+      !loadData.query.root
+  ) {
+    router.push({ path: '/login' });
+    return;
+  }
+  const code = Cookies.get('code');
+  if (code == null || code === '') {
+    router.push({ path: '/login' });
+    return;
+  }
+  getSign();
+  getList();
+  getDownNum();
+});
+
+
 function testDownLoad(){
   return new Promise(resolve =>{
     let ws = new WebSocket('ws://localhost:16800/jsonrpc');
@@ -438,7 +458,11 @@ function testDownLoad(){
 
 }
 
-function getIconClass(filename) {
+function getIconClass(row) {
+  const {server_filename ,isdir} = row;
+  if(parseInt(isdir) === 1){
+    return "icon-wenjianjia";
+  }
   const filetype = {
     "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
     "icon-audio": ["wma", "wav", "mp3", "aac", "ra", "ram", "mp2", "ogg", "aif", "mpega", "amr", "mid", "midi", "m4a", "flac"],
@@ -453,9 +477,9 @@ function getIconClass(filename) {
     "icon-ppt": ["ppt", "pptx", "potx", "pot", "potm", "ppsx", "pps", "ppam", "ppa"],
     "icon-pdfwenjian": ["pdf"]
   };
-  let index = filename.lastIndexOf(".");
+  let index = server_filename.lastIndexOf(".");
   if (index === -1) return "icon-wenjianjia";
-  let name = filename.substring(index + 1);
+  let name = server_filename.substring(index + 1);
   name = name.toLowerCase();
   for (let icon in filetype){
     for (let type in filetype[icon]){
@@ -503,9 +527,9 @@ function getIconClass(filename) {
       float: left;
     }
   }
-  //header:hover {
-  //  background-color: #1c84c6;
-  //}
+  header:hover {
+    color:#409EFF;
+  }
   .wp-table ::v-deep .el-table__body tr:hover > td {
     //background-color: #c0ffe7 !important;
     color:#409EFF;
@@ -526,7 +550,6 @@ function getIconClass(filename) {
   .qr-hint {
     margin-top: 10px;
     text-align: center;
-    font-size: 20px;
     font-size: 20px;
     font-weight: bold;
     color: #e94242;

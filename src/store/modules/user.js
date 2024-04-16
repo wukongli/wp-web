@@ -61,7 +61,7 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-    getSign(params) {
+    getSignData(params) {
       return new Promise((resolve, reject) => {
         getSignReq(params)
           .then((res) => {
