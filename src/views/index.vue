@@ -100,6 +100,17 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 到达每天下载次数弹窗 -->
+    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
+<!--      <img class="qr-code" :src="wechar" alt="" />-->
+      <div class="qr-hint">今天下载次数已达30次，请明天再来下载!</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="loadData.maxNum = false">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
     <div class="we-chart">
       <img :src="wechar" alt="">
       <p class="con">资源交流群</p>
@@ -112,9 +123,10 @@ import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
-import Cookies from 'js-cookie';
 import wechar from "@/assets/images/wechar.png";
 import MySvg from "@/components/icon/Svg.vue";
+import moment from 'moment';
+import Cookies from 'js-cookie';
 import {onMounted} from 'vue';
 const userStore = useUserStore();
 const route = useRoute();
@@ -138,6 +150,7 @@ const loadData = reactive({
   addWeCharVisible: false,
   limitSpeedVisible: false,
   errorDia: false,
+  maxNum: false,
   codeNum:"",
   tableLoading:false,
   fileSize: 2147483648,
@@ -210,6 +223,12 @@ async function downLoad(item){
     loadData.dialogVisible = true;
     return;
   }
+  const now = moment().format('YYYY-MM-DD');
+  const downLoadNum = Cookies.get(now);
+  if(parseInt(downLoadNum) >= 30){
+    loadData.maxNum = true;
+    return;
+  }
   item.loading = true;
   item.status = 1;
   item.disable = true;
@@ -263,6 +282,8 @@ async function confirm(item) {
       .then((data) => {
         if (data.code === 200) {
           if (data.data.errno === '0') {
+            const now = moment().format('YYYY-MM-DD');
+            Cookies.set(now,parseInt(Cookies.get(now)) + 1);
             if (data.data.codeUseNum === '0') {
               //下载次数为0，弹窗，请重新获取验证码
               //删除验证码
@@ -315,10 +336,10 @@ async function confirm(item) {
 
               switch (received_msg.method) {
                 case 'aria2.onDownloadStart':
-                  ElMessage({
-                    message: `${item.server_filename}开始下载！`,
-                    type: 'success',
-                  })
+                  // ElMessage({
+                  //   message: `${item.server_filename}开始下载！`,
+                  //   type: 'success',
+                  // })
                   item.status = 1;
                   break;
 
@@ -426,6 +447,13 @@ onMounted(() => {
   getSign();
   getList();
   getDownNum();
+
+  const now = moment().format('YYYY-MM-DD');
+  const downLoadNum = Cookies.get(now);
+  if(downLoadNum == null){
+    Cookies.set(now,0,{ expires: 1 })
+  }
+
 });
 
 

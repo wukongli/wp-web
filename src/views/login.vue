@@ -41,24 +41,24 @@
           /></template>
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          v-model="loginForm.code"
-          size="large"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter="handleLogin"
-        >
-          <template #prefix
-            ><svg-icon icon-class="validCode" class="el-input__icon input-icon"
-          /></template>
-        </el-input>
-        <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
-<!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
-        </div>
-      </el-form-item>
+<!--      <el-form-item prop="code" v-if="captchaEnabled">-->
+<!--        <el-input-->
+<!--          v-model="loginForm.code"-->
+<!--          size="large"-->
+<!--          auto-complete="off"-->
+<!--          placeholder="验证码"-->
+<!--          style="width: 63%"-->
+<!--          @keyup.enter="handleLogin"-->
+<!--        >-->
+<!--          <template #prefix-->
+<!--            ><svg-icon icon-class="validCode" class="el-input__icon input-icon"-->
+<!--          /></template>-->
+<!--        </el-input>-->
+<!--        <div class="login-code">-->
+<!--          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>-->
+<!--&lt;!&ndash;          <img :src="codeUrl" @click="getCode" class="login-code-img" />&ndash;&gt;-->
+<!--        </div>-->
+<!--      </el-form-item>-->
       <!-- <el-checkbox -->
       <!-- v-model="loginForm.rememberMe"
         style="margin: 0px 0px 25px 0px"
@@ -119,7 +119,7 @@ const loginForm = ref({
   username: '',
   password: '',
   rememberMe: false,
-  code: '',
+  code: '745216',
   uuid: '',
   shorturl: '',
   pwd: '',
