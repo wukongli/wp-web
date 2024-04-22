@@ -134,7 +134,7 @@ function handleLogin() {
       userStore
         .adminLogin(loginForm.value)
         .then(() => {
-          router.push({ path: redirect.value || '/' });
+          router.push({ path: '/system/user' });
         })
         .catch(() => {
           loading.value = false;

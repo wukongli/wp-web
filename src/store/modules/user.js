@@ -1,4 +1,14 @@
-import { login, adminLogin, logout, getInfo } from '@/api/login';
+import {
+  login,
+  adminLogin,
+  logout,
+  getInfo,
+  parseCopyLink as parse,
+  parseLinkReq,
+  getSignReq,
+  getVip,
+  getCode
+} from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.jpg';
 
@@ -23,6 +33,39 @@ const useUserStore = defineStore('user', {
             setToken(res.token);
             this.token = res.token;
             resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    parseCopyLink(params) {
+      return new Promise((resolve, reject) => {
+        parse(params)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    parseLink(parseLink) {
+      return new Promise((resolve, reject) => {
+        parseLinkReq(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    getSignData(params) {
+      return new Promise((resolve, reject) => {
+        getSignReq(params)
+          .then((res) => {
+            resolve(res);
           })
           .catch((error) => {
             reject(error);
@@ -90,6 +133,28 @@ const useUserStore = defineStore('user', {
           });
       });
     },
+    getVipNum() {
+      return new Promise((resolve, reject) => {
+        getVip()
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    getCodeNum(data){
+      return new Promise((resolve, reject) => {
+        getCode(data)
+            .then((res) => {
+              resolve(res);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+      });
+    }
   },
 });
 

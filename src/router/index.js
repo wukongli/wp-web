@@ -1,4 +1,4 @@
-import { createWebHashHistory, createRouter } from 'vue-router';
+import { createWebHistory,createRouter } from 'vue-router';
 /* Layout */
 import Layout from '@/layout';
 
@@ -27,15 +27,9 @@ import Layout from '@/layout';
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect/index.vue'),
-      },
-    ],
+    path: '/',
+    redirect: '/login',
+    component: () => import('@/views/login.vue'),
   },
   {
     path: '/login',
@@ -63,15 +57,15 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    path: '',
+    path: '/index',
     component: Layout,
-    redirect: '/index',
+    redirect: 'noredirect',
     children: [
       {
         path: '/index',
         component: () => import('@/views/index'),
         name: 'Index',
-        meta: { title: '首页', icon: 'dashboard', affix: true },
+        meta: { title: '列表', icon: 'dashboard', affix: true },
       },
     ],
   },
@@ -166,7 +160,7 @@ export const dynamicRoutes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: constantRoutes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

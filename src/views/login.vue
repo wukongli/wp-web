@@ -6,14 +6,21 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">网盘高速下载</h3>
+      <h3 class="title">网盘高速下载在线解析</h3>
+      <div v-if="hint.show" class="hint-box">
+        <el-tag class="hint" type="danger" effect="dark" round>
+          下载解析限速中管理员正在修复请稍后再试...
+        </el-tag>
+      </div>
+
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
           type="text"
           size="large"
           auto-complete="off"
-          placeholder="请输入激活码"
+          @blur="handleBlur"
+          placeholder="请输入分享链接(可输入带提取码链接)"
         >
           <template #prefix
             ><svg-icon icon-class="user" class="el-input__icon input-icon"
@@ -23,10 +30,10 @@
       <el-form-item prop="password">
         <el-input
           v-model="loginForm.password"
-          type="password"
+          type="text"
           size="large"
           auto-complete="off"
-          placeholder="密码"
+          placeholder="提取码"
           @keyup.enter="handleLogin"
         >
           <template #prefix
@@ -48,14 +55,15 @@
           /></template>
         </el-input>
         <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img" />
+          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
+<!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
       </el-form-item>
-      <el-checkbox
-        v-model="loginForm.rememberMe"
+      <!-- <el-checkbox -->
+      <!-- v-model="loginForm.rememberMe"
         style="margin: 0px 0px 25px 0px"
         >记住密码</el-checkbox
-      >
+      > -->
       <el-form-item style="width: 100%">
         <el-button
           :loading="loading"
@@ -64,8 +72,8 @@
           style="width: 100%"
           @click.prevent="handleLogin"
         >
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
+          <span v-if="!loading">提 取</span>
+          <span v-else>提 取 中...</span>
         </el-button>
         <div style="float: right" v-if="register">
           <router-link class="link-type" :to="'/register'"
@@ -78,6 +86,21 @@
     <div class="el-login-footer">
       <span>Copyright 2024 All Rights Reserved.</span>
     </div>
+    <!-- 获取验证码弹窗 -->
+    <el-dialog
+      @close="handleClose()"
+      title="提示"
+      v-model="hint.getCodeVisible"
+      width="30%"
+    >
+      <img class="qr-code" :src="qrCode" alt="" />
+      <div class="qr-hint">{{hint.message}}</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="confirm()" type="primary">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -85,11 +108,12 @@
 import { getCodeImg, querySecretKey } from '@/api/login';
 import Cookies from 'js-cookie';
 import { encrypt, decrypt } from '@/utils/jsencrypt';
-import useUserStore from '@/store/modules/user';
-
-const userStore = useUserStore();
+import { ElMessage } from 'element-plus';
 const router = useRouter();
 const { proxy } = getCurrentInstance();
+import useUserStore from '@/store/modules/user';
+const userStore = useUserStore();
+import qrCode from '@/assets/images/qrcode.jpg';
 
 const loginForm = ref({
   username: '',
@@ -97,12 +121,21 @@ const loginForm = ref({
   rememberMe: false,
   code: '',
   uuid: '',
+  shorturl: '',
+  pwd: '',
+  dir: '1',
+  root: '1',
+});
+const hint = reactive({
+  show: false,
+  getCodeVisible: false,
+  message:''
 });
 
 const loginRules = {
-  username: [{ required: true, trigger: 'blur', message: '请输入激活码' }],
-  password: [{ required: true, trigger: 'blur', message: '请输入您的密码' }],
-  code: [{ required: true, trigger: 'change', message: '请输入验证码' }],
+  username: [{ required: true, trigger: 'blur', message: '请输入分享链接' }],
+  // password: [{ required: true, trigger: 'blur', message: '请输入您的密码' }],
+  // code: [{ required: true, trigger: 'change', message: '请输入验证码' }],
 };
 
 const codeUrl = ref('');
@@ -113,60 +146,113 @@ const captchaEnabled = ref(true);
 const register = ref(false);
 const redirect = ref(undefined);
 
-function handleLogin() {
-  proxy.$refs.loginRef.validate((valid) => {
+function getVipNums(){
+  userStore.getVipNum().then((data) => {
+    if (data.code === 200) {
+      if (data.data === 0) {
+        hint.show = true;
+      }
+    }
+  });
+}
+function handleBlur() {
+  const { url, pwd } = SubmitLink(loginForm.value.username);
+  loginForm.value.shorturl = url;
+  loginForm.value.pwd = pwd;
+  loginForm.value.password = pwd;
+}
+
+async function handleLogin() {
+  hint.message = "";
+  proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
-      //勾选了需要记住密码设置在 cookie 中设置记住用户名和密码
-      if (loginForm.value.rememberMe) {
-        Cookies.set('username', loginForm.value.username, { expires: 30 });
-        Cookies.set('password', loginForm.value.password, {
-          expires: 30,
-        });
-        Cookies.set('rememberMe', loginForm.value.rememberMe, { expires: 30 });
-      } else {
-        // 否则移除
-        Cookies.remove('username');
-        Cookies.remove('password');
-        Cookies.remove('rememberMe');
+      if (loginForm.value.code === '' || loginForm.value.code == null) {
+        hint.getCodeVisible = true;
+        hint.message = "请扫码关注获取验证码!"
+        return;
       }
-      // 调用action的登录方法
-      loginForm.value.password = 123456;
-      userStore
-        .login(loginForm.value)
-        .then(() => {
-          router.push({ path: redirect.value || '/' });
-        })
-        .catch(() => {
+      //获取下载次数
+      const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
+        return res;
+      })
+      if (result.code === 200) {
+        if (result.data === "验证码不正确") {
           loading.value = false;
-          //重新获取验证码;
-          if (captchaEnabled.value) {
-            getCode();
-          }
-        });
+          hint.getCodeVisible = true;
+          hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"
+          return;
+        }
+      }
+      //过期时间十分钟
+      Cookies.set('code', loginForm.value.code, { expires: 1 });
+      router.push({
+        name: 'Index',
+        path: '/',
+        query: {
+          shorturl: loginForm.value.shorturl,
+          pwd: loginForm.value.pwd,
+          dir: loginForm.value.dir,
+          root: loginForm.value.root,
+        },
+      });
+      // 调用action的登录方法
     }
   });
 }
 
-function getCode() {
-  getCodeImg().then((res) => {
-    captchaEnabled.value =
-      res.captchaEnabled === undefined ? true : res.captchaEnabled;
-    if (captchaEnabled.value) {
-      codeUrl.value = 'data:image/gif;base64,' + res.img;
-      loginForm.value.uuid = res.uuid;
+function SubmitLink(url) {
+  let surl = null;
+  let uk = url.match(/uk=(\d+)/),
+    shareid = url.match(/shareid=(\d+)/);
+  if (uk != null && shareid != null) {
+    let tmp = uk[1] + '&' + shareid[1];
+    surl = '2' + window.btoa(tmp); // base64 encode
+  } else {
+    surl = url.match(/surl=([A-Za-z0-9-_]+)/);
+    if (surl == null) {
+      surl = url.match(/1[A-Za-z0-9-_]+/);
+      if (surl != null) {
+        surl = surl[0];
+      }
+    } else {
+      surl = '1' + surl[1];
     }
-  });
+
+    if (surl == null || surl === '') {
+      ElMessage.error('百度网盘分享链接有错误，请检查输入的链接 ！');
+      return false;
+    }
+  }
+
+  let pwd = url.match(
+    /(提取码|pwd=|pwd:|密码|%E6%8F%90%E5%8F%96%E7%A0%81|%E5%AF%86%E7%A0%81)( |:|：|%EF%BC%9A|%20)*([a-zA-Z0-9]{4})/i
+  );
+  let pw;
+  if (pwd != null && pwd.length === 4) {
+    pw = pwd[3];
+  }
+  if (pw.length !== 0 && pw.length !== 4) {
+    ElMessage.error('验证码错误，请检查！');
+    return false;
+  }
+  return {
+    url: surl,
+    pwd: pw,
+  };
 }
 
-// function getSecretKey() {
-//     Cookies.set('publicKey', 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALBG1hY69Hu9s1pnDOBr+6ASbfaUPxV2PX6Xgnd/4Juud+f90qOQ4/ywBqJKYcZSaLx+3woVY75ynFFv1sfAzo8CAwEAAQ==');
-//     Cookies.set('privateKey', 'MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAsEbWFjr0e72zWmcM%0A4Gv7oBJt9pQ/FXY9fpeCd3/gm6535/3So5Dj/LAGokphxlJovH7fChVjvnKcUW/W%0Ax8DOjwIDAQABAkBX+yMDeW1pDWelKWXt5Tdzz37+4UMTLS7ILkq55iNuz7Nfh+7D%0A7EPREPIPgWUTuBDUZLXTWh3Jbg7oAvpOQAkhAiEA3YM42G1JbivBREPKp7jJvvw9%0Ax5bJhNQ/fYXbE2vzrEkCIQDLuKhgqP1gxLu0+4f4n6iXHuTlPGsezA3FMtfJF/G0%0AFwIgVECX+4G930CXNv7N8vNPEOxiFyscJQCR0Y17ISz7NrkCIQCoNO/R37ZWEBps%0AdMLwJeOt43RbUmegJhu4lyJUh9CqQQIgcjxOCXVj7EkTw7RmjKuyDZrYP2f307Fk%0ACb3NkEwaljk=');
-// }
-//
-// getSecretKey();
+function confirm() {
+  hint.getCodeVisible = false;
+  loading.value = false;
+}
 
-getCode();
+function handleClose() {
+  hint.getCodeVisible = false;
+  loading.value = false;
+}
+
+getVipNums();
 </script>
 
 <style lang="scss" scoped>
@@ -177,18 +263,44 @@ getCode();
   height: 100%;
   background-image: url('../assets/images/bac.jpg');
   background-size: cover;
+  .qr-code {
+    width: 180px;
+    height: 180px;
+    margin: auto;
+    display: block;
+  }
+  .qr-hint {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #e94242;
+  }
 }
 .title {
   margin: 0px auto 30px auto;
   text-align: center;
   color: #707070;
 }
+.hint-box {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  height: 50px; /* 父元素高度 */
+  margin-bottom: 30px;
+
+  .hint {
+    // display: block;
+    // margin: 0px auto 30px auto;
+    margin: auto;
+  }
+}
 
 .login-form {
   border-radius: 6px;
   background: #ffffff;
-  width: 400px;
-  padding: 25px 25px 5px 25px;
+  width: 500px;
+  padding: 30px 25px 20px 25px;
   .el-input {
     height: 40px;
     input {
@@ -209,11 +321,21 @@ getCode();
 .login-code {
   width: 33%;
   height: 40px;
+  line-height: 40px;
   float: right;
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-  }
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+  text-decoration: none; /* 默认情况下不显示下划线 */
+  transition: text-decoration 0.3s; /* 添加过渡效果使下划线出现更平滑 */
+  //img {
+  //  cursor: pointer;
+  //  vertical-align: middle;
+  //}
+}
+.login-code:hover{
+  text-decoration: underline; /* 鼠标滑过时显示下划线 */
 }
 .el-login-footer {
   height: 40px;
