@@ -167,8 +167,6 @@ async function handleLogin() {
   proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
-      console.log("登录获取的参数数据========");
-      console.log(loginForm.value);
       if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
         hint.message = "请扫码关注获取验证码!"
@@ -178,7 +176,6 @@ async function handleLogin() {
       const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
         return res;
       })
-      console.log(result);
       if (result.code === 200) {
         if (result.data === "验证码不正确") {
           loading.value = false;

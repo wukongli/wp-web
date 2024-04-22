@@ -1,14 +1,14 @@
 <template>
   <div class="app-container home">
-    <header @click="refresh()">
+    <header>
       <div class="back-icon">
+        <span @click="goIndex()">首页 /</span>
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
-        <span>返回</span>
+        <span style="margin-left: 15px;" @click="goBack()">返回上一级</span>
       </div>
-      <div class="back-title" v-for="(item, index) in loadData.bread" :key="index">
-        <span>{{ item.replace('/', '') }}</span>
+      <div class="back-title">
+        <span>{{loadData.bread}}</span>
       </div>
-
     </header>
 
     <div id="content">
@@ -100,6 +100,10 @@
         </span>
       </template>
     </el-dialog>
+    <div class="we-chart">
+      <img :src="wechar" alt="">
+      <p class="con">资源交流群</p>
+    </div>
   </div>
 </template>
 
@@ -109,16 +113,14 @@ import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
-import qrCode from "@/assets/images/qrcode.jpg";
 import wechar from "@/assets/images/wechar.png";
-// import SvgIcon from "@/components/SvgIcon/index.vue";
 import MySvg from "@/components/icon/Svg.vue";
 import {onMounted} from 'vue';
 const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 const loadData = reactive({
-  bread: [],
+  bread: '',
   tableData: [],
   query: route.query,
   parseLinkParams: {
@@ -131,48 +133,23 @@ const loadData = reactive({
     code: '',
   },
   dialogVisible: false,
-  fileName: '',
+  // fileName: '',
   realLink: '',
   addWeCharVisible: false,
   limitSpeedVisible: false,
   errorDia: false,
   codeNum:"",
   tableLoading:false,
-  fileSize: 2147483648
+  fileSize: 2147483648,
+  routeData:[],
 });
 
 function getList(){
 
   loadData.tableLoading = true;
   const userCode = Cookies.get('code');
-  const result = Object.assign({code:userCode},route.query)
-  console.log(result);
-  userStore
-      .parseCopyLink(result)
-      .then((data) => {
-        loadData.tableLoading = false;
-        if (data.code === 200) {
-          if (data.data.errno === 0) {
-            const list = data.data.data.list;
-            const title = data.data.data.title;
-            loadData.bread.push(title);
-            list.forEach(e=>{
-              e.status = 0;
-              if (parseInt(e.size) > loadData.fileSize){
-                e.disable = true;
-              }
-              // if (parseInt(e.size) > 1024){
-              //   e.disable = true;
-              // }
-            })
-            loadData.tableData = list;
-            loadData.parseLinkParams.randsk = data.data.data.seckey;
-            loadData.parseLinkParams.shareid = data.data.data.shareid;
-            loadData.parseLinkParams.uk = data.data.data.uk;
-          }
-        }
-      })
-      .catch(() => {});
+  const data = Object.assign({code:userCode},route.query)
+  parseCopyLink(data);
 }
 
 
@@ -182,19 +159,27 @@ function parseList(item) {
     loadData.tableLoading = true;
     const data = {
       dir: path,
-      root: '0',
+      root: '0',// 1 文件夹，0 文件
       shorturl: loadData.query.shorturl,
       pwd: loadData.query.pwd,
       code:Cookies.get("code")
     };
-    // 获取文件列表
-    userStore
-      .parseCopyLink(data)
+    parseCopyLink(data);
+  }
+}
+
+function parseCopyLink(params){
+  loadData.routeData.push(params);
+  // 获取文件列表
+  userStore
+      .parseCopyLink(params)
       .then((data) => {
         loadData.tableLoading = false;
         if (data.code === 200) {
           if ( parseInt(data.data.errno) === 0) {
-           const list =  data.data.data.list;
+            const list =  data.data.data.list;
+            const title = data.data.data.title;
+            loadData.bread = title;
             list.forEach((item)=>{
               // 0 下载，1，下载中
               item.status = 0;
@@ -215,7 +200,6 @@ function parseList(item) {
       .catch(() => {
         loadData.errorDia = true;
       });
-  }
 }
 
 async function downLoad(item){
@@ -236,8 +220,7 @@ async function downLoad(item){
   }
   loadData.parseLinkParams.code = code;
   loadData.parseLinkParams.fs_id = item.fs_id;
-  loadData.fileName = item.server_filename;
-
+  // loadData.fileName = item.server_filename;
   //真正开始下载
   confirm(item);
 }
@@ -261,7 +244,6 @@ async function getSign() {
           if (parseInt(data.data.errno) === 0) {
             loadData.parseLinkParams.timestamp = data.data.data.timestamp;
             loadData.parseLinkParams.sign = data.data.data.sign;
-            console.log(data);
           }
         }
       })
@@ -295,12 +277,11 @@ async function confirm(item) {
             }
             loadData.codeNum = parseInt(data.data.codeUseNum) - 1 ;
             loadData.realLink = data.data.realLink;
-
             //发送到下载器
             let options = {
               'max-connection-per-server': '16',
               'user-agent': 'LogStatistic',
-              'opt':loadData.filename
+              'opt': item.server_filename.trim()
             };
 
             let json = {
@@ -322,7 +303,6 @@ async function confirm(item) {
             };
 
             ws.onmessage = (event) => {
-              console.log(event);
               let received_msg = JSON.parse(event.data);
               if (received_msg.error !== undefined) {
                 if (received_msg.error.code === 1) {
@@ -337,7 +317,7 @@ async function confirm(item) {
                 case 'aria2.onDownloadStart':
                   ElMessage({
                     message: `${item.server_filename}开始下载！`,
-                    type: 'warning',
+                    type: 'success',
                   })
                   item.status = 1;
                   break;
@@ -374,8 +354,22 @@ async function confirm(item) {
         loadData.errorDia = true;
       });
 }
-function refresh() {
-  location.reload();
+
+function goBack(){
+  if(loadData.routeData.length === 1){
+    return;
+  }
+  if(loadData.routeData.length  > 1 ){
+    loadData.tableLoading = true;
+    loadData.routeData.pop();
+    const route = loadData.routeData.pop();
+    parseCopyLink(route);
+  }
+
+}
+
+function goIndex(){
+  router.push({ path: '/login' });
 }
 function getFilesize(row, column, size) {
   if (!size) return '';
@@ -494,41 +488,40 @@ function getIconClass(row) {
 
 <style scoped lang="scss">
 .home {
-  width: 100%;
+  width: 98%;
   height: calc(100vh - 100px);
   margin: auto;
   font-size: 18px;
   header {
     width: 100%;
     height: 50px;
-    line-height: 50px;
-
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
     .back-icon{
-      width: 80px;
+      //width: 80px;
       height: 40px;
       float: left;
-      margin-left: 20px;
+      margin-left: 10px;
       svg{
         float: left;
         margin-top: 10px;
+        margin-left: 15px;
       }
       span{
         float: left;
-        margin-left: 5px;
         line-height: 50px;
+      }
+      span:hover {
+        color:#409EFF;
       }
     }
 
     .back-title {
-      margin-left: 10px;
+      margin-left: 20px;
       float: left;
+      line-height: 50px;
     }
-  }
-  header:hover {
-    color:#409EFF;
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {
     //background-color: #c0ffe7 !important;
@@ -567,6 +560,31 @@ function getIconClass(row) {
     text-align: center;
     font-size: 20px;
     font-weight: bold;
+  }
+  .we-chart{
+    width: 150px;
+    height:150px;
+    position: fixed;
+    bottom: 50px;
+    right: 10px;
+    cursor: pointer;
+    //background: #53a7ff;
+    color: black;
+    font-weight: bold;
+    z-index: 100;
+    text-align: center;
+    img{
+      width: 100px;
+      height: 100px;
+      margin: 0;
+    }
+    .con{
+      width: 100%;
+      height: 20px;
+      line-height: 20px;
+      margin:0;
+      color: red;
+    }
   }
 }
 </style>

@@ -46,7 +46,7 @@ const svgClass = computed(() => {
     .svg-icon {
       /* v-bind 是 Vue3 才支持的功能，可以将 CSS 的值与 js 的值绑定 */
       //position: relative;
-      fill: currentColor;
+      //fill: currentColor;
       //vertical-align: -2px;
     }
 </style>

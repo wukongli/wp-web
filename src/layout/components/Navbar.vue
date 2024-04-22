@@ -122,7 +122,6 @@ function setLayout() {
 function getLogin(){
   if (getToken()) {
     loginData.login = true;
-    console.log(loginData.login);
   }else{
     loginData.login= false;
   }
