@@ -315,10 +315,10 @@ async function confirm(item) {
 
               switch (received_msg.method) {
                 case 'aria2.onDownloadStart':
-                  ElMessage({
-                    message: `${item.server_filename}开始下载！`,
-                    type: 'success',
-                  })
+                  // ElMessage({
+                  //   message: `${item.server_filename}开始下载！`,
+                  //   type: 'success',
+                  // })
                   item.status = 1;
                   break;
 
