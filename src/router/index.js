@@ -161,6 +161,7 @@ export const dynamicRoutes = [
 
 const router = createRouter({
   history: createWebHistory(),
+  base:'/svip/',
   routes: constantRoutes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
