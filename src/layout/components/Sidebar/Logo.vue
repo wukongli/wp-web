@@ -14,7 +14,7 @@
         v-if="collapse"
         key="collapse"
         class="sidebar-logo-link"
-        to="/login"
+        to="/vip/login"
       >
         <img v-if="logo" :src="logo" class="sidebar-logo" />
         <h1

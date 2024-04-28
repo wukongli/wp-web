@@ -36,9 +36,14 @@ export const constantRoutes = [
     component: () => import('@/views/login'),
     hidden: true,
   },
+  // {
+  //   path: '/parse/index',
+  //   component: () => import('@/views/parse/index.vue'),
+  //   hidden: true,
+  // },
   {
-    path: '/admin/login',
-    component: () => import('@/views/adminLogin'),
+    path: '/vip/login',
+    component: () => import('@/views/vipLogin'),
     hidden: true,
   },
   {
@@ -56,19 +61,19 @@ export const constantRoutes = [
     component: () => import('@/views/error/401'),
     hidden: true,
   },
-  {
-    path: '/index',
-    component: Layout,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: '/index',
-        component: () => import('@/views/index'),
-        name: 'Index',
-        meta: { title: '列表', icon: 'dashboard', affix: true },
-      },
-    ],
-  },
+  // {
+  //   path: '/index',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   children: [
+  //     {
+  //       path: '/index',
+  //       component: () => import('@/views/index'),
+  //       name: 'Index',
+  //       meta: { title: '首页', icon: 'dashboard', affix: true },
+  //     },
+  //   ],
+  // },
   {
     path: '/user',
     component: Layout,

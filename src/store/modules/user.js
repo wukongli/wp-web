@@ -81,9 +81,11 @@ const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         adminLogin(username, password, code, uuid)
           .then((res) => {
-            setToken(res.token);
-            this.token = res.token;
-            resolve();
+              if(res.token !== '会员已到期'){
+                  setToken(res.token);
+                  this.token = res.token;
+              }
+              resolve(res);
           })
           .catch((error) => {
             reject(error);

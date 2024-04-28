@@ -2,7 +2,7 @@
   <div class="app-container home">
     <header>
       <div class="back-icon">
-        <span @click="goIndex()">首页 /</span>
+<!--        <span @click="goIndex()">首页 /</span>-->
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
         <span style="margin-left: 15px;" @click="goBack()">返回上一级</span>
       </div>
@@ -15,9 +15,9 @@
       <el-table
           v-loading="loadData.tableLoading"
           element-loading-text="数据正在加载中..."
-        :data="loadData.tableData"
-        height="calc(100vh - 200px)"
-        style="width: 100%; cursor: pointer;font-size: 14px;font-weight:600;"
+          :data="loadData.tableData"
+          height="calc(100vh - 200px)"
+          style="width: 100%; cursor: pointer;font-size: 14px;font-weight:600;"
           class="wp-table"
       >
         <el-table-column min-width="280px" prop="server_filename" label="文件名">
@@ -25,15 +25,15 @@
             <div @click="parseList(scope.row)" style="display: flex; align-items: center">
               <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
               <span style="margin-left: 10px">{{
-                scope.row.server_filename
-              }}</span>
+                  scope.row.server_filename
+                }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column
-          prop="server_mtime"
-          :formatter="timestampToTime"
-          label="修改时间"
+            prop="server_mtime"
+            :formatter="timestampToTime"
+            label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
         <el-table-column label="剩余下载次数" >{{parseInt(loadData.codeNum) > 5 ? '无限':loadData.codeNum }} 次</el-table-column>
@@ -61,7 +61,7 @@
       <div class=" down-address" ><span>下载地址：</span >
         <a href="https://wwf.lanzouq.com/b05f548wf密码:hb1i" target="_blank">
           https://wwf.lanzouq.com/b05f548wf
-        密码:hb1i</a></div>
+          密码:hb1i</a></div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"  @click="loadData.dialogVisible = false">确 定</el-button>
@@ -75,7 +75,7 @@
       <div class="qr-hint">体验无限下载次数，扫一扫开通权限！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="goToLogin()">确 定</el-button>
+          <el-button type="primary" @click="loadData.addWeCharVisible = false">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -85,7 +85,7 @@
       <div class="qr-hint">下载解析限速中，管理员正在修复，请稍后再试</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="goToLogin()">确 定</el-button>
+          <el-button type="primary" @click="loadData.limitSpeedVisible = false">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -216,7 +216,7 @@ async function downLoad(item){
   item.disable = true;
   const code = Cookies.get('code');
   if (code == null || code === '') {
-    router.push({ path: '/login' });
+    router.push({ path: '/parse/login' });
     return;
   }
   loadData.parseLinkParams.code = code;
@@ -241,7 +241,7 @@ async function getSign() {
     code:Cookies.get("code")
   };
   await userStore
-    .getSignData(param).then((data) => {
+      .getSignData(param).then((data) => {
         if (data.code === 200) {
           if (parseInt(data.data.errno) === 0) {
             loadData.parseLinkParams.timestamp = data.data.data.timestamp;
@@ -257,7 +257,7 @@ async function confirm(item) {
   //重新获取时间戳
   const date = (new Date().getTime() / 1000);
   if(date - loadData.parseLinkParams.timestamp > 300){
-     await getSign();
+    await getSign();
   }
   console.log('下载参数');
   console.log(loadData.parseLinkParams);
@@ -372,9 +372,9 @@ function goBack(){
 
 }
 
-function goIndex(){
-  router.push({ path: '/login' });
-}
+// function goIndex(){
+//   router.push({ path: '/login' });
+// }
 function getFilesize(row, column, size) {
   if (!size) return '';
 
@@ -398,9 +398,9 @@ function timestampToTime(row, column, timestamp) {
   var date = new Date(timestamp * 1000);
   var Y = date.getFullYear() + '-';
   var M =
-    (date.getMonth() + 1 < 10
-      ? '0' + (date.getMonth() + 1)
-      : date.getMonth() + 1) + '-';
+      (date.getMonth() + 1 < 10
+          ? '0' + (date.getMonth() + 1)
+          : date.getMonth() + 1) + '-';
   var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
   var h = date.getHours() + ':';
   var m = date.getMinutes() + ':';
@@ -408,9 +408,9 @@ function timestampToTime(row, column, timestamp) {
   return Y + M + D + h + m + s;
 }
 
-function goToLogin() {
-  router.push({ path: '/login' });
-}
+// function goToLogin() {
+//   router.push({ path: '/login' });
+// }
 
 onMounted(() => {
   if (
@@ -419,12 +419,12 @@ onMounted(() => {
       !loadData.query.dir ||
       !loadData.query.root
   ) {
-    router.push({ path: '/login' });
+    router.push({ path: '/parse/login' });
     return;
   }
   const code = Cookies.get('code');
   if (code == null || code === '') {
-    router.push({ path: '/login' });
+    router.push({ path: '/parse/login' });
     return;
   }
   getSign();

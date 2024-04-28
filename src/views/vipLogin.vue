@@ -86,6 +86,7 @@ import { getCodeImg, querySecretKey } from '@/api/login';
 import Cookies from 'js-cookie';
 import { encrypt, decrypt } from '@/utils/jsencrypt';
 import useUserStore from '@/store/modules/user';
+import { ElMessage } from 'element-plus';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -133,12 +134,17 @@ function handleLogin() {
       // 调用action的登录方法
       userStore
         .adminLogin(loginForm.value)
-        .then(() => {
-          router.push({ path: '/system/user' });
+        .then((data) => {
+          if(data.token === "会员已到期"){
+            loading.value = false;
+            ElMessage.error('会员已到期请联系管理员')
+            return;
+          }
+          router.push({ path: '/parse/login' });
         })
         .catch(() => {
           loading.value = false;
-          重新获取验证码;
+          //重新获取验证码;
           if (captchaEnabled.value) {
             getCode();
           }
