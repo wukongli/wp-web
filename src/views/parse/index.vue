@@ -259,8 +259,6 @@ async function confirm(item) {
   if(date - loadData.parseLinkParams.timestamp > 300){
     await getSign();
   }
-  console.log('下载参数');
-  console.log(loadData.parseLinkParams);
   // 获取真实下载地址
   userStore
       .parseLink(loadData.parseLinkParams)
@@ -278,6 +276,10 @@ async function confirm(item) {
               //真实链接为null 限速了
               loadData.limitSpeedVisible = true;
               return;
+            }
+            //每天最多允许下载40次
+            if(data.data.codeUseNum === '40'){
+
             }
             loadData.codeNum = parseInt(data.data.codeUseNum) - 1 ;
             loadData.realLink = data.data.realLink;
