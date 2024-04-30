@@ -10,7 +10,7 @@ import {
   getCode
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
-import defAva from '@/assets/images/profile.jpg';
+import defAva from '@/assets/images/profile.png';
 
 const useUserStore = defineStore('user', {
   state: () => ({
@@ -81,10 +81,8 @@ const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         adminLogin(username, password, code, uuid)
           .then((res) => {
-              if(res.token !== '会员已到期'){
-                  setToken(res.token);
-                  this.token = res.token;
-              }
+              setToken(res.token);
+              this.token = res.token;
               resolve(res);
           })
           .catch((error) => {

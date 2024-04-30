@@ -118,7 +118,7 @@ service.interceptors.response.use(
             useUserStore()
               .logOut()
               .then(() => {
-                location.href = '/index';
+                location.href = '/vip/login';
               });
           })
           .catch(() => {
@@ -127,7 +127,7 @@ service.interceptors.response.use(
       }
       return;
     } else if (code === 500) {
-      // ElMessage({ message: msg, type: 'error' });
+       ElMessage({ message: msg, type: 'error' });
       return Promise.reject(new Error(msg));
     } else if (code === 601) {
       ElMessage({ message: msg, type: 'warning' });

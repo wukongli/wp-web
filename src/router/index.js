@@ -28,8 +28,8 @@ import Layout from '@/layout';
 export const constantRoutes = [
   {
     path: '/',
-    redirect: '/login',
-    component: () => import('@/views/login.vue'),
+    redirect: '/vip/login',
+    component: () => import('@/views/vipLogin.vue'),
   },
   {
     path: '/login',

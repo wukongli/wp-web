@@ -83,9 +83,9 @@
       </el-form-item>
     </el-form>
     <!--  底部  -->
-    <div class="el-login-footer">
-      <span>Copyright 2024 All Rights Reserved.</span>
-    </div>
+<!--    <div class="el-login-footer">-->
+<!--      <span>Copyright 2024 All Rights Reserved.</span>-->
+<!--    </div>-->
     <!-- 获取验证码弹窗 -->
     <el-dialog
         @close="handleClose()"
@@ -147,6 +147,7 @@ const register = ref(false);
 const redirect = ref(undefined);
 
 function getVipNums(){
+  proxy.$tab.closeLeftPage();
   userStore.getVipNum().then((data) => {
     if (data.code === 200) {
       if (data.data === 0) {
@@ -169,7 +170,7 @@ async function handleLogin() {
       loading.value = true;
       if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
-        hint.message = "请扫码关注获取验证码!"
+        hint.message = "请扫码关注公众号点击右下角验证码菜单!"
         return;
       }
       //获取下载次数
@@ -261,7 +262,7 @@ getVipNums();
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 84px);
-  background-image: url('../../assets/images/350.jpeg');
+  background-image: url('../../assets/images/apple.jpg');
   background-size: cover;
   .qr-code {
     width: 180px;
@@ -299,7 +300,7 @@ getVipNums();
 .login-form {
   border-radius: 6px;
   background: #ffffff;
-  width: 500px;
+  width: 600px;
   padding: 30px 25px 20px 25px;
   .el-input {
     height: 40px;

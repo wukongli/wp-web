@@ -277,6 +277,25 @@
                   </el-form-item>
                </el-col>
             </el-row>
+           <el-row>
+             <el-col :span="12">
+               <el-form-item label="VIP验证码" prop="vipCode">
+                 <el-input v-model="form.vipCode" placeholder="请输VIP验证码" maxlength="11" />
+               </el-form-item>
+             </el-col>
+             <el-col :span="12">
+               <el-form-item label="有效天数" prop="vipNum">
+                 <el-input v-model="form.vipNum" placeholder="请输有效天数" maxlength="50" />
+               </el-form-item>
+             </el-col>
+           </el-row>
+           <el-row>
+             <el-col :span="18">
+               <el-form-item label="到期时间">
+                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>
+               </el-form-item>
+             </el-col>
+           </el-row>
             <el-row>
                <el-col :span="24">
                   <el-form-item label="备注">
@@ -332,6 +351,7 @@
 <script setup name="User">
 import { getToken } from "@/utils/auth";
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user";
+import moment from 'moment';
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
@@ -385,8 +405,6 @@ const data = reactive({
     pageSize: 10,
     userName: undefined,
     phonenumber: undefined,
-    status: undefined,
-    deptId: undefined
   },
   rules: {
     userName: [{ required: true, message: "用户名称不能为空", trigger: "blur" }, { min: 2, max: 20, message: "用户名称长度必须介于 2 和 20 之间", trigger: "blur" }],
@@ -545,6 +563,8 @@ function reset() {
     sex: undefined,
     status: "0",
     remark: undefined,
+    vipNum:0,
+    vipCode:'',
     postIds: [],
     roleIds: []
   };
@@ -571,6 +591,7 @@ function handleUpdate(row) {
   reset();
   const userId = row.userId || ids.value;
   getUser(userId).then(response => {
+    response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
     form.value = response.data;
     postOptions.value = response.posts;
     roleOptions.value = response.roles;

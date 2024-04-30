@@ -187,8 +187,7 @@ async function handleLogin() {
       //过期时间十分钟
       Cookies.set('code', loginForm.value.code, { expires: 1 });
       router.push({
-        name: 'Index',
-        path: '/',
+        path: '/index',
         query: {
           shorturl: loginForm.value.shorturl,
           pwd: loginForm.value.pwd,

@@ -10,6 +10,7 @@
         :unique-opened="true"
         :active-text-color="theme"
         :collapse-transition="false"
+        :default-openeds="['/parse/login']"
         mode="vertical"
       >
         <sidebar-item

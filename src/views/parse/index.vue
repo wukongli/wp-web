@@ -4,7 +4,7 @@
       <div class="back-icon">
 <!--        <span @click="goIndex()">首页 /</span>-->
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
-        <span style="margin-left: 15px;" @click="goBack()">返回上一级</span>
+        <span style="margin-left: 15px;" @click="goBack()">{{loadData.rootBackTitle}}</span>
       </div>
       <div class="back-title">
         <span>{{loadData.bread}}</span>
@@ -69,13 +69,13 @@
       </template>
     </el-dialog>
     <!-- 添加微信弹窗 -->
-    <el-dialog title="提示" v-model="loadData.addWeCharVisible" width="30%">
-      <div class="qr-title">下载次数已用完，请重新获取验证码!</div>
+    <el-dialog :show-close="false" title="提示" v-model="loadData.addWeCharVisible" width="30%">
       <img class="qr-code" :src="wechar" alt="" />
+      <div class="qr-title">下载次数已用完，请重新获取验证码!</div>
       <div class="qr-hint">体验无限下载次数，扫一扫开通权限！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.addWeCharVisible = false">确 定</el-button>
+          <el-button type="primary" @click="goToIndex()">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -100,9 +100,19 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 到达每天下载次数弹窗 -->
+    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
+      <!--      <img class="qr-code" :src="wechar" alt="" />-->
+      <div class="qr-hint">今天下载次数已达40次，请休息一下明天再来下载吧!</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="loadData.maxNum = false">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
     <div class="we-chart">
       <img :src="wechar" alt="">
-      <p class="con">资源交流群</p>
+      <p class="con">有问题联系管理员</p>
     </div>
   </div>
 </template>
@@ -143,6 +153,8 @@ const loadData = reactive({
   tableLoading:false,
   fileSize: 2147483648,
   routeData:[],
+  rootBackTitle:"全部文件",
+  maxNum: false
 });
 
 function getList(){
@@ -151,6 +163,12 @@ function getList(){
   const userCode = Cookies.get('code');
   const data = Object.assign({code:userCode},route.query)
   parseCopyLink(data);
+}
+
+function goToIndex(){
+  router.push({
+    path:"/parse/login"
+  })
 }
 
 
@@ -171,6 +189,11 @@ function parseList(item) {
 
 function parseCopyLink(params){
   loadData.routeData.push(params);
+  if(loadData.routeData.length === 1){
+    loadData.rootBackTitle = "全部文件"
+  }else{
+    loadData.rootBackTitle = '返回上一级'
+  }
   // 获取文件列表
   userStore
       .parseCopyLink(params)
@@ -270,17 +293,28 @@ async function confirm(item) {
               //删除验证码
               Cookies.remove('code');
               loadData.addWeCharVisible = true;
+              item.status = 0;
+              item.loading = false;
+              item.disable = false;
+              return;
+            }
+            //每天最多允许下载40次
+            if(data.data.codeUseNum === '40'){
+              loadData.maxNum = true;
+              item.status = 0;
+              item.loading = false;
+              item.disable = false;
               return;
             }
             if (data.data.realLink == null) {
               //真实链接为null 限速了
               loadData.limitSpeedVisible = true;
+              item.status = 0;
+              item.loading = false;
+              item.disable = false;
               return;
             }
-            //每天最多允许下载40次
-            if(data.data.codeUseNum === '40'){
 
-            }
             loadData.codeNum = parseInt(data.data.codeUseNum) - 1 ;
             loadData.realLink = data.data.realLink;
             //发送到下载器
@@ -363,6 +397,7 @@ async function confirm(item) {
 
 function goBack(){
   if(loadData.routeData.length === 1){
+    ElMessage.error('当前已是全部文件');
     return;
   }
   if(loadData.routeData.length  > 1 ){
@@ -547,7 +582,7 @@ function getIconClass(row) {
     display: block;
   }
   .qr-hint {
-    margin-top: 10px;
+    margin-top: 20px;
     text-align: center;
     font-size: 20px;
     font-weight: bold;

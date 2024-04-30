@@ -21,22 +21,34 @@
                         <svg-icon icon-class="phone" />手机号码
                         <div class="pull-right">{{ state.user.phonenumber }}</div>
                      </li>
-                     <li class="list-group-item">
-                        <svg-icon icon-class="email" />用户邮箱
-                        <div class="pull-right">{{ state.user.email }}</div>
-                     </li>
-                     <li class="list-group-item">
-                        <svg-icon icon-class="tree" />所属部门
-                        <div class="pull-right" v-if="state.user.dept">{{ state.user.dept.deptName }} / {{ state.postGroup }}</div>
-                     </li>
+<!--                     <li class="list-group-item">-->
+<!--                        <svg-icon icon-class="email" />用户邮箱-->
+<!--                        <div class="pull-right">{{ state.user.email }}</div>-->
+<!--                     </li>-->
+<!--                     <li class="list-group-item">-->
+<!--                        <svg-icon icon-class="tree" />所属部门-->
+<!--                        <div class="pull-right" v-if="state.user.dept">{{ state.user.dept.deptName }} / {{ state.postGroup }}</div>-->
+<!--                     </li>-->
                      <li class="list-group-item">
                         <svg-icon icon-class="peoples" />所属角色
                         <div class="pull-right">{{ state.roleGroup }}</div>
                      </li>
                      <li class="list-group-item">
-                        <svg-icon icon-class="date" />创建日期
-                        <div class="pull-right">{{ state.user.createTime }}</div>
+                        创建日期
+                        <div class="pull-right">{{ moment(state.user.createTime).format("YYYY-MM-DD") }}</div>
                      </li>
+                    <li class="list-group-item">
+                      vip验证码
+                      <div class="pull-right">{{state.user.vipCode }}</div>
+                    </li>
+                    <li class="list-group-item">
+                      验证码剩余时间
+                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>
+                    </li>
+                    <li class="list-group-item">
+                      验证码到期日期
+                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>
+                    </li>
                   </ul>
                </div>
             </el-card>
@@ -67,6 +79,7 @@ import userAvatar from "./userAvatar";
 import userInfo from "./userInfo";
 import resetPwd from "./resetPwd";
 import { getUserProfile } from "@/api/system/user";
+import moment from 'moment';
 
 const activeTab = ref("userinfo");
 const state = reactive({

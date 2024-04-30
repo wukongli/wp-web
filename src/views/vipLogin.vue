@@ -6,7 +6,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">网盘高速下载</h3>
+      <h3 class="title">登录</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -111,7 +111,7 @@ const loading = ref(false);
 // 验证码开关
 const captchaEnabled = ref(true);
 // 注册开关
-const register = ref(false);
+const register = ref(true);
 const redirect = ref(undefined);
 
 function handleLogin() {
@@ -135,11 +135,11 @@ function handleLogin() {
       userStore
         .adminLogin(loginForm.value)
         .then((data) => {
-          if(data.token === "会员已到期"){
-            loading.value = false;
-            ElMessage.error('会员已到期请联系管理员')
-            return;
-          }
+          // if(data.token === "会员已到期"){
+          //   loading.value = false;
+          //   ElMessage.error('会员已到期请联系管理员')
+          //   return;
+          // }
           router.push({ path: '/parse/login' });
         })
         .catch(() => {
