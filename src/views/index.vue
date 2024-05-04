@@ -131,7 +131,8 @@ const loadData = reactive({
     shareid: '',
     uk: '',
     code: '',
-    link:''
+    link:'',
+    cookieIndex:0
   },
   dialogVisible: false,
   // fileName: '',
@@ -148,8 +149,8 @@ const loadData = reactive({
 function getList(){
 
   loadData.tableLoading = true;
-  const userCode = Cookies.get('code');
-  const data = Object.assign({code:userCode},route.query)
+  // const userCode = Cookies.get('code');
+  const data = Object.assign({index:loadData.parseLinkParams.cookieIndex},route.query)
   parseCopyLink(data);
 }
 
@@ -163,7 +164,8 @@ function parseList(item) {
       root: '0',// 1 文件夹，0 文件
       shorturl: loadData.query.shorturl,
       pwd: loadData.query.pwd,
-      code:Cookies.get("code")
+      index:loadData.parseLinkParams.cookieIndex,
+      // code:Cookies.get("code")
     };
     parseCopyLink(data);
   }
@@ -216,7 +218,7 @@ async function downLoad(item){
   item.disable = true;
   const code = Cookies.get('code');
   if (code == null || code === '') {
-    router.push({ path: '/login' });
+    router.push({ path: '/vip/login' });
     return;
   }
   loadData.parseLinkParams.code = code;
@@ -238,14 +240,16 @@ function getDownNum(){
 async function getSign() {
   const param = {
     shorturl: route.query.shorturl,
-    code:Cookies.get("code")
+    // code:Cookies.get("code")
   };
   await userStore
-    .getSignData(param).then((data) => {
-        if (data.code === 200) {
-          if (parseInt(data.data.errno) === 0) {
-            loadData.parseLinkParams.timestamp = data.data.data.timestamp;
-            loadData.parseLinkParams.sign = data.data.data.sign;
+    .getSignData(param).then((response) => {
+        if (response.code === 200) {
+          if (parseInt(response.data.result.errno) === 0) {
+            loadData.parseLinkParams.cookieIndex = response.data.index;
+            loadData.parseLinkParams.timestamp = response.data.result.data.timestamp;
+            loadData.parseLinkParams.sign = response.data.result.data.sign;
+
           }
         }
       })
@@ -259,8 +263,6 @@ async function confirm(item) {
   if(date - loadData.parseLinkParams.timestamp > 300){
      await getSign();
   }
-  console.log('下载参数');
-  console.log(loadData.parseLinkParams);
   // 获取真实下载地址
   userStore
       .parseLink(loadData.parseLinkParams)
@@ -409,7 +411,7 @@ function timestampToTime(row, column, timestamp) {
 }
 
 function goToLogin() {
-  router.push({ path: '/login' });
+  router.push({ path: '/vip/login' });
 }
 
 onMounted(() => {
@@ -419,17 +421,17 @@ onMounted(() => {
       !loadData.query.dir ||
       !loadData.query.root
   ) {
-    router.push({ path: '/login' });
+    router.push({ path: '/vip/login' });
     return;
   }
   const code = Cookies.get('code');
   if (code == null || code === '') {
-    router.push({ path: '/login' });
+    router.push({ path: '/vip/login' });
     return;
   }
   getSign();
-  getList();
   getDownNum();
+  getList();
 });
 
 

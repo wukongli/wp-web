@@ -141,7 +141,8 @@ const loadData = reactive({
     shareid: '',
     uk: '',
     code: '',
-    link:''
+    link:'',
+    cookieIndex:0,
   },
   dialogVisible: false,
   // fileName: '',
@@ -160,8 +161,8 @@ const loadData = reactive({
 function getList(){
 
   loadData.tableLoading = true;
-  const userCode = Cookies.get('code');
-  const data = Object.assign({code:userCode},route.query)
+  // const userCode = Cookies.get('code');
+  const data = Object.assign({index:loadData.parseLinkParams.cookieIndex},route.query)
   parseCopyLink(data);
 }
 
@@ -181,7 +182,8 @@ function parseList(item) {
       root: '0',// 1 文件夹，0 文件
       shorturl: loadData.query.shorturl,
       pwd: loadData.query.pwd,
-      code:Cookies.get("code")
+      index:loadData.parseLinkParams.cookieIndex,
+      // code:Cookies.get("code")
     };
     parseCopyLink(data);
   }
@@ -261,14 +263,16 @@ function getDownNum(){
 async function getSign() {
   const param = {
     shorturl: route.query.shorturl,
-    code:Cookies.get("code")
+    // code:Cookies.get("code")
   };
   await userStore
-      .getSignData(param).then((data) => {
-        if (data.code === 200) {
-          if (parseInt(data.data.errno) === 0) {
-            loadData.parseLinkParams.timestamp = data.data.data.timestamp;
-            loadData.parseLinkParams.sign = data.data.data.sign;
+      .getSignData(param).then((response) => {
+        if (response.code === 200) {
+          if (parseInt(response.data.result.errno) === 0) {
+            loadData.parseLinkParams.cookieIndex = response.data.index;
+            loadData.parseLinkParams.timestamp = response.data.result.data.timestamp;
+            loadData.parseLinkParams.sign = response.data.result.data.sign;
+            return response;
           }
         }
       })
@@ -464,9 +468,11 @@ onMounted(() => {
     router.push({ path: '/parse/login' });
     return;
   }
-  getSign();
-  getList();
+  getSign().then(()=>{
+    getList();
+  })
   getDownNum();
+
 });
 
 

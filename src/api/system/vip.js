@@ -27,3 +27,27 @@ export function addPost(data) {
     params: data,
   });
 }
+
+export function getCommonCookie (query){
+  return request({
+    url: '/wp/getCookie',
+    method: 'get',
+    params: query,
+  });
+}
+
+export function addCommonCookie(data) {
+  return request({
+    url: '/wp/setCookie',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function deleteCommonCookie(data) {
+  return request({
+    url: '/wp/deleteCookie',
+    method: 'post',
+    data: data,
+  });
+}

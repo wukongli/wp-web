@@ -24,23 +24,24 @@
         @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="名字" align="center" prop="name" />
+      <el-table-column :show-overflow-tooltip="true" label="普通cookie" align="center" prop="name" >
+      </el-table-column>
       <!-- <el-table-column label="vipCookie" align="center" prop="cookie" /> -->
-      <el-table-column label="状态" align="center" prop="status">
-        <template #default="scope">
-          <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
-        </template>
-      </el-table-column>
-      <el-table-column
-          label="创建时间"
-          align="center"
-          prop="createTime"
-          width="180"
-      >
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="状态" align="center" prop="status">-->
+<!--        <template #default="scope">-->
+<!--          <dict-tag :options="sys_normal_disable" :value="scope.row.status" />-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--          label="创建时间"-->
+<!--          align="center"-->
+<!--          prop="createTime"-->
+<!--          width="180"-->
+<!--      >-->
+<!--        <template #default="scope">-->
+<!--          <span>{{ parseTime(scope.row.createTime) }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
           label="操作"
           width="180"
@@ -48,14 +49,14 @@
           class-name="small-padding fixed-width"
       >
         <template #default="scope">
-          <el-button
-              link
-              type="primary"
-              icon="Edit"
-              @click="handleUpdate(scope.row)"
-              v-hasPermi="['system:post:edit']"
-          >修改</el-button
-          >
+<!--          <el-button-->
+<!--              link-->
+<!--              type="primary"-->
+<!--              icon="Edit"-->
+<!--              @click="handleUpdate(scope.row)"-->
+<!--              v-hasPermi="['system:post:edit']"-->
+<!--          >修改</el-button-->
+<!--          >-->
           <el-button
               link
               type="primary"
@@ -79,11 +80,11 @@
     <!-- 添加或修改岗位对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="vip名字" prop="name">
-          <el-input v-model="form.name" placeholder="请输vip名字" />
-        </el-form-item>
+<!--        <el-form-item label="vip名字" prop="name">-->
+<!--          <el-input v-model="form.name" placeholder="请输vip名字" />-->
+<!--        </el-form-item>-->
         <el-form-item label="cookie" prop="cookie">
-          <el-input v-model="form.cookie" placeholder="请输入cookie" />
+          <el-input v-model="form.cookie" placeholder="请输入普通cookie" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -97,7 +98,7 @@
 </template>
 
 <script setup name="Post">
-import { listVip, addPost,deleteVip } from '@/api/system/vip';
+import {addCommonCookie, deleteCommonCookie, getCommonCookie} from '@/api/system/vip';
 import {ElMessage} from "element-plus";
 
 const { proxy } = getCurrentInstance();
@@ -120,7 +121,6 @@ const data = reactive({
     pageSize: 10,
   },
   rules: {
-    name: [{ required: true, message: 'name不能为空', trigger: 'blur' }],
     cookie: [{ required: true, message: 'cookie不能为空', trigger: 'blur' }],
   },
 });
@@ -130,7 +130,7 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询vip列表 */
 function getList() {
   loading.value = true;
-  listVip(queryParams).then((response) => {
+  getCommonCookie(queryParams).then((response) => {
     postList.value = response.rows;
     total.value = response.total;
     loading.value = false;
@@ -145,7 +145,6 @@ function cancel() {
 function reset() {
   form.value = {
     cookie: undefined,
-    name: undefined,
   };
   proxy.resetForm('postRef');
 }
@@ -160,14 +159,14 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = '新增vip';
+  title.value = '新增普通cookie';
 }
 
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs['postRef'].validate((valid) => {
     if (valid) {
-      addPost(form.value).then((response) => {
+      addCommonCookie(form.value).then((response) => {
         proxy.$modal.msgSuccess('新增成功');
         open.value = false;
         getList();
@@ -178,9 +177,9 @@ function submitForm() {
 
 function handleDelete(item){
   const data = {
-    idList:item.id
+    cookie:item.name
   }
-  deleteVip(data).then((response) => {
+  deleteCommonCookie(data).then((response) => {
     ElMessage.success("删除成功")
     getList();
   });
