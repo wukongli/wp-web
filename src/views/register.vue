@@ -13,6 +13,17 @@
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
         </el-input>
       </el-form-item>
+      <el-form-item prop="phonenumber">
+        <el-input
+            v-model="registerForm.phonenumber"
+            type="text"
+            size="large"
+            auto-complete="off"
+            placeholder="手机号/用于找回修改密码"
+        >
+          <template #prefix><svg-icon icon-class="phone" class="el-input__icon input-icon" /></template>
+        </el-input>
+      </el-form-item>
       <el-form-item prop="password">
         <el-input
             v-model="registerForm.password"
@@ -84,6 +95,7 @@ const { proxy } = getCurrentInstance();
 
 const registerForm = ref({
   username: "",
+  phonenumber:"",
   password: "",
   confirmPassword: "",
   code: "",
@@ -103,6 +115,7 @@ const registerRules = {
     { required: true, trigger: "blur", message: "请输入您的账号" },
     { min: 2, max: 20, message: "用户账号长度必须介于 2 和 20 之间", trigger: "blur" }
   ],
+  phonenumber: [{ pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur" }],
   password: [
     { required: true, trigger: "blur", message: "请输入您的密码" },
     { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" }

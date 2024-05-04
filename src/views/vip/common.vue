@@ -3,28 +3,28 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:post:add']"
-          >新增</el-button
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['system:post:add']"
+        >新增</el-button
         >
       </el-col>
 
       <right-toolbar
-        v-model:showSearch="showSearch"
-        @queryTable="getList"
+          v-model:showSearch="showSearch"
+          @queryTable="getList"
       ></right-toolbar>
     </el-row>
 
     <el-table
-      v-loading="loading"
-      :data="postList"
-      @selection-change="handleSelectionChange"
+        v-loading="loading"
+        :data="postList"
+        @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="vip名字" align="center" prop="name" />
+      <el-table-column label="名字" align="center" prop="name" />
       <!-- <el-table-column label="vipCookie" align="center" prop="cookie" /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
@@ -32,59 +32,53 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="180"
+          label="创建时间"
+          align="center"
+          prop="createTime"
+          width="180"
       >
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="操作"
-        width="180"
-        align="center"
-        class-name="small-padding fixed-width"
+          label="操作"
+          width="180"
+          align="center"
+          class-name="small-padding fixed-width"
       >
         <template #default="scope">
           <el-button
-            link
-            type="primary"
-            icon="Edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:post:edit']"
-            >修改</el-button
+              link
+              type="primary"
+              icon="Edit"
+              @click="handleUpdate(scope.row)"
+              v-hasPermi="['system:post:edit']"
+          >修改</el-button
           >
           <el-button
-            link
-            type="primary"
-            icon="Delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:post:remove']"
-            >删除</el-button
+              link
+              type="primary"
+              icon="Delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['system:post:remove']"
+          >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total > 0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total > 0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改岗位对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
-<!--        <el-form-item label="账号类型" prop="type">-->
-<!--          <el-select v-model="form.type" placeholder="请选择">-->
-<!--            <el-option label="svip账号" value="1" />-->
-<!--            <el-option label="普通账号" value="0" />-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
         <el-form-item label="vip名字" prop="name">
           <el-input v-model="form.name" placeholder="请输vip名字" />
         </el-form-item>
@@ -187,7 +181,7 @@ function handleDelete(item){
     idList:item.id
   }
   deleteVip(data).then((response) => {
-   ElMessage.success("删除成功")
+    ElMessage.success("删除成功")
     getList();
   });
 }

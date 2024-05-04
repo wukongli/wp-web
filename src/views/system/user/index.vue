@@ -284,15 +284,21 @@
                </el-form-item>
              </el-col>
              <el-col :span="12">
-               <el-form-item label="有效天数" prop="vipNum">
-                 <el-input v-model="form.vipNum" placeholder="请输有效天数" maxlength="50" />
+               <el-form-item label="剩余天数" prop="vipNum">
+                 <el-input disabled v-model="form.vipNum" placeholder="0" maxlength="50" />
                </el-form-item>
              </el-col>
            </el-row>
            <el-row>
              <el-col :span="18">
+
                <el-form-item label="到期时间">
-                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>
+                 <el-date-picker
+                     v-model="form.vipEndTime"
+                     type="date"
+                     placeholder="选择日期">
+                 </el-date-picker>
+<!--                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>-->
                </el-form-item>
              </el-col>
            </el-row>
@@ -591,7 +597,9 @@ function handleUpdate(row) {
   reset();
   const userId = row.userId || ids.value;
   getUser(userId).then(response => {
-    response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
+    if(response.data.vipEndTime){
+      response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
+    }
     form.value = response.data;
     postOptions.value = response.posts;
     roleOptions.value = response.roles;
