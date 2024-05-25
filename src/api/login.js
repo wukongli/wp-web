@@ -98,6 +98,7 @@ export function parseCopyLink(data) {
 export function parseLinkReq(data) {
   return request({
     url: '/wp/parseLink',
+    // url: '/wp/parseLinkTest',
     method: 'post',
     timeout: 20000,
     data: data,

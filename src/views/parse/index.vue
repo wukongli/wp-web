@@ -2,7 +2,6 @@
   <div class="app-container home">
     <header>
       <div class="back-icon">
-<!--        <span @click="goIndex()">首页 /</span>-->
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
         <span style="margin-left: 15px;" @click="goBack()">{{loadData.rootBackTitle}}</span>
       </div>
@@ -82,7 +81,8 @@
     <!-- 限速提示弹窗 -->
     <el-dialog title="提示" v-model="loadData.limitSpeedVisible" width="40%">
       <img class="qr-code" :src="wechar" alt="" />
-      <div class="qr-hint">下载解析限速中，管理员正在修复，请稍后再试</div>
+      <div class="qr-hint">当前下载通道拥挤，请刷新重试或者稍后再试！</div>
+      <div class="qr-hint">如有问题，扫码联系管理员！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.limitSpeedVisible = false">确 定</el-button>
@@ -103,7 +103,7 @@
     <!-- 到达每天下载次数弹窗 -->
     <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
       <!--      <img class="qr-code" :src="wechar" alt="" />-->
-      <div class="qr-hint">今天下载次数已达40次，请休息一下明天再来下载吧!</div>
+      <div class="qr-hint">今天下载次数已达20次，请休息一下明天再来下载吧!</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.maxNum = false">确 定</el-button>
@@ -125,8 +125,9 @@ import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import wechar from "@/assets/images/wechar.png";
 import MySvg from "@/components/icon/Svg.vue";
-import {onMounted} from 'vue';
 const userStore = useUserStore();
+import {getFilesize,getIconClass} from "@/utils/wp";
+import {setDownLoadRecord} from '@/api/system/vip';
 const route = useRoute();
 const router = useRouter();
 const loadData = reactive({
@@ -142,7 +143,7 @@ const loadData = reactive({
     uk: '',
     code: '',
     link:'',
-    cookieIndex:0,
+    index:0,
   },
   dialogVisible: false,
   // fileName: '',
@@ -152,7 +153,7 @@ const loadData = reactive({
   errorDia: false,
   codeNum:"",
   tableLoading:false,
-  fileSize: 2147483648,
+  fileSize: 3247483648,
   routeData:[],
   rootBackTitle:"全部文件",
   maxNum: false
@@ -162,7 +163,7 @@ function getList(){
 
   loadData.tableLoading = true;
   // const userCode = Cookies.get('code');
-  const data = Object.assign({index:loadData.parseLinkParams.cookieIndex},route.query)
+  const data = Object.assign({index:loadData.parseLinkParams.index},route.query)
   parseCopyLink(data);
 }
 
@@ -182,7 +183,7 @@ function parseList(item) {
       root: '0',// 1 文件夹，0 文件
       shorturl: loadData.query.shorturl,
       pwd: loadData.query.pwd,
-      index:loadData.parseLinkParams.cookieIndex,
+      index:loadData.parseLinkParams.index,
       // code:Cookies.get("code")
     };
     parseCopyLink(data);
@@ -224,7 +225,7 @@ function parseCopyLink(params){
         }
       })
       .catch(() => {
-        loadData.errorDia = true;
+        // loadData.errorDia = true;
       });
 }
 
@@ -260,16 +261,20 @@ function getDownNum(){
     }
   })
 }
-async function getSign() {
+async function getSign(params) {
+  const {shorturl,shareId,uk} = params;
   const param = {
-    shorturl: route.query.shorturl,
-    // code:Cookies.get("code")
+    shorturl: shorturl,
+    shareId:shareId,
+    uk:uk,
   };
   await userStore
       .getSignData(param).then((response) => {
         if (response.code === 200) {
           if (parseInt(response.data.result.errno) === 0) {
-            loadData.parseLinkParams.cookieIndex = response.data.index;
+            if(shorturl){
+              loadData.parseLinkParams.index = response.data.index;
+            }
             loadData.parseLinkParams.timestamp = response.data.result.data.timestamp;
             loadData.parseLinkParams.sign = response.data.result.data.sign;
             return response;
@@ -280,11 +285,16 @@ async function getSign() {
 }
 
 async function confirm(item) {
-
-  //重新获取时间戳
+  //过期重新获取时间戳
   const date = (new Date().getTime() / 1000);
+
   if(date - loadData.parseLinkParams.timestamp > 300){
-    await getSign();
+    const param = {
+      // shorturl: shorturl,
+      shareId:loadData.parseLinkParams.shareid,
+      uk:loadData.parseLinkParams.uk,
+    };
+    await getSign(param);
   }
   // 获取真实下载地址
   userStore
@@ -303,7 +313,7 @@ async function confirm(item) {
               return;
             }
             //每天最多允许下载40次
-            if(data.data.codeUseNum === '40'){
+            if(parseInt(data.data.codeUseNum) >= 16){
               loadData.maxNum = true;
               item.status = 0;
               item.loading = false;
@@ -343,6 +353,12 @@ async function confirm(item) {
               ElMessage.error('链接失败，请检查是否安装Motrix');
             };
             ws.onopen = () => {
+              const data = {
+                fileName:item.server_filename.trim(),
+                fileSize:getFilesize(0,0,item.size)
+              }
+              setDownLoadRecord(data);
+
               ws.send(JSON.stringify(json));
             };
 
@@ -395,7 +411,7 @@ async function confirm(item) {
         item.status = 0;
         item.disable = false;
         item.loading = false;
-        loadData.errorDia = true;
+        // loadData.errorDia = true;
       });
 }
 
@@ -416,24 +432,7 @@ function goBack(){
 // function goIndex(){
 //   router.push({ path: '/login' });
 // }
-function getFilesize(row, column, size) {
-  if (!size) return '';
 
-  var num = 1024.0; //byte
-
-  if (size < num) return size + 'B';
-  if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K'; //kb
-  if (size < Math.pow(num, 3))
-    return (size / Math.pow(num, 2)).toFixed(2) + 'M'; //M
-  if (size < Math.pow(num, 4)){
-    let fileSize = (size / Math.pow(num, 3)).toFixed(2);
-    if(fileSize > 2){
-      return fileSize + 'G' + ` ( 文件大于2G无法下载 )`; //G
-    }
-    return fileSize + 'G'; //G
-  }
-  return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于2G无法下载)`; //T
-}
 function timestampToTime(row, column, timestamp) {
   // 时间戳为10位需*1000，时间戳为13位不需乘1000
   var date = new Date(timestamp * 1000);
@@ -449,11 +448,7 @@ function timestampToTime(row, column, timestamp) {
   return Y + M + D + h + m + s;
 }
 
-// function goToLogin() {
-//   router.push({ path: '/login' });
-// }
-
-onMounted(() => {
+function init(){
   if (
       !loadData.query.shorturl ||
       !loadData.query.pwd ||
@@ -468,12 +463,15 @@ onMounted(() => {
     router.push({ path: '/parse/login' });
     return;
   }
-  getSign().then(()=>{
+  const params = {
+    shorturl:route.query.shorturl
+  }
+  getSign(params).then(()=>{
     getList();
   })
   getDownNum();
-
-});
+}
+init();
 
 
 function testDownLoad(){
@@ -497,39 +495,6 @@ function testDownLoad(){
 
 
 
-}
-
-function getIconClass(row) {
-  const {server_filename ,isdir} = row;
-  if(parseInt(isdir) === 1){
-    return "icon-wenjianjia";
-  }
-  const filetype = {
-    "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
-    "icon-audio": ["wma", "wav", "mp3", "aac", "ra", "ram", "mp2", "ogg", "aif", "mpega", "amr", "mid", "midi", "m4a", "flac"],
-    "icon-image": ["jpg", "jpeg", "gif", "bmp", "png", "jpe", "cur", "svg", "svgz", "ico", "webp", "tif", "tiff"],
-    "icon-yasuobao": ["rar", "zip", "7z", "iso"],
-    "icon-exe": ["exe"],
-    "icon-pingguo": ["ipa"],
-    "icon-APK": ["apk"],
-    "icon-txt": ["txt", "rtf"],
-    "icon-xls": ["xls", "xlsx", "xlsm", "xlsb", "csv", "xltx", "xlt", "xltm", "xlam"],
-    "icon-docx": ["doc", "docx", "docm", "dotx"],
-    "icon-ppt": ["ppt", "pptx", "potx", "pot", "potm", "ppsx", "pps", "ppam", "ppa"],
-    "icon-pdfwenjian": ["pdf"]
-  };
-  let index = server_filename.lastIndexOf(".");
-  if (index === -1) return "icon-wenjianjia";
-  let name = server_filename.substring(index + 1);
-  name = name.toLowerCase();
-  for (let icon in filetype){
-    for (let type in filetype[icon]){
-      if (name === filetype[icon][type]){
-        return icon;
-      }
-    }
-  }
-  return "icon-wenjian";
 }
 </script>
 

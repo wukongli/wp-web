@@ -6,7 +6,7 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 class="title">网盘高速下载在线解析</h3>
+      <h3 class="title">网盘文件下载加速平台</h3>
       <div v-if="hint.show" class="hint-box">
         <el-tag class="hint" type="danger" effect="dark" round>
           下载解析限速中管理员正在修复请稍后再试...
@@ -20,7 +20,7 @@
             size="large"
             auto-complete="off"
             @blur="handleBlur"
-            placeholder="请输入分享链接(可输入带提取码链接)"
+            placeholder="请输入分享的网盘链接(可输入带提取码链接)"
         >
           <template #prefix
           ><svg-icon icon-class="user" class="el-input__icon input-icon"
@@ -105,15 +105,14 @@
 </template>
 
 <script setup>
-import { getCodeImg, querySecretKey } from '@/api/login';
 import Cookies from 'js-cookie';
-import { encrypt, decrypt } from '@/utils/jsencrypt';
-import { ElMessage } from 'element-plus';
+import { encrypt } from '@/utils/jsencrypt';
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 import useUserStore from '@/store/modules/user';
 const userStore = useUserStore();
 import qrCode from '@/assets/images/qrcode.jpg';
+import {SubmitLink} from "@/utils/wp";
 
 const loginForm = ref({
   username: '',
@@ -131,9 +130,8 @@ const hint = reactive({
   getCodeVisible: false,
   message:''
 });
-
 const loginRules = {
-  username: [{ required: true, trigger: 'blur', message: '请输入分享链接' }],
+  username: [{ required: true, trigger: 'blur', message: '请输入分享的网盘链接' }],
   // password: [{ required: true, trigger: 'blur', message: '请输入您的密码' }],
   // code: [{ required: true, trigger: 'change', message: '请输入验证码' }],
 };
@@ -147,7 +145,6 @@ const register = ref(false);
 const redirect = ref(undefined);
 
 function getVipNums(){
-  proxy.$tab.closeLeftPage();
   userStore.getVipNum().then((data) => {
     if (data.code === 200) {
       if (data.data === 0) {
@@ -170,7 +167,7 @@ async function handleLogin() {
       loading.value = true;
       if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
-        hint.message = "请扫码关注公众号点击右下角验证码菜单!"
+        hint.message = "请扫码关注公众号获取验证码!"
         return;
       }
       //获取下载次数
@@ -187,61 +184,21 @@ async function handleLogin() {
       }
       //过期时间十分钟
       Cookies.set('code', loginForm.value.code, { expires: 1 });
+      // showLogin.value = false;
       router.push({
         path: '/parse/index',
         query: {
           shorturl: loginForm.value.shorturl,
-          pwd: loginForm.value.pwd,
+          pwd: encrypt(loginForm.value.pwd),
           dir: loginForm.value.dir,
           root: loginForm.value.root,
         },
       });
-      proxy.$tab.closeOpenPage();
-      // 调用action的登录方法
     }
   });
 }
 
-function SubmitLink(url) {
-  let surl = null;
-  let uk = url.match(/uk=(\d+)/),
-      shareid = url.match(/shareid=(\d+)/);
-  if (uk != null && shareid != null) {
-    let tmp = uk[1] + '&' + shareid[1];
-    surl = '2' + window.btoa(tmp); // base64 encode
-  } else {
-    surl = url.match(/surl=([A-Za-z0-9-_]+)/);
-    if (surl == null) {
-      surl = url.match(/1[A-Za-z0-9-_]+/);
-      if (surl != null) {
-        surl = surl[0];
-      }
-    } else {
-      surl = '1' + surl[1];
-    }
 
-    if (surl == null || surl === '') {
-      ElMessage.error('百度网盘分享链接有错误，请检查输入的链接 ！');
-      return false;
-    }
-  }
-
-  let pwd = url.match(
-      /(提取码|pwd=|pwd:|密码|%E6%8F%90%E5%8F%96%E7%A0%81|%E5%AF%86%E7%A0%81)( |:|：|%EF%BC%9A|%20)*([a-zA-Z0-9]{4})/i
-  );
-  let pw;
-  if (pwd != null && pwd.length === 4) {
-    pw = pwd[3];
-  }
-  if (pw.length !== 0 && pw.length !== 4) {
-    ElMessage.error('验证码错误，请检查！');
-    return false;
-  }
-  return {
-    url: surl,
-    pwd: pw,
-  };
-}
 
 function confirm() {
   hint.getCodeVisible = false;
@@ -258,6 +215,7 @@ getVipNums();
 
 <style lang="scss" scoped>
 .login {
+  width: 98%;
   display: flex;
   justify-content: center;
   align-items: center;

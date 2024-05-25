@@ -36,11 +36,32 @@ export const constantRoutes = [
     component: () => import('@/views/login'),
     hidden: true,
   },
-  // {
-  //   path: '/parse/index',
-  //   component: () => import('@/views/parse/index.vue'),
-  //   hidden: true,
-  // },
+  {
+    path: '/back',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/back',
+        component: () => import('@/views/back/index.vue'),
+        name: 'back',
+        meta: { title: 'Java教程', icon: 'dashboard' },
+      },
+    ],
+  },
+  {
+    path: '/front',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/front',
+        component: () => import('@/views/front/index.vue'),
+        name: 'front',
+        meta: { title: '前端教程', icon: 'dashboard'},
+      },
+    ],
+  },
   {
     path: '/vip/login',
     component: () => import('@/views/vipLogin'),

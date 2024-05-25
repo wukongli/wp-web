@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('网盘高速下载');
+const title = ref('爱分享');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>

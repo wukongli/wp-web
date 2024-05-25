@@ -17,9 +17,6 @@
           @queryTable="getList"
       ></right-toolbar>
     </el-row>
-    <span class = "code-down">验证码下载次数：</span>
-    <el-input v-model="downNum" style="width: 240px" placeholder="请输入下载次数" />
-    <el-button style="margin-left: 20px;" @click="setDownLoad"  type="primary">保存</el-button>
     <el-table
         style="margin-top: 20px;"
         v-loading="loading"
@@ -27,47 +24,13 @@
         @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column :show-overflow-tooltip="true" label="普通cookie" align="center" prop="name" >
+      <el-table-column :show-overflow-tooltip="true" label="文件名称" align="center" prop="fileName" >
       </el-table-column>
-      <!-- <el-table-column label="vipCookie" align="center" prop="cookie" /> -->
-<!--      <el-table-column label="状态" align="center" prop="status">-->
-<!--        <template #default="scope">-->
-<!--          <dict-tag :options="sys_normal_disable" :value="scope.row.status" />-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column-->
-<!--          label="创建时间"-->
-<!--          align="center"-->
-<!--          prop="createTime"-->
-<!--          width="180"-->
-<!--      >-->
-<!--        <template #default="scope">-->
-<!--          <span>{{ parseTime(scope.row.createTime) }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column
-          label="操作"
-          width="180"
-          align="center"
-          class-name="small-padding fixed-width"
-      >
+       <el-table-column label="文件大小" align="center" prop="fileSize" />
+       <el-table-column label="用户名" align="center" prop="userName" />
+      <el-table-column label="下载时间" align="center" prop="createTime" >
         <template #default="scope">
-<!--          <el-button-->
-<!--              link-->
-<!--              type="primary"-->
-<!--              icon="Edit"-->
-<!--              @click="handleUpdate(scope.row)"-->
-<!--              v-hasPermi="['system:post:edit']"-->
-<!--          >修改</el-button-->
-<!--          >-->
-          <el-button
-              link
-              type="primary"
-              icon="Delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['system:post:remove']"
-          >删除</el-button
-          >
+          <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -83,9 +46,6 @@
     <!-- 添加或修改岗位对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
-<!--        <el-form-item label="vip名字" prop="name">-->
-<!--          <el-input v-model="form.name" placeholder="请输vip名字" />-->
-<!--        </el-form-item>-->
         <el-form-item label="cookie" prop="cookie">
           <el-input v-model="form.cookie" placeholder="请输入普通cookie" />
         </el-form-item>
@@ -101,9 +61,7 @@
 </template>
 
 <script setup name="Post">
-import {addCommonCookie, deleteCommonCookie, getCommonCookie,getDownLoadNum,setDownLoadNum} from '@/api/system/vip';
-import {ElMessage} from "element-plus";
-
+import {getDownLoadRecord} from '@/api/system/vip';
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
@@ -116,7 +74,6 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
-const downNum = ref('')
 const data = reactive({
   form: {},
   queryParams: {
@@ -133,7 +90,7 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询vip列表 */
 function getList() {
   loading.value = true;
-  getCommonCookie(queryParams).then((response) => {
+  getDownLoadRecord(data.queryParams).then((response) => {
     postList.value = response.rows;
     total.value = response.total;
     loading.value = false;
@@ -177,37 +134,6 @@ function submitForm() {
     }
   });
 }
-
-function handleDelete(item){
-  if(postList.value.length <= 1){
-    ElMessage.error("最少保留一个普通cookie");
-    return;
-  }
-  const data = {
-    cookie:item.name
-  }
-  deleteCommonCookie(data).then((response) => {
-    ElMessage.success("删除成功")
-    getList();
-  });
-}
-
-function getDownLoad(){
-  getDownLoadNum().then(res=>{
-    if(res.code === 200){
-      downNum.value = res.data;
-    }
-  })
-}
-function setDownLoad(){
-  const data= {
-    downLoadNum:downNum.value
-  }
-  setDownLoadNum(data).then(res=>{
-    ElMessage.success("设置成功")
-  })
-}
-getDownLoad();
 getList();
 </script>
 <style scoped lang="scss">

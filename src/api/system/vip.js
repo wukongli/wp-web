@@ -51,3 +51,32 @@ export function deleteCommonCookie(data) {
     data: data,
   });
 }
+export function getDownLoadNum() {
+  return request({
+    url: 'wp/downLoadNum',
+    method: 'get',
+  });
+}
+export function setDownLoadNum(data) {
+  return request({
+    url: 'wp/downLoadNum',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function setDownLoadRecord(data) {
+  return request({
+    url: '/downloadRecord',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function getDownLoadRecord(data) {
+  return request({
+    url: '/downloadRecord',
+    method: 'get',
+    params: data,
+  });
+}
