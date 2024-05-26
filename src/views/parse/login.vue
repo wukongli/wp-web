@@ -6,7 +6,7 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 class="title">网盘文件下载加速平台</h3>
+      <h3 class="title">网盘文件加速下载</h3>
       <div v-if="hint.show" class="hint-box">
         <el-tag class="hint" type="danger" effect="dark" round>
           下载解析限速中管理员正在修复请稍后再试...
@@ -193,7 +193,7 @@ async function handleLogin() {
           dir: loginForm.value.dir,
           root: loginForm.value.root,
         },
-      });
+      })
     }
   });
 }

@@ -1,12 +1,12 @@
 <template>
   <div class="app-container home">
     <header>
-      <div class="back-icon">
+      <div @click="goBack()" class="back-icon">
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
-        <span style="margin-left: 15px;" @click="goBack()">{{loadData.rootBackTitle}}</span>
+        <span style="margin-left: 15px;" >{{loadData.rootBackTitle}}</span>
       </div>
-      <div class="back-title">
-        <span>{{loadData.bread}}</span>
+      <div :title="loadData.bread" class="back-title">
+        {{loadData.bread}}
       </div>
     </header>
 
@@ -35,13 +35,33 @@
             label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
-
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button
+                v-if="!parseInt(scope.row.isdir)"
+                :type="'primary'"
+                @click="downLoad()"
+            >
+              下 载
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
-    <div class="we-chart">
-      <img :src="wechar" alt="">
-      <p class="con">扫码学习课程</p>
-    </div>
+<!--    <div class="we-chart">-->
+<!--      <img :src="wechar" alt="">-->
+<!--      <p class="con">扫码学习课程</p>-->
+<!--    </div>-->
+    <!-- 添加微信弹窗 -->
+    <el-dialog :show-close="false" title="提示" v-model="loadData.addWeCharVisible">
+      <img class="qr-code" :src="wechar" alt="" />
+      <div class="qr-hint">扫一扫备注【教程】获取下载地址</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="loadData.addWeCharVisible=false">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,7 +72,7 @@ import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
 import MySvg from "@/components/icon/Svg.vue";
 const userStore = useUserStore();
-import {getFilesize,getIconClass} from "@/utils/wp";
+import {getFilesize,getIconClass,timestampToTime} from "@/utils/wp";
 import {encrypt} from "@/utils/jsencrypt";
 import wechar from "@/assets/images/back.png";
 const route = useRoute();
@@ -91,8 +111,6 @@ const loadData = reactive({
 });
 
 function getList(){
-
-  loadData.tableLoading = true;
   // const userCode = Cookies.get('code');
   const data = Object.assign({index:loadData.parseLinkParams.index},loadData.query)
   parseCopyLink(data);
@@ -179,7 +197,9 @@ async function getSign(params) {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
 }
 
 
@@ -197,31 +217,19 @@ function goBack(){
 
 }
 
-function timestampToTime(row, column, timestamp) {
-  // 时间戳为10位需*1000，时间戳为13位不需乘1000
-  var date = new Date(timestamp * 1000);
-  var Y = date.getFullYear() + '-';
-  var M =
-      (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-';
-  var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
-  var h = date.getHours() + ':';
-  var m = date.getMinutes() + ':';
-  var s = date.getSeconds();
-  return Y + M + D + h + m + s;
-}
-
 function init(){
   const params = {
     shorturl:loadData.query.shorturl
   }
+  loadData.tableLoading = true;
   getSign(params).then(()=>{
     getList();
   })
 }
 init();
-
+function downLoad(){
+  loadData.addWeCharVisible=true;
+}
 
 </script>
 
@@ -233,23 +241,23 @@ init();
   font-size: 18px;
   header {
     width: 100%;
-    height: 50px;
+    height: 40px;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
     .back-icon{
       //width: 80px;
-      height: 40px;
+      height: 30px;
       float: left;
       margin-left: 10px;
       svg{
         float: left;
-        margin-top: 10px;
+        margin-top: 5px;
         margin-left: 15px;
       }
       span{
         float: left;
-        line-height: 50px;
+        line-height: 40px;
       }
       span:hover {
         color:#409EFF;
@@ -259,7 +267,12 @@ init();
     .back-title {
       margin-left: 20px;
       float: left;
-      line-height: 50px;
+      line-height: 40px;
+      max-width: 80%;
+      white-space: nowrap; /* 防止文本换行 */
+      overflow: hidden; /* 隐藏超出容器的部分 */
+      text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
+
     }
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {

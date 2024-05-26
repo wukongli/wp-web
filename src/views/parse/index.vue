@@ -1,12 +1,12 @@
 <template>
   <div class="app-container home">
     <header>
-      <div class="back-icon">
+      <div @click="goBack()" class="back-icon">
         <MySvg iconName='icon-fanhui' width="30px" height="30px" size="30"></MySvg>
-        <span style="margin-left: 15px;" @click="goBack()">{{loadData.rootBackTitle}}</span>
+        <span style="margin-left: 15px;">{{loadData.rootBackTitle}}</span>
       </div>
-      <div class="back-title">
-        <span>{{loadData.bread}}</span>
+      <div :title="loadData.bread" class="back-title">
+        {{loadData.bread}}
       </div>
     </header>
 
@@ -126,8 +126,10 @@ import Cookies from 'js-cookie';
 import wechar from "@/assets/images/wechar.png";
 import MySvg from "@/components/icon/Svg.vue";
 const userStore = useUserStore();
-import {getFilesize,getIconClass} from "@/utils/wp";
+import {getFilesize,getIconClass,timestampToTime} from "@/utils/wp";
 import {setDownLoadRecord} from '@/api/system/vip';
+import { onBeforeRouteLeave,onBeforeRouteUpdate } from 'vue-router';
+const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
 const loadData = reactive({
@@ -158,10 +160,11 @@ const loadData = reactive({
   rootBackTitle:"全部文件",
   maxNum: false
 });
-
+// 路由离开时的操作
+onBeforeRouteLeave((to,from)=>{
+  proxy.$tab.closeOpenPage();
+})
 function getList(){
-
-  loadData.tableLoading = true;
   // const userCode = Cookies.get('code');
   const data = Object.assign({index:loadData.parseLinkParams.index},route.query)
   parseCopyLink(data);
@@ -225,6 +228,7 @@ function parseCopyLink(params){
         }
       })
       .catch(() => {
+        loadData.tableLoading = false;
         // loadData.errorDia = true;
       });
 }
@@ -281,7 +285,9 @@ async function getSign(params) {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
 }
 
 async function confirm(item) {
@@ -433,21 +439,6 @@ function goBack(){
 //   router.push({ path: '/login' });
 // }
 
-function timestampToTime(row, column, timestamp) {
-  // 时间戳为10位需*1000，时间戳为13位不需乘1000
-  var date = new Date(timestamp * 1000);
-  var Y = date.getFullYear() + '-';
-  var M =
-      (date.getMonth() + 1 < 10
-          ? '0' + (date.getMonth() + 1)
-          : date.getMonth() + 1) + '-';
-  var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ';
-  var h = date.getHours() + ':';
-  var m = date.getMinutes() + ':';
-  var s = date.getSeconds();
-  return Y + M + D + h + m + s;
-}
-
 function init(){
   if (
       !loadData.query.shorturl ||
@@ -466,6 +457,7 @@ function init(){
   const params = {
     shorturl:route.query.shorturl
   }
+  loadData.tableLoading = true;
   getSign(params).then(()=>{
     getList();
   })
@@ -506,23 +498,23 @@ function testDownLoad(){
   font-size: 18px;
   header {
     width: 100%;
-    height: 50px;
+    height: 40px;
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
     .back-icon{
       //width: 80px;
-      height: 40px;
+      height: 30px;
       float: left;
       margin-left: 10px;
       svg{
         float: left;
-        margin-top: 10px;
+        margin-top: 5px;
         margin-left: 15px;
       }
       span{
         float: left;
-        line-height: 50px;
+        line-height: 40px;
       }
       span:hover {
         color:#409EFF;
@@ -532,7 +524,11 @@ function testDownLoad(){
     .back-title {
       margin-left: 20px;
       float: left;
-      line-height: 50px;
+      line-height: 40px;
+      max-width: 80%;
+      white-space: nowrap; /* 防止文本换行 */
+      overflow: hidden; /* 隐藏超出容器的部分 */
+      text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
     }
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {

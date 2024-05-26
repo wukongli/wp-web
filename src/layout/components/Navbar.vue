@@ -35,31 +35,31 @@
 <!--          <size-select id="size-select" class="right-menu-item hover-effect" />-->
 <!--        </el-tooltip>-->
       </template>
-      <div v-if="loginData.login" class="avatar-container">
-        <el-dropdown
-          @command="handleCommand"
-          class="right-menu-item hover-effect"
-          trigger="click"
-        >
-          <div class="avatar-wrapper">
-            <img :src="userStore.avatar" class="user-avatar" />
-            <el-icon><caret-bottom /></el-icon>
-          </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <router-link to="/user/profile">
-                <el-dropdown-item>个人中心</el-dropdown-item>
-              </router-link>
-              <el-dropdown-item command="setLayout">
-                <span>布局设置</span>
-              </el-dropdown-item>
-              <el-dropdown-item divided command="logout">
-                <span>退出登录</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+<!--      <div v-if="loginData.login" class="avatar-container">-->
+<!--        <el-dropdown-->
+<!--          @command="handleCommand"-->
+<!--          class="right-menu-item hover-effect"-->
+<!--          trigger="click"-->
+<!--        >-->
+<!--          <div class="avatar-wrapper">-->
+<!--            <img :src="userStore.avatar" class="user-avatar" />-->
+<!--            <el-icon><caret-bottom /></el-icon>-->
+<!--          </div>-->
+<!--          <template #dropdown>-->
+<!--            <el-dropdown-menu>-->
+<!--              <router-link to="/user/profile">-->
+<!--                <el-dropdown-item>个人中心</el-dropdown-item>-->
+<!--              </router-link>-->
+<!--              <el-dropdown-item command="setLayout">-->
+<!--                <span>布局设置</span>-->
+<!--              </el-dropdown-item>-->
+<!--              <el-dropdown-item divided command="logout">-->
+<!--                <span>退出登录</span>-->
+<!--              </el-dropdown-item>-->
+<!--            </el-dropdown-menu>-->
+<!--          </template>-->
+<!--        </el-dropdown>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
@@ -108,7 +108,7 @@ function logout() {
   })
     .then(() => {
       userStore.logOut().then(() => {
-        location.href = '/vip/login';
+        location.href = '/parse/login';
       });
     })
     .catch(() => {});

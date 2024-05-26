@@ -421,12 +421,12 @@ onMounted(() => {
       !loadData.query.dir ||
       !loadData.query.root
   ) {
-    router.push({ path: '/vip/login' });
+    router.push({ path: '/parse/login' });
     return;
   }
   const code = Cookies.get('code');
   if (code == null || code === '') {
-    router.push({ path: '/vip/login' });
+    router.push({ path: '/parse/login' });
     return;
   }
   getSign();

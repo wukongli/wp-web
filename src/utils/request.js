@@ -105,10 +105,10 @@ service.interceptors.response.use(
       if (!isRelogin.show) {
         isRelogin.show = true;
         ElMessageBox.confirm(
-          '登录状态已过期，您可以继续留在该页面，或者重新登录',
+          '状态已过期，您可以继续留在该页面，或者返回首页',
           '系统提示',
           {
-            confirmButtonText: '重新登录',
+            confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',
           }
@@ -118,7 +118,7 @@ service.interceptors.response.use(
             useUserStore()
               .logOut()
               .then(() => {
-                location.href = '/vip/login';
+                location.href = '/parse/login';
               });
           })
           .catch(() => {
