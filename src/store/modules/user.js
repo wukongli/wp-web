@@ -39,19 +39,19 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-  loginNoPwd(){
-      return new Promise((resolve, reject) => {
-          loginNoPwd()
-              .then((res) => {
-                  setToken(res.token);
-                  this.token = res.token;
-                  resolve(res);
-              })
-              .catch((error) => {
-                  reject(error);
-              });
-      });
-  },
+  // loginNoPwd(){
+  //     return new Promise((resolve, reject) => {
+  //         loginNoPwd()
+  //             .then((res) => {
+  //                 setToken(res.token);
+  //                 this.token = res.token;
+  //                 resolve(res);
+  //             })
+  //             .catch((error) => {
+  //                 reject(error);
+  //             });
+  //     });
+  // },
     parseCopyLink(params) {
       return new Promise((resolve, reject) => {
         parse(params)

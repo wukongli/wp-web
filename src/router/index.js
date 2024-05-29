@@ -56,6 +56,102 @@ export const constantRoutes = [
     component: () => import('@/views/error/401'),
     hidden: true,
   },
+  {
+    name: "Back",
+    path: "/back",
+    hidden: false,
+    redirect: "noRedirect",
+    component: Layout,
+    alwaysShow: true,
+    meta: {
+      title: "Java教程",
+      icon: "back",
+      noCache: false,
+      link: null
+    },
+    children: [
+      {
+        name: "Java/list",
+        path: "java/list",
+        hidden: false,
+        meta: {
+          title: "Java列表",
+          icon: "course",
+          noCache: false,
+          link: null
+        },
+        component: () => import('@/views/back/index.vue'),
+      }
+    ]
+  },
+  {
+    name: "Front",
+    path: "/front",
+    hidden: false,
+    redirect: "noRedirect",
+    component: Layout,
+    alwaysShow: true,
+    meta: {
+      title: "前端教程",
+      icon: "front",
+      noCache: false,
+      link: null
+    },
+    children: [
+      {
+        name: "Front/list",
+        path: "front/list",
+        hidden: false,
+        component: () => import('@/views/front/index.vue'),
+        meta: {
+          title: "前端列表",
+          icon: "course",
+          noCache: false,
+          link: null
+        }
+      }
+    ]
+  },
+  {
+    name: "Parse",
+    path: "/parse",
+    hidden: false,
+    redirect: "noRedirect",
+    component: Layout,
+    alwaysShow: true,
+    meta: {
+      title: "高速下载",
+      icon: "upload",
+      noCache: false,
+      link: null
+    },
+    children: [
+      {
+        name: "Login",
+        path: "login",
+        hidden: false,
+        component: () => import('@/views/parse/login.vue'),
+        meta: {
+          title: "下载列表",
+          icon: "example",
+          noCache: false,
+          link: null
+        }
+      },
+      {
+        name: "Index",
+        path: "index",
+        hidden: true,
+        component: () => import('@/views/parse/index.vue'),
+        meta: {
+          title: "解析列表",
+          icon: "example",
+          noCache: false,
+          link: null
+        }
+      }
+    ]
+  },
   // {
   //   path: '/index',
   //   component: Layout,

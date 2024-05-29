@@ -16,7 +16,7 @@ const usePermissionStore = defineStore(
       addRoutes: [],
       defaultRoutes: [],
       topbarRouters: [],
-      sidebarRouters: []
+      sidebarRouters: constantRoutes
     }),
     actions: {
       setRoutes(routes) {
@@ -45,11 +45,138 @@ const usePermissionStore = defineStore(
             const asyncRoutes = filterDynamicRoutes(dynamicRoutes)
             asyncRoutes.forEach(route => { router.addRoute(route) })
             this.setRoutes(rewriteRoutes)
-            this.setSidebarRouters(constantRoutes.concat(sidebarRoutes))
+            const result = constantRoutes.filter((e)=>{
+              sidebarRoutes.forEach((item)=>{
+                if(e.path !== item.path){
+                  return e;
+                }
+              })
+            })
+            this.setSidebarRouters(result.concat(sidebarRoutes));
             this.setDefaultRoutes(sidebarRoutes)
             this.setTopbarRoutes(defaultRoutes)
             resolve(rewriteRoutes)
           })
+        })
+      },
+      generateStaticRoutes(roles) {
+        return new Promise(resolve => {
+          const res = {
+            msg: "操作成功",
+            code: 200,
+            data: [
+              {
+                name: "Front",
+                path: "/front",
+                hidden: false,
+                redirect: "noRedirect",
+                component: "Layout",
+                alwaysShow: true,
+                meta: {
+                  title: "前端教程",
+                  icon: "front",
+                  noCache: false,
+                  link: null
+                },
+                children: [
+                  {
+                    name: "Front/list",
+                    path: "front/list",
+                    hidden: false,
+                    component: "front/index",
+                    meta: {
+                      title: "前端列表",
+                      icon: "course",
+                      noCache: false,
+                      link: null
+                    }
+                  }
+                ]
+              },
+              {
+                name: "Back",
+                path: "/back",
+                hidden: false,
+                redirect: "noRedirect",
+                component: "Layout",
+                alwaysShow: true,
+                meta: {
+                  title: "Java教程",
+                  icon: "back",
+                  noCache: false,
+                  link: null
+                },
+                children: [
+                  {
+                    name: "Java/list",
+                    path: "java/list",
+                    hidden: false,
+                    component: "back/index",
+                    meta: {
+                      title: "Java列表",
+                      icon: "course",
+                      noCache: false,
+                      link: null
+                    }
+                  }
+                ]
+              },
+              {
+                name: "Parse",
+                path: "/parse",
+                hidden: false,
+                redirect: "noRedirect",
+                component: "Layout",
+                alwaysShow: true,
+                meta: {
+                  title: "高速下载",
+                  icon: "upload",
+                  noCache: false,
+                  link: null
+                },
+                children: [
+                  {
+                    name: "Login",
+                    path: "login",
+                    hidden: false,
+                    component: "parse/login",
+                    meta: {
+                      title: "下载列表",
+                      icon: "example",
+                      noCache: false,
+                      link: null
+                    }
+                  },
+                  {
+                    name: "Index",
+                    path: "index",
+                    hidden: true,
+                    component: "parse/index",
+                    meta: {
+                      title: "解析列表",
+                      icon: "example",
+                      noCache: false,
+                      link: null
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+          // 向后端请求路由数据
+            const sdata = JSON.parse(JSON.stringify(res.data))
+            const rdata = JSON.parse(JSON.stringify(res.data))
+            const defaultData = JSON.parse(JSON.stringify(res.data))
+            const sidebarRoutes = filterAsyncRouter(sdata)
+            const rewriteRoutes = filterAsyncRouter(rdata, false, true)
+            const defaultRoutes = filterAsyncRouter(defaultData)
+            const asyncRoutes = filterDynamicRoutes(dynamicRoutes)
+            asyncRoutes.forEach(route => { router.addRoute(route) })
+            this.setRoutes(rewriteRoutes)
+            this.setSidebarRouters(constantRoutes.concat(sidebarRoutes))
+            this.setDefaultRoutes(sidebarRoutes)
+            this.setTopbarRoutes(defaultRoutes)
+            resolve(rewriteRoutes)
         })
       }
     }

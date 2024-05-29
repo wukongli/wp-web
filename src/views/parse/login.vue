@@ -175,7 +175,7 @@ async function handleLogin() {
         return res;
       })
       if (result.code === 200) {
-        if (result.data === "验证码不正确") {
+        if (result.data === "0") {
           loading.value = false;
           hint.getCodeVisible = true;
           hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"

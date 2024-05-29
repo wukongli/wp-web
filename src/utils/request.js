@@ -118,7 +118,7 @@ service.interceptors.response.use(
             useUserStore()
               .logOut()
               .then(() => {
-                location.href = '/parse/login';
+                location.href = '/vip/login';
               });
           })
           .catch(() => {

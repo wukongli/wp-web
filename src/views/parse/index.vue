@@ -308,7 +308,7 @@ async function confirm(item) {
       .then((data) => {
         if (data.code === 200) {
           if (data.data.errno === '0') {
-            if (data.data.codeUseNum === '0') {
+            if (data.data.restNum === '-1') {
               //下载次数为0，弹窗，请重新获取验证码
               //删除验证码
               Cookies.remove('code');
@@ -318,8 +318,8 @@ async function confirm(item) {
               item.disable = false;
               return;
             }
-            //每天最多允许下载40次
-            if(parseInt(data.data.codeUseNum) >= 16){
+            //每天最多允许下载20次
+            if(parseInt(data.data.codeUseNum) >= 20){
               loadData.maxNum = true;
               item.status = 0;
               item.loading = false;
@@ -335,7 +335,7 @@ async function confirm(item) {
               return;
             }
 
-            loadData.codeNum = parseInt(data.data.codeUseNum) - 1 ;
+            loadData.codeNum = data.data.restNum === "-1" ? 0 : parseInt(data.data.restNum);
             loadData.realLink = data.data.realLink;
             //发送到下载器
             let options = {

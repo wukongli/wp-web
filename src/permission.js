@@ -8,11 +8,11 @@ import { isRelogin } from '@/utils/request';
 import useUserStore from '@/store/modules/user';
 import useSettingsStore from '@/store/modules/settings';
 import usePermissionStore from '@/store/modules/permission';
-import Layout from "@/layout/index.vue";
+// import Layout from "@/layout/index.vue";
 
 NProgress.configure({ showSpinner: false });
 
-const whiteList = ['/login', '/register', '/vip/login', '/index'];
+const whiteList = ['/login', '/register', '/vip/login','/back/java/list','/front/front/list','/parse/login','/parse/index'];
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
@@ -35,17 +35,7 @@ router.beforeEach((to, from, next) => {
                       router.addRoute(route); // 动态添加可访问路由表
                     }
                   });
-                  console.log(to);
-                  if(to.path==="/parse/login"){
-                      next({ path: '/parse/login' });
-                  }else if(to.path==="/front/front/list"){
-                      next({ path: '/front/front/list' });
-
-                  }else if(to.path==="/back/java/list"){
-                      next({ path: '/back/java/list' });
-                  }else{
-                      next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
-                  }
+                  next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
 
                 });
           })
@@ -54,40 +44,20 @@ router.beforeEach((to, from, next) => {
                 .logOut()
                 .then(() => {
                   ElMessage.error(err);
-                  next({ path: '/parse/login' });
+                  next({ path: '/vip/login' });
                 });
           });
     } else {
 
       next();
     }
-    /* has token*/
-    // if (to.path === '/login') {
-    //   next({ path: '/system/user' });
-    //   NProgress.done();
-    // } else {
-    //
-    // }
   } else {
     // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
       // 在免登录白名单，直接进入
       next();
     } else {
-        useUserStore()
-            .loginNoPwd()
-            .then((res) => {
-                console.log(to.path);
-                if(to.path==="/parse/login"){
-                    next({ path: '/parse/login' });
-                }else if(to.path==="/front/front/list"){
-                    next({ path: '/front/front/list' });
-
-                }else if(to.path==="/back/java/list") {
-                    next({path: '/back/java/list'});
-                }
-            });
-      // next(`/vip/login?redirect=${to.fullPath}`); // 否则全部重定向到登录页
+      next(`/vip/login?redirect=${to.fullPath}`); // 否则全部重定向到登录页
       NProgress.done();
     }
   }
