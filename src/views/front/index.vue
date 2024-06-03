@@ -74,6 +74,8 @@ import { ElMessage } from 'element-plus';
 import MySvg from "@/components/icon/Svg.vue";
 const userStore = useUserStore();
 import {getFilesize,getIconClass,timestampToTime} from "@/utils/wp";
+const { proxy } = getCurrentInstance();
+const { sys_course_type } = proxy.useDict('sys_course_type');
 import wechar from "@/assets/images/wechar.png";
 const route = useRoute();
 const router = useRouter();
@@ -81,8 +83,8 @@ const loadData = reactive({
   bread: '',
   tableData: [],
   query: {
-    shorturl: '1QxFSc2H2GsEyLTHsClQzoQ',
-    pwd: encrypt('ayxd'),
+    shorturl: '',
+    pwd: '',
     dir: '1',
     root: '1',
   },
@@ -218,13 +220,20 @@ function goBack(){
 }
 
 function init(){
-  const params = {
-    shorturl:loadData.query.shorturl
-  }
   loadData.tableLoading = true;
-  getSign(params).then(()=>{
-    getList();
+  userStore.getCourse(0).then((res)=>{
+    if(res.code === 200){
+      loadData.query.shorturl = res.data.url;
+      loadData.query.pwd = res.data.pwd;
+      const params = {
+        shorturl:res.data.url
+      }
+      getSign(params).then(()=>{
+        getList();
+      })
+    }
   })
+
 }
 init();
 function downLoad(){
@@ -245,11 +254,10 @@ function downLoad(){
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
+    display: flex;
     .back-icon{
       //width: 80px;
       height: 30px;
-      float: left;
-      margin-left: 10px;
       svg{
         float: left;
         margin-top: 5px;
@@ -266,7 +274,6 @@ function downLoad(){
 
     .back-title {
       margin-left: 20px;
-      float: left;
       line-height: 40px;
       max-width: 80%;
       white-space: nowrap; /* 防止文本换行 */
@@ -286,9 +293,9 @@ function downLoad(){
     color: #923333;
   }
   .qr-code {
-    width: 180px;
+    width: 170px;
     height: 180px;
-    margin: 20px auto 0;
+    margin: auto ;
     display: block;
   }
   .qr-hint {

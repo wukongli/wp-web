@@ -57,34 +57,6 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    name: "Back",
-    path: "/back",
-    hidden: false,
-    redirect: "noRedirect",
-    component: Layout,
-    alwaysShow: true,
-    meta: {
-      title: "Java教程",
-      icon: "back",
-      noCache: false,
-      link: null
-    },
-    children: [
-      {
-        name: "Java/list",
-        path: "java/list",
-        hidden: false,
-        meta: {
-          title: "Java列表",
-          icon: "course",
-          noCache: false,
-          link: null
-        },
-        component: () => import('@/views/back/index.vue'),
-      }
-    ]
-  },
-  {
     name: "Front",
     path: "/front",
     hidden: false,
@@ -99,16 +71,67 @@ export const constantRoutes = [
     },
     children: [
       {
-        name: "Front/list",
+        // name: "Front/list",
         path: "front/list",
         hidden: false,
         component: () => import('@/views/front/index.vue'),
         meta: {
-          title: "前端列表",
+          title: "前端课程列表",
           icon: "course",
           noCache: false,
           link: null
         }
+      },{
+        // name: "Front/list",
+        path: "front/interview",
+        hidden: false,
+        component: () => import('@/views/front/interview.vue'),
+        meta: {
+          title: "前端面试题",
+          icon: "documentation",
+          noCache: false,
+          link: null
+        }
+      }
+    ]
+  },
+  {
+    name: "Back",
+    path: "/back",
+    hidden: false,
+    redirect: "noRedirect",
+    component: Layout,
+    alwaysShow: true,
+    meta: {
+      title: "Java教程",
+      icon: "back",
+      noCache: false,
+      link: null
+    },
+    children: [
+      {
+        // name: "Java/list",
+        path: "java/list",
+        hidden: false,
+        meta: {
+          title: "Java课程列表",
+          icon: "course",
+          noCache: false,
+          link: null
+        },
+        component: () => import('@/views/back/index.vue'),
+      },
+      {
+        // name: "Java/list",
+        path: "java/interview",
+        hidden: false,
+        meta: {
+          title: "Java面试题",
+          icon: "documentation",
+          noCache: false,
+          link: null
+        },
+        component: () => import('@/views/back/interview.vue'),
       }
     ]
   },

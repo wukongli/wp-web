@@ -122,12 +122,19 @@ export function getVip() {
   });
 }
 
-
 export function getCode(data) {
   return request({
     url: '/wp/getCodeNum',
     method: 'post',
     timeout: 20000,
     data: data,
+  });
+}
+
+export function getCourseByType(type) {
+  return request({
+    url: '/course/' + type,
+    method: 'get',
+    timeout: 20000,
   });
 }

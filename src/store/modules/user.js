@@ -7,7 +7,8 @@ import {
   getSignReq,
   getVip,
   getCode,
-    loginNoPwd
+    loginNoPwd,
+    getCourseByType
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -167,7 +168,18 @@ const useUserStore = defineStore('user', {
               reject(error);
             });
       });
-    }
+    },
+      getCourse(type){
+          return new Promise((resolve, reject) => {
+              getCourseByType(type)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      }
   },
 });
 

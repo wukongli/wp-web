@@ -3,32 +3,42 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-            type="primary"
-            plain
-            icon="Plus"
-            @click="handleAdd"
-            v-hasPermi="['system:post:add']"
-        >新增</el-button
+          type="primary"
+          plain
+          icon="Plus"
+          @click="handleAdd"
+          v-hasPermi="['system:post:add']"
+          >新增</el-button
         >
       </el-col>
 
       <right-toolbar
-          v-model:showSearch="showSearch"
-          @queryTable="getList"
+        v-model:showSearch="showSearch"
+        @queryTable="getList"
       ></right-toolbar>
     </el-row>
     <el-table
-        style="margin-top: 20px;"
-        v-loading="loading"
-        :data="postList"
-        @selection-change="handleSelectionChange"
+      style="margin-top: 20px"
+      v-loading="loading"
+      :data="postList"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column :show-overflow-tooltip="true" label="文件名称" align="center" prop="fileName" >
+      <el-table-column
+        :show-overflow-tooltip="true"
+        label="文件名称"
+        align="center"
+        prop="fileName"
+      >
       </el-table-column>
-       <el-table-column label="文件大小" align="center" prop="fileSize" />
-       <el-table-column label="用户名" align="center" prop="userName" />
-      <el-table-column label="下载时间" align="center" prop="createTime" >
+      <el-table-column
+        label="文件大小"
+        align="center"
+        prop="fileSize"
+        :formatter="getFilesize"
+      />
+      <el-table-column label="用户名" align="center" prop="userName" />
+      <el-table-column label="下载时间" align="center" prop="createTime">
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
@@ -36,11 +46,11 @@
     </el-table>
 
     <pagination
-        v-show="total > 0"
-        :total="total"
-        v-model:page="queryParams.pageNum"
-        v-model:limit="queryParams.pageSize"
-        @pagination="getList"
+      v-show="total > 0"
+      :total="total"
+      v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
     />
 
     <!-- 添加或修改岗位对话框 -->
@@ -61,10 +71,9 @@
 </template>
 
 <script setup name="Post">
-import {getDownLoadRecord} from '@/api/system/vip';
+import { getDownLoadRecord } from '@/api/system/vip';
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
-
+import { getFilesize } from '@/utils/wp';
 const postList = ref([]);
 const open = ref(false);
 const loading = ref(true);
@@ -137,7 +146,7 @@ function submitForm() {
 getList();
 </script>
 <style scoped lang="scss">
-.code-down{
+.code-down {
   font-weight: bold;
 }
 </style>

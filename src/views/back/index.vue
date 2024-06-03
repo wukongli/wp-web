@@ -81,8 +81,8 @@ const loadData = reactive({
   bread: '',
   tableData: [],
   query: {
-    shorturl: '1Ss2szFitiVs0wRhpEMj0nw',
-    pwd: encrypt('va8r'),
+    shorturl: '',
+    pwd: '',
     dir: '1',
     root: '1',
   },
@@ -218,12 +218,18 @@ function goBack(){
 }
 
 function init(){
-  const params = {
-    shorturl:loadData.query.shorturl
-  }
   loadData.tableLoading = true;
-  getSign(params).then(()=>{
-    getList();
+  userStore.getCourse(1).then((res)=>{
+    if(res.code === 200){
+      loadData.query.shorturl = res.data.url;
+      loadData.query.pwd = res.data.pwd;
+      const params = {
+        shorturl:res.data.url
+      }
+      getSign(params).then(()=>{
+        getList();
+      })
+    }
   })
 }
 init();
@@ -245,10 +251,10 @@ function downLoad(){
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
+    display: flex;
     .back-icon{
       //width: 80px;
       height: 30px;
-      float: left;
       margin-left: 10px;
       svg{
         float: left;
@@ -266,7 +272,6 @@ function downLoad(){
 
     .back-title {
       margin-left: 20px;
-      float: left;
       line-height: 40px;
       max-width: 80%;
       white-space: nowrap; /* 防止文本换行 */
@@ -287,9 +292,9 @@ function downLoad(){
     color: #923333;
   }
   .qr-code {
-    width: 180px;
+    width: 170px;
     height: 180px;
-    margin: 20px auto 0;
+    margin: auto ;
     display: block;
   }
   .qr-hint {
