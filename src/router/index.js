@@ -1,4 +1,4 @@
-import { createWebHistory,createRouter } from 'vue-router';
+import { createWebHistory, createRouter } from 'vue-router';
 /* Layout */
 import Layout from '@/layout';
 
@@ -57,123 +57,124 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    name: "Front",
-    path: "/front",
+    name: 'Front',
+    path: '/front',
     hidden: false,
-    redirect: "noRedirect",
+    redirect: 'noRedirect',
     component: Layout,
     alwaysShow: true,
     meta: {
-      title: "前端教程",
-      icon: "front",
+      title: '前端教程',
+      icon: 'front',
       noCache: false,
-      link: null
+      link: null,
     },
     children: [
       {
         // name: "Front/list",
-        path: "front/list",
+        path: 'front/list',
         hidden: false,
         component: () => import('@/views/front/index.vue'),
         meta: {
-          title: "前端课程列表",
-          icon: "course",
+          title: '前端课程列表',
+          icon: 'course',
           noCache: false,
-          link: null
-        }
-      },{
+          link: null,
+        },
+      },
+      {
         // name: "Front/list",
-        path: "front/interview",
+        path: 'front/interview',
         hidden: false,
         component: () => import('@/views/front/interview.vue'),
         meta: {
-          title: "前端面试题",
-          icon: "documentation",
+          title: '前端面试题',
+          icon: 'documentation',
           noCache: false,
-          link: null
-        }
-      }
-    ]
+          link: null,
+        },
+      },
+    ],
   },
   {
-    name: "Back",
-    path: "/back",
+    name: 'Back',
+    path: '/back',
     hidden: false,
-    redirect: "noRedirect",
+    redirect: 'noRedirect',
     component: Layout,
     alwaysShow: true,
     meta: {
-      title: "Java教程",
-      icon: "back",
+      title: 'Java教程',
+      icon: 'back',
       noCache: false,
-      link: null
+      link: null,
     },
     children: [
       {
         // name: "Java/list",
-        path: "java/list",
+        path: 'java/list',
         hidden: false,
         meta: {
-          title: "Java课程列表",
-          icon: "course",
+          title: 'Java课程列表',
+          icon: 'course',
           noCache: false,
-          link: null
+          link: null,
         },
         component: () => import('@/views/back/index.vue'),
       },
       {
         // name: "Java/list",
-        path: "java/interview",
+        path: 'java/interview',
         hidden: false,
         meta: {
-          title: "Java面试题",
-          icon: "documentation",
+          title: 'Java面试题',
+          icon: 'documentation',
           noCache: false,
-          link: null
+          link: null,
         },
         component: () => import('@/views/back/interview.vue'),
-      }
-    ]
+      },
+    ],
   },
   {
-    name: "Parse",
-    path: "/parse",
+    name: 'Parse',
+    path: '/parse',
     hidden: false,
-    redirect: "noRedirect",
+    redirect: 'noRedirect',
     component: Layout,
     alwaysShow: true,
     meta: {
-      title: "高速下载",
-      icon: "upload",
+      title: '高速下载',
+      icon: 'upload',
       noCache: false,
-      link: null
+      link: null,
     },
     children: [
       {
-        name: "Login",
-        path: "login",
+        name: 'Login',
+        path: 'login',
         hidden: false,
         component: () => import('@/views/parse/login.vue'),
         meta: {
-          title: "下载列表",
-          icon: "example",
+          title: '下载列表',
+          icon: 'example',
           noCache: false,
-          link: null
-        }
+          link: null,
+        },
       },
       {
-        name: "Index",
-        path: "index",
+        name: 'Index',
+        path: 'index',
         hidden: true,
         component: () => import('@/views/parse/index.vue'),
         meta: {
-          title: "解析列表",
-          icon: "example",
+          title: '解析列表',
+          icon: 'example',
           noCache: false,
-          link: null
-        }
-      }
-    ]
+          link: null,
+        },
+      },
+    ],
   },
   // {
   //   path: '/index',

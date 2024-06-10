@@ -17,7 +17,8 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
-
+    <span>关闭网盘限速短信提醒：</span
+    ><el-switch @change="switchLimitMessage" v-model="value1" />
     <el-table
       v-loading="loading"
       :data="postList"
@@ -48,14 +49,14 @@
         class-name="small-padding fixed-width"
       >
         <template #default="scope">
-<!--          <el-button-->
-<!--            link-->
-<!--            type="primary"-->
-<!--            icon="Edit"-->
-<!--            @click="handleUpdate(scope.row)"-->
-<!--            v-hasPermi="['system:post:edit']"-->
-<!--            >修改</el-button-->
-<!--          >-->
+          <!--          <el-button-->
+          <!--            link-->
+          <!--            type="primary"-->
+          <!--            icon="Edit"-->
+          <!--            @click="handleUpdate(scope.row)"-->
+          <!--            v-hasPermi="['system:post:edit']"-->
+          <!--            >修改</el-button-->
+          <!--          >-->
           <el-button
             link
             type="primary"
@@ -79,12 +80,12 @@
     <!-- 添加或修改岗位对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="postRef" :model="form" :rules="rules" label-width="80px">
-<!--        <el-form-item label="账号类型" prop="type">-->
-<!--          <el-select v-model="form.type" placeholder="请选择">-->
-<!--            <el-option label="svip账号" value="1" />-->
-<!--            <el-option label="普通账号" value="0" />-->
-<!--          </el-select>-->
-<!--        </el-form-item>-->
+        <!--        <el-form-item label="账号类型" prop="type">-->
+        <!--          <el-select v-model="form.type" placeholder="请选择">-->
+        <!--            <el-option label="svip账号" value="1" />-->
+        <!--            <el-option label="普通账号" value="0" />-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
         <el-form-item label="vip名字" prop="name">
           <el-input v-model="form.name" placeholder="请输vip名字" />
         </el-form-item>
@@ -103,8 +104,14 @@
 </template>
 
 <script setup name="Post">
-import { listVip, addPost,deleteVip } from '@/api/system/vip';
-import {ElMessage} from "element-plus";
+import {
+  listVip,
+  addPost,
+  deleteVip,
+  getMessage,
+  sendMessage,
+} from '@/api/system/vip';
+import { ElMessage } from 'element-plus';
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -118,7 +125,7 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
-
+const value1 = ref(false);
 const data = reactive({
   form: {},
   queryParams: {
@@ -132,6 +139,12 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+function switchLimitMessage(value) {
+  console.log(value);
+  const param = { limit: value ? 1 : 0 };
+  sendMessage(param).then(() => {});
+}
 
 /** 查询vip列表 */
 function getList() {
@@ -182,15 +195,23 @@ function submitForm() {
   });
 }
 
-function handleDelete(item){
+function handleDelete(item) {
   const data = {
-    idList:item.id
-  }
+    idList: item.id,
+  };
   deleteVip(data).then((response) => {
-   ElMessage.success("删除成功")
+    ElMessage.success('删除成功');
     getList();
   });
 }
 
+function getMessageStatus() {
+  getMessage().then((response) => {
+    if ((response.code = 200)) {
+      value1.value = response.data === 1 ? true : false;
+    }
+  });
+}
+getMessageStatus();
 getList();
 </script>

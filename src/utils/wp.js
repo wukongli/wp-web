@@ -107,3 +107,14 @@ export function timestampToTime(row, column, timestamp) {
     // return Y + M + D + h + m + s;
     return Y + M + D;
 }
+
+export function generateRandomLetters(count) {
+    let letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    let counts = count || 4;
+    for (let i = 0; i < counts; i++) {
+        result += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+
+    return result;
+}

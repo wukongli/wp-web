@@ -18,9 +18,7 @@ export function addPost(data) {
   });
 }
 
-
-
- export function deleteVip (data){
+export function deleteVip(data) {
   return request({
     url: '/vip',
     method: 'delete',
@@ -28,7 +26,7 @@ export function addPost(data) {
   });
 }
 
-export function getCommonCookie (query){
+export function getCommonCookie(query) {
   return request({
     url: '/wp/getCookie',
     method: 'get',
@@ -78,5 +76,28 @@ export function getDownLoadRecord(data) {
     url: '/downloadRecord',
     method: 'get',
     params: data,
+  });
+}
+
+export function sendMessage(data) {
+  return request({
+    url: '/vip/sendMessage',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function getMessage() {
+  return request({
+    url: '/vip/getMessage',
+    method: 'get',
+  });
+}
+
+export function shareUrl(data) {
+  return request({
+    url: '/wp/getDownLoadUrl',
+    method: 'post',
+    data: data,
   });
 }

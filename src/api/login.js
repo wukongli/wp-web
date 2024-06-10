@@ -138,3 +138,26 @@ export function getCourseByType(type) {
     timeout: 20000,
   });
 }
+
+fetch('/rest/2.0/xpan/nas?method=uinfo')
+  .then((q) => q.json())
+  .then((r) => {
+    if (r.errno == 0) {
+      const param = {
+        uk: r.uk,
+      };
+      fetch(config.main_url + '/wp/getNum', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(param),
+      })
+        .then((q) => q.json())
+        .then((item) => {
+          if (item.code == 200 && item.data.code == 0 && item.data.num > 0) {
+            console.log('账号正常可以下载');
+          }
+        });
+    }
+  });

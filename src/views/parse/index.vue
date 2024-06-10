@@ -243,11 +243,14 @@ function parseCopyLink(params) {
           const list = data.data.data.list;
           const title = data.data.data.title;
           loadData.bread = title;
+          const code = Cookies.get('code');
           list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
-            if (parseInt(item.size) > loadData.fileSize) {
-              item.disable = true;
+            if (!code.includes('svip')) {
+              if (parseInt(item.size) > loadData.fileSize) {
+                item.disable = true;
+              }
             }
           });
           loadData.tableData = list;
