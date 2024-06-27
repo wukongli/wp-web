@@ -32,6 +32,7 @@
           <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
         </template>
       </el-table-column>
+      <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
       <el-table-column
         label="创建时间"
         align="center"
@@ -43,20 +44,29 @@
         </template>
       </el-table-column>
       <el-table-column
+          label="修改时间"
+          align="center"
+          prop="createTime"
+          width="180"
+      >
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.updateTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="操作"
         width="180"
         align="center"
         class-name="small-padding fixed-width"
       >
         <template #default="scope">
-          <!--          <el-button-->
-          <!--            link-->
-          <!--            type="primary"-->
-          <!--            icon="Edit"-->
-          <!--            @click="handleUpdate(scope.row)"-->
-          <!--            v-hasPermi="['system:post:edit']"-->
-          <!--            >修改</el-button-->
-          <!--          >-->
+                    <el-button
+                      link
+                      type="primary"
+                      icon="Edit"
+                      @click="handleUpdate(scope.row)"
+                      >修改</el-button
+                    >
           <el-button
             link
             type="primary"
@@ -92,6 +102,9 @@
         <el-form-item label="cookie" prop="cookie">
           <el-input v-model="form.cookie" placeholder="请输入cookie" />
         </el-form-item>
+        <el-form-item label="status" prop="status">
+          <el-input v-model="form.status" placeholder="0正常1停用" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -109,9 +122,10 @@ import {
   addPost,
   deleteVip,
   getMessage,
-  sendMessage,
+  sendMessage, putPost,
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
+import {getUser} from "@/api/system/user";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -165,6 +179,7 @@ function reset() {
   form.value = {
     cookie: undefined,
     name: undefined,
+    status:undefined,
   };
   proxy.resetForm('postRef');
 }
@@ -182,15 +197,39 @@ function handleAdd() {
   title.value = '新增vip';
 }
 
+function handleUpdate(row) {
+   console.log(row);
+    open.value = true;
+    title.value = "修改信息";
+    form.value = {
+      cookie: row.cookie,
+      name: row.name,
+      status:row.status,
+      id:row.id
+    };
+
+}
+
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs['postRef'].validate((valid) => {
     if (valid) {
-      addPost(form.value).then((response) => {
-        proxy.$modal.msgSuccess('新增成功');
-        open.value = false;
-        getList();
-      });
+      if(title.value === "修改信息"){
+        putPost(form.value).then((response) => {
+          proxy.$modal.msgSuccess('修改成功');
+          reset();
+          open.value = false;
+          getList();
+        });
+      }else if(title.value === "新增vip"){
+        addPost(form.value).then((response) => {
+          proxy.$modal.msgSuccess('新增成功');
+          reset();
+          open.value = false;
+          getList();
+        });
+      }
+
     }
   });
 }

@@ -97,7 +97,7 @@ export function parseCopyLink(data) {
 
 export function parseLinkReq(data) {
   return request({
-    url: '/wp/parseLink',
+    url: '/wp/dlink',
     // url: '/wp/parseLinkTest',
     method: 'post',
     timeout: 20000,
@@ -125,6 +125,15 @@ export function getVip() {
 export function getCode(data) {
   return request({
     url: '/wp/getCodeNum',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function delCode(data) {
+  return request({
+    url: '/wp/del/code',
     method: 'post',
     timeout: 20000,
     data: data,

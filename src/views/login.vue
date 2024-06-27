@@ -146,15 +146,15 @@ const captchaEnabled = ref(true);
 const register = ref(false);
 const redirect = ref(undefined);
 
-function getVipNums(){
-  userStore.getVipNum().then((data) => {
-    if (data.code === 200) {
-      if (data.data === 0) {
-        hint.show = true;
-      }
-    }
-  });
-}
+// function getVipNums(){
+//   userStore.getVipNum().then((data) => {
+//     if (data.code === 200) {
+//       if (data.data === 0) {
+//         hint.show = true;
+//       }
+//     }
+//   });
+// }
 function handleBlur() {
   const { url, pwd } = SubmitLink(loginForm.value.username);
   loginForm.value.shorturl = url;
@@ -251,7 +251,7 @@ function handleClose() {
   loading.value = false;
 }
 
-getVipNums();
+// getVipNums();
 </script>
 
 <style lang="scss" scoped>

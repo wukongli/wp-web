@@ -7,11 +7,11 @@
         class="login-form"
     >
       <h3 class="title">网盘文件加速下载</h3>
-      <div v-if="hint.show" class="hint-box">
-        <el-tag class="hint" type="danger" effect="dark" round>
-          下载解析限速中管理员正在修复请稍后再试...
-        </el-tag>
-      </div>
+<!--      <div v-if="hint.show" class="hint-box">-->
+<!--        <el-tag class="hint" type="danger" effect="dark" round>-->
+<!--          下载解析限速中管理员正在修复请稍后再试...-->
+<!--        </el-tag>-->
+<!--      </div>-->
 
       <el-form-item prop="username">
         <el-input
@@ -41,24 +41,24 @@
           /></template>
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-            v-model="loginForm.code"
-            size="large"
-            auto-complete="off"
-            placeholder="验证码"
-            style="width: 63%"
-            @keyup.enter="handleLogin"
-        >
-          <template #prefix
-          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"
-          /></template>
-        </el-input>
+<!--      <el-form-item prop="code" v-if="captchaEnabled">-->
+<!--        <el-input-->
+<!--            v-model="loginForm.code"-->
+<!--            size="large"-->
+<!--            auto-complete="off"-->
+<!--            placeholder="验证码"-->
+<!--            style="width: 63%"-->
+<!--            @keyup.enter="handleLogin"-->
+<!--        >-->
+<!--          <template #prefix-->
+<!--          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"-->
+<!--          /></template>-->
+<!--        </el-input>-->
         <div class="login-code">
           <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
           <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
-      </el-form-item>
+<!--      </el-form-item>-->
       <!-- <el-checkbox -->
       <!-- v-model="loginForm.rememberMe"
         style="margin: 0px 0px 25px 0px"
@@ -144,15 +144,15 @@ const captchaEnabled = ref(true);
 const register = ref(false);
 const redirect = ref(undefined);
 
-function getVipNums(){
-  userStore.getVipNum().then((data) => {
-    if (data.code === 200) {
-      if (data.data === 0) {
-        hint.show = true;
-      }
-    }
-  });
-}
+// function getVipNums(){
+//   userStore.getVipNum().then((data) => {
+//     if (data.code === 200) {
+//       if (data.data === 0) {
+//         hint.show = true;
+//       }
+//     }
+//   });
+// }
 function handleBlur() {
   const { url, pwd } = SubmitLink(loginForm.value.username);
   loginForm.value.shorturl = url;
@@ -165,25 +165,25 @@ async function handleLogin() {
   proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
-      if (loginForm.value.code === '' || loginForm.value.code == null) {
-        hint.getCodeVisible = true;
-        hint.message = "请扫码关注公众号获取验证码!"
-        return;
-      }
-      //获取下载次数
-      const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
-        return res;
-      })
-      if (result.code === 200) {
-        if (result.data === "0") {
-          loading.value = false;
-          hint.getCodeVisible = true;
-          hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"
-          return;
-        }
-      }
-      //过期时间十分钟
-      Cookies.set('code', loginForm.value.code, { expires: 1 });
+      // if (loginForm.value.code === '' || loginForm.value.code == null) {
+      //   hint.getCodeVisible = true;
+      //   hint.message = "请扫码关注公众号获取验证码!"
+      //   return;
+      // }
+      // //获取下载次数
+      // const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
+      //   return res;
+      // })
+      // if (result.code === 200) {
+      //   if (result.data === "0") {
+      //     loading.value = false;
+      //     hint.getCodeVisible = true;
+      //     hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"
+      //     return;
+      //   }
+      // }
+      // //过期时间十分钟
+      // Cookies.set('code', loginForm.value.code, { expires: 1 });
       // showLogin.value = false;
       router.push({
         path: '/parse/index',
@@ -210,7 +210,7 @@ function handleClose() {
   loading.value = false;
 }
 
-getVipNums();
+// getVipNums();
 </script>
 
 <style lang="scss" scoped>
@@ -279,15 +279,18 @@ getVipNums();
 }
 .login-code {
   width: 33%;
-  height: 40px;
-  line-height: 40px;
-  float: right;
+  height: 20px;
+  line-height: 20px;
+  margin-bottom: 18px;
+  float: left;
   cursor: pointer;
-  text-align: center;
   font-weight: bold;
-  color: red;
   text-decoration: none; /* 默认情况下不显示下划线 */
   transition: text-decoration 0.3s; /* 添加过渡效果使下划线出现更平滑 */
+  a{
+    color: red;
+
+  }
   //img {
   //  cursor: pointer;
   //  vertical-align: middle;

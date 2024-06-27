@@ -47,12 +47,12 @@
           label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
-        <el-table-column label="剩余下载次数"
-          >{{
-            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum
-          }}
-          次</el-table-column
-        >
+<!--        <el-table-column label="剩余下载次数"-->
+<!--          >{{-->
+<!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
+<!--          }}-->
+<!--          次</el-table-column-->
+<!--        >-->
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
@@ -87,19 +87,27 @@
         </span>
       </template>
     </el-dialog>
-    <!-- 添加微信弹窗 -->
+    <!-- 扫描获取验证码弹窗 -->
     <el-dialog
-      :show-close="false"
-      title="提示"
-      v-model="loadData.addWeCharVisible"
-      width="30%"
+        title="提示"
+        v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="wechar" alt="" />
-      <div class="qr-title">下载次数已用完，请重新获取验证码!</div>
-      <div class="qr-hint">体验无限下载次数，扫一扫开通权限！</div>
+      <img class="qr-code" :src="qrCode" alt="" />
+      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
+        <el-form-item prop="code" label="请输入验证码">
+          <el-input v-model="form.code" auto-complete="off" />
+        </el-form-item>
+      </el-form>
+      <div class="qr-hint">扫一扫获取验证码</div>
+      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
+      <div class="qr-title">受网络波动影响有时候可能解析不出来，重试两次即可</div>
+<!--      <div class="qr-title">当天达到解析次数后，请明天再来解析！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="goToIndex()">确 定</el-button>
+          <el-button type="primary" :loading="isSending"
+                     @click="onSubmit"
+          >确 定</el-button
+          >
         </span>
       </template>
     </el-dialog>
@@ -157,12 +165,18 @@ import Cookies from 'js-cookie';
 import wechar from '@/assets/images/wechar.png';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
-import { getFilesize, getIconClass, timestampToTime } from '@/utils/wp';
-import { setDownLoadRecord } from '@/api/system/vip';
+import {generateRandomLetters, getFilesize, getIconClass, timestampToTime} from '@/utils/wp';
+import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
+import qrCode from "@/assets/images/qrcode.jpg";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
+const codeRef = ref();
+const form = reactive({
+  code: '',
+})
+const isSending = ref(false)
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -181,15 +195,16 @@ const loadData = reactive({
   dialogVisible: false,
   // fileName: '',
   realLink: '',
-  addWeCharVisible: false,
+  WeCharVisible: false,
   limitSpeedVisible: false,
   errorDia: false,
-  codeNum: '',
+  // codeNum: '',
   tableLoading: false,
-  fileSize: 3247483648,
+  fileSize: 6698669056,
   routeData: [],
   rootBackTitle: '全部文件',
   maxNum: false,
+  item:null
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -198,11 +213,14 @@ onBeforeRouteLeave((to, from) => {
 function getList() {
   // const userCode = Cookies.get('code');
   const data = Object.assign(
-    { index: loadData.parseLinkParams.index },
+    { index: 0 },
     route.query
   );
   parseCopyLink(data);
 }
+const codeRules = {
+  code: [{ required: true, trigger: 'blur', message: '请输入验证码' }],
+};
 
 function goToIndex() {
   router.push({
@@ -243,18 +261,16 @@ function parseCopyLink(params) {
           const list = data.data.data.list;
           const title = data.data.data.title;
           loadData.bread = title;
-          const code = Cookies.get('code');
+          // const code = Cookies.get('code');
           list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
-            if (!code.includes('svip')) {
-              if (parseInt(item.size) > loadData.fileSize) {
-                item.disable = true;
-              }
+            if (parseInt(item.size) > loadData.fileSize) {
+              item.disable = true;
             }
           });
           loadData.tableData = list;
-          loadData.parseLinkParams.randsk = data.data.data.seckey;
+          loadData.parseLinkParams.seckey = data.data.data.seckey;
           loadData.parseLinkParams.shareid = data.data.data.shareid;
           loadData.parseLinkParams.uk = data.data.data.uk;
         } else {
@@ -269,185 +285,255 @@ function parseCopyLink(params) {
     });
 }
 
-async function downLoad(item) {
+
+function downLoad(item){
+  loadData.item = item;
+  loadData.WeCharVisible = true;
+  form.code = "";
+}
+
+const onSubmit = () => {
+  isSending.value = true;
+  proxy.$refs.codeRef.validate(async (valid) => {
+    if (valid) {
+      const params = {
+        code:form.code
+      }
+      const result = await testDownLoad();
+      if (!result) {
+        loadData.dialogVisible = true;
+        userStore.delCodeNum(params);
+        isSending.value = false;
+        return;
+      }
+
+      userStore
+          .getCodeNum(params)
+          .then((res) => {
+            if(res.code === 200){
+              if(res.data == 100){
+                setTimeout(()=>{
+                  isSending.value =false;
+                  loadData.WeCharVisible = false;
+                  confirm(loadData.item);
+                },2000)
+              }else if(res.data == 80){
+                setTimeout(()=>{
+                  isSending.value =false;
+                  loadData.WeCharVisible = false;
+                  ElMessage.error("解析通道比较拥堵，请重试！")
+                },2000)
+              } else if(res.data == 60){
+                setTimeout(()=>{
+                  isSending.value =false;
+                  ElMessage.error("今日解析次数已达上限，请明天再来！")
+                },2000)
+              } else if(res.data == 50){
+                setTimeout(()=>{
+                  isSending.value =false;
+                  ElMessage.error("您输入的验证码不正确，请重新获取!")
+                },2000)
+              }
+
+            }else{
+              isSending.value = false;
+              ElMessage.error("您输入的验证码不正确，请重新获取！！")
+            }
+          })
+    }
+  })
+}
+
+async function downLoadConfirm(item) {
+
   //检查是否安装下载器
 
-  const result = await testDownLoad();
-  if (!result) {
-    loadData.dialogVisible = true;
-    return;
-  }
+  // const result = await testDownLoad();
+  // if (!result) {
+  //   loadData.dialogVisible = true;
+  //   return;
+  // }
+  // item.loading = true;
+  // item.status = 1;
+  // item.disable = true;
+  // const code = Cookies.get('code');
+  // if (code == null || code === '') {
+  //   router.push({ path: '/parse/login' });
+  //   return;
+  // }
+  // loadData.parseLinkParams.code = code;
+  // loadData.parseLinkParams.fs_id = item.fs_id;
+  // loadData.parseLinkParams.link = item.dlink;
+  // loadData.fileName = item.server_filename;
+  //真正开始下载
+  // confirm(item);
+}
+// function getDownNum() {
+//   //获取下载次数
+//   userStore.getCodeNum({ code: Cookies.get('code') }).then((res) => {
+//     if (res.code === 200) {
+//       loadData.codeNum = res.data;
+//     }
+//   });
+// }
+// async function getSign(params) {
+//   const { shorturl, shareId, uk } = params;
+//   const param = {
+//     shorturl: shorturl,
+//     shareId: shareId,
+//     uk: uk,
+//   };
+//   await userStore
+//     .getSignData(param)
+//     .then((response) => {
+//       if (response.code === 200) {
+//         if (parseInt(response.data.result.errno) === 0) {
+//           if (shorturl) {
+//             loadData.parseLinkParams.index = response.data.index;
+//           }
+//           loadData.parseLinkParams.timestamp =
+//             response.data.result.data.timestamp;
+//           loadData.parseLinkParams.sign = response.data.result.data.sign;
+//           return response;
+//         }
+//       }
+//     })
+//     .catch(() => {
+//       loadData.tableLoading = false;
+//     });
+// }
+
+async function confirm(item) {
   item.loading = true;
   item.status = 1;
   item.disable = true;
-  const code = Cookies.get('code');
-  if (code == null || code === '') {
-    router.push({ path: '/parse/login' });
-    return;
-  }
-  loadData.parseLinkParams.code = code;
-  loadData.parseLinkParams.fs_id = item.fs_id;
-  loadData.parseLinkParams.link = item.dlink;
-  // loadData.fileName = item.server_filename;
-  //真正开始下载
-  confirm(item);
-}
-function getDownNum() {
-  //获取下载次数
-  userStore.getCodeNum({ code: Cookies.get('code') }).then((res) => {
-    if (res.code === 200) {
-      loadData.codeNum = res.data;
-    }
-  });
-}
-async function getSign(params) {
-  const { shorturl, shareId, uk } = params;
-  const param = {
-    shorturl: shorturl,
-    shareId: shareId,
-    uk: uk,
+
+  const params = {
+    shareid:loadData.parseLinkParams.shareid,
+    from:loadData.parseLinkParams.uk,
+    sekey:loadData.parseLinkParams.seckey,
+    fsId:item.fs_id,
+    path:`/`+item.server_filename,
   };
-  await userStore
-    .getSignData(param)
-    .then((response) => {
-      if (response.code === 200) {
-        if (parseInt(response.data.result.errno) === 0) {
-          if (shorturl) {
-            loadData.parseLinkParams.index = response.data.index;
-          }
-          loadData.parseLinkParams.timestamp =
-            response.data.result.data.timestamp;
-          loadData.parseLinkParams.sign = response.data.result.data.sign;
-          return response;
-        }
-      }
-    })
-    .catch(() => {
-      loadData.tableLoading = false;
-    });
-}
-
-async function confirm(item) {
   //过期重新获取时间戳
-  const date = new Date().getTime() / 1000;
-
-  if (date - loadData.parseLinkParams.timestamp > 300) {
-    const param = {
-      // shorturl: shorturl,
-      shareId: loadData.parseLinkParams.shareid,
-      uk: loadData.parseLinkParams.uk,
-    };
-    await getSign(param);
-  }
+  // const date = new Date().getTime() / 1000;
+  //
+  // if (date - loadData.parseLinkParams.timestamp > 300) {
+  //   const param = {
+  //     // shorturl: shorturl,
+  //     shareId: loadData.parseLinkParams.shareid,
+  //     uk: loadData.parseLinkParams.uk,
+  //   };
+  //   await getSign(param);
+  // }
   // 获取真实下载地址
   userStore
-    .parseLink(loadData.parseLinkParams)
+    .parseLink(params)
     .then((data) => {
       if (data.code === 200) {
-        if (data.data.errno === '0') {
-          if (data.data.restNum === '-1') {
-            //下载次数为0，弹窗，请重新获取验证码
-            //删除验证码
-            Cookies.remove('code');
-            loadData.addWeCharVisible = true;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            return;
-          }
-          //每天最多允许下载20次
-          if (parseInt(data.data.codeUseNum) >= 20) {
-            loadData.maxNum = true;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            return;
-          }
-          if (data.data.realLink == null) {
-            //真实链接为null 限速了
-            loadData.limitSpeedVisible = true;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            return;
-          }
 
-          loadData.codeNum =
-            data.data.restNum === '-1' ? 0 : parseInt(data.data.restNum);
-          loadData.realLink = data.data.realLink;
-          //发送到下载器
-          let options = {
-            'max-connection-per-server': '16',
-            'user-agent': 'LogStatistic',
-            opt: item.server_filename.trim(),
-          };
 
-          let json = {
-            id: 'wp',
-            jsonrpc: '2.0',
-            method: 'aria2.addUri',
-            params: [[loadData.realLink], options],
-          };
+        item.status = 0;
+        item.loading = false;
+        item.disable = false;
 
-          json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
-          const ws = new WebSocket('ws://localhost:16800/jsonrpc');
-          ws.onerror = (event) => {
-            item.loading = false;
-            item.disable = false;
-            ElMessage.error('链接失败，请检查是否安装Motrix');
-          };
-          ws.onopen = () => {
-            const data = {
-              fileName: item.server_filename.trim(),
-              fileSize: item.size,
-            };
-            setDownLoadRecord(data);
+        // //每天最多允许下载20次
+        // if (parseInt(data.data.codeUseNum) >= 20) {
+        //   loadData.maxNum = true;
+        //   item.status = 0;
+        //   item.loading = false;
+        //   item.disable = false;
+        //   return;
+        // }
+        // if (data.data.realLink == null) {
+        //   //真实链接为null 限速了
+        //   loadData.limitSpeedVisible = true;
+        //   item.status = 0;
+        //   item.loading = false;
+        //   item.disable = false;
+        //   return;
+        // }
 
-            ws.send(JSON.stringify(json));
-          };
+        // loadData.codeNum =
+        //   data.data.restNum === '-1' ? 0 : parseInt(data.data.restNum);
+        // loadData.realLink = data.data.realLink;
+        //发送到下载器
+        let options = {
+          'max-connection-per-server': '16',
+          'user-agent': 'LogStatistic',
+          'X-forwarded-for':'1.94.42.208',
+          opt: item.server_filename.trim(),
+        };
 
-          ws.onmessage = (event) => {
-            let received_msg = JSON.parse(event.data);
-            if (received_msg.error !== undefined) {
-              if (received_msg.error.code === 1) {
-                item.loading = false;
-                item.disable = false;
-                ElMessage.error('链接失败，请检查是否安装Motrix');
-                return;
-              }
+        let json = {
+          id: 'wp',
+          jsonrpc: '2.0',
+          method: 'aria2.addUri',
+          params: [[data.data.urls[0].url], options],
+        };
+
+        json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
+        const ws = new WebSocket('ws://localhost:16800/jsonrpc');
+        ws.onerror = (event) => {
+          item.loading = false;
+          item.disable = false;
+          ElMessage.error('链接失败，请检查是否安装Motrix');
+        };
+        ws.onopen = () => {
+          // const data = {
+          //   fileName: item.server_filename.trim(),
+          //   fileSize: item.size,
+          // };
+          // setDownLoadRecord(data);
+
+          ws.send(JSON.stringify(json));
+        };
+
+        ws.onmessage = (event) => {
+          let received_msg = JSON.parse(event.data);
+          if (received_msg.error !== undefined) {
+            if (received_msg.error.code === 1) {
+              item.loading = false;
+              item.disable = false;
+              ElMessage.error('链接失败，请检查是否安装Motrix');
+              return;
             }
+          }
 
-            switch (received_msg.method) {
-              case 'aria2.onDownloadStart':
-                // ElMessage({
-                //   message: `${item.server_filename}开始下载！`,
-                //   type: 'success',
-                // })
-                item.status = 1;
-                break;
+          switch (received_msg.method) {
+            case 'aria2.onDownloadStart':
+              ElMessage({
+                message: `${item.server_filename}开始下载！`,
+                type: 'success',
+              })
+              item.status = 1;
+              break;
 
-              case 'aria2.onDownloadError':
-                item.loading = false;
-                item.disable = false;
-                ElMessage.error('下载失败，请检查是否安装Motrix');
-                break;
+            case 'aria2.onDownloadError':
+              item.loading = false;
+              item.disable = false;
+              item.status = 0;
+              // ElMessage.error('下载失败，请检查是否安装Motrix');
+              break;
 
-              case 'aria2.onDownloadComplete':
-                ElMessage({
-                  message: `${item.server_filename}下载完成！`,
-                  type: 'success',
-                });
-                ws.close();
-                item.loading = false;
-                item.status = 2;
-                break;
-              default:
-                break;
-            }
-          };
-        } else {
-          loadData.limitSpeedVisible = true;
+            case 'aria2.onDownloadComplete':
+              ElMessage({
+                message: `${item.server_filename}下载完成！`,
+                type: 'success',
+              });
+              ws.close();
+              item.loading = false;
+              item.status = 2;
+              break;
+            default:
+              break;
+          }
         }
+      }else{
+        item.status = 0;
+        item.disable = false;
+        item.loading = false;
+        loadData.limitSpeedVisible = true;
       }
     })
     .catch(() => {
@@ -485,19 +571,17 @@ function init() {
     router.push({ path: '/parse/login' });
     return;
   }
-  const code = Cookies.get('code');
-  if (code == null || code === '') {
-    router.push({ path: '/parse/login' });
-    return;
-  }
-  const params = {
-    shorturl: route.query.shorturl,
-  };
+  // const code = Cookies.get('code');
+  // if (code == null || code === '') {
+  //   router.push({ path: '/parse/login' });
+  //   return;
+  // }
+  // const params = {
+  //   shorturl: route.query.shorturl,
+  // };
   loadData.tableLoading = true;
-  getSign(params).then(() => {
-    getList();
-  });
-  getDownNum();
+  getList();
+  // getDownNum();
 }
 init();
 
@@ -567,7 +651,7 @@ function testDownLoad() {
   .qr-title {
     margin-top: 20px;
     text-align: center;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
     color: #923333;
   }

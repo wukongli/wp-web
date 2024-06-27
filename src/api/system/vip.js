@@ -18,6 +18,14 @@ export function addPost(data) {
   });
 }
 
+export function putPost(data) {
+  return request({
+    url: '/vip',
+    method: 'put',
+    data: data,
+  });
+}
+
 export function deleteVip(data) {
   return request({
     url: '/vip',

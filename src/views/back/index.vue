@@ -50,8 +50,9 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
-                v-if="!parseInt(scope.row.isdir)"
+                v-if="parseInt(scope.row.isdir) === 0"
                 :type="'primary'"
+                :disabled="!(scope.$index % 2 === 0)"
                 @click="downLoad(scope.row)"
             >
               下 载
@@ -75,7 +76,7 @@
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">扫一扫获取下载地址</div>
+      <div class="qr-hint">扫一扫输入验证码获取下载地址</div>
       <div class="qr-title">{{loadData.downLoadUrl}}</div>
       <template #footer>
         <span class="dialog-footer">
@@ -289,9 +290,10 @@ function init() {
       const params = {
         shorturl: res.data.url,
       };
-      getSign(params).then(() => {
-        getList();
-      });
+      // getSign(params).then(() => {
+      //
+      // });
+      getList();
     }
   });
 }

@@ -1,14 +1,14 @@
 import {
-  adminLogin,
-  logout,
-  getInfo,
-  parseCopyLink as parse,
-  parseLinkReq,
-  getSignReq,
-  getVip,
-  getCode,
+    adminLogin,
+    logout,
+    getInfo,
+    parseCopyLink as parse,
+    parseLinkReq,
+    getSignReq,
+    getVip,
+    getCode,
     loginNoPwd,
-    getCourseByType
+    getCourseByType, delCode
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -169,6 +169,18 @@ const useUserStore = defineStore('user', {
             });
       });
     },
+
+      delCodeNum(data){
+          return new Promise((resolve, reject) => {
+              delCode(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
       getCourse(type){
           return new Promise((resolve, reject) => {
               getCourseByType(type)

@@ -65,7 +65,10 @@ router.beforeEach((to, from, next) => {
       // 在免登录白名单，直接进入
       next();
     } else {
-      next(`/vip/login?redirect=${to.fullPath}`); // 否则全部重定向到登录页
+      // console.log(to.path);
+      // const index = to.path.lastIndexOf("/");
+      // const key = to.path.substring(index+1);
+      next(`/vip/login`); // 否则全部重定向到登录页
       NProgress.done();
     }
   }
