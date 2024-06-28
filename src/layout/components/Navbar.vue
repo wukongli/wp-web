@@ -122,7 +122,6 @@ function setLayout() {
 
 function getLogin(){
   if (getToken()) {
-    console.log('显示头像。。。');
     loginData.login = true;
   }else{
     loginData.login= false;

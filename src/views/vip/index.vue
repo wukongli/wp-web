@@ -155,7 +155,6 @@ const data = reactive({
 const { queryParams, form, rules } = toRefs(data);
 
 function switchLimitMessage(value) {
-  console.log(value);
   const param = { limit: value ? 1 : 0 };
   sendMessage(param).then(() => {});
 }
@@ -198,7 +197,6 @@ function handleAdd() {
 }
 
 function handleUpdate(row) {
-   console.log(row);
     open.value = true;
     title.value = "修改信息";
     form.value = {
