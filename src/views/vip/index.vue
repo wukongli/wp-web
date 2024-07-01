@@ -17,8 +17,8 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
-    <span>关闭网盘限速短信提醒：</span
-    ><el-switch @change="switchLimitMessage" v-model="value1" />
+<!--    <span>关闭网盘限速短信提醒：</span-->
+<!--    ><el-switch @change="switchLimitMessage" v-model="value1" />-->
     <el-table
       v-loading="loading"
       :data="postList"
@@ -32,6 +32,7 @@
           <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
         </template>
       </el-table-column>
+      <el-table-column label="解析次数" align="center" prop="count" />
       <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
       <el-table-column
         label="创建时间"
@@ -154,10 +155,10 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-function switchLimitMessage(value) {
-  const param = { limit: value ? 1 : 0 };
-  sendMessage(param).then(() => {});
-}
+// function switchLimitMessage(value) {
+//   const param = { limit: value ? 1 : 0 };
+//   sendMessage(param).then(() => {});
+// }
 
 /** 查询vip列表 */
 function getList() {

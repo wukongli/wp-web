@@ -100,14 +100,15 @@
       </el-form>
       <div class="qr-hint">扫一扫获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">受网络波动影响有时候可能解析不出来，重试两次即可</div>
-<!--      <div class="qr-title">当天达到解析次数后，请明天再来解析！</div>-->
+      <div class="qr-title">受网络波动影响有时候可能解析不出来，重试几次即可！！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" :loading="isSending"
+          <el-button v-if="showParse" type="primary" :loading="isSending"
                      @click="onSubmit"
-          >确 定</el-button
-          >
+          >解 析</el-button>
+          <el-button v-else type="danger"
+                     @click="trySend"
+          >重 试</el-button>
         </span>
       </template>
     </el-dialog>
@@ -176,7 +177,8 @@ const codeRef = ref();
 const form = reactive({
   code: '',
 })
-const isSending = ref(false)
+const isSending = ref(false);
+const showParse = ref(true);
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -200,11 +202,12 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: false,
-  fileSize: 6698669056,
+  fileSize: 8698669056,
   routeData: [],
   rootBackTitle: '全部文件',
   maxNum: false,
-  item:null
+  item:null,
+  url:"",
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -290,12 +293,15 @@ function downLoad(item){
   loadData.item = item;
   loadData.WeCharVisible = true;
   form.code = "";
+  isSending.value = false;
+  showParse.value = true;
 }
 
 const onSubmit = () => {
-  isSending.value = true;
+
   proxy.$refs.codeRef.validate(async (valid) => {
     if (valid) {
+      isSending.value = true;
       const params = {
         code:form.code
       }
@@ -314,13 +320,13 @@ const onSubmit = () => {
               if(res.data == 100){
                 setTimeout(()=>{
                   isSending.value =false;
-                  loadData.WeCharVisible = false;
+                  //loadData.WeCharVisible = false;
                   confirm(loadData.item);
                 },2000)
               }else if(res.data == 80){
                 setTimeout(()=>{
                   isSending.value =false;
-                  loadData.WeCharVisible = false;
+                 // loadData.WeCharVisible = false;
                   ElMessage.error("解析通道比较拥堵，请重试！")
                 },2000)
               } else if(res.data == 60){
@@ -342,6 +348,10 @@ const onSubmit = () => {
           })
     }
   })
+}
+
+const trySend = ()=>{
+    sendToMotrix(loadData.item);
 }
 
 async function downLoadConfirm(item) {
@@ -436,99 +446,15 @@ async function confirm(item) {
         item.status = 0;
         item.loading = false;
         item.disable = false;
-
-        // //每天最多允许下载20次
-        // if (parseInt(data.data.codeUseNum) >= 20) {
-        //   loadData.maxNum = true;
-        //   item.status = 0;
-        //   item.loading = false;
-        //   item.disable = false;
-        //   return;
-        // }
-        // if (data.data.realLink == null) {
-        //   //真实链接为null 限速了
-        //   loadData.limitSpeedVisible = true;
-        //   item.status = 0;
-        //   item.loading = false;
-        //   item.disable = false;
-        //   return;
-        // }
-
-        // loadData.codeNum =
-        //   data.data.restNum === '-1' ? 0 : parseInt(data.data.restNum);
-        // loadData.realLink = data.data.realLink;
-        //发送到下载器
-        let options = {
-          'max-connection-per-server': '16',
-          'user-agent': 'LogStatistic',
-          'X-forwarded-for':'1.94.42.208',
-          opt: item.server_filename.trim(),
-        };
-
-        let json = {
-          id: 'wp',
-          jsonrpc: '2.0',
-          method: 'aria2.addUri',
-          params: [[data.data.urls[0].url], options],
-        };
-
-        json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
-        const ws = new WebSocket('ws://localhost:16800/jsonrpc');
-        ws.onerror = (event) => {
-          item.loading = false;
-          item.disable = false;
-          ElMessage.error('链接失败，请检查是否安装Motrix');
-        };
-        ws.onopen = () => {
-          // const data = {
-          //   fileName: item.server_filename.trim(),
-          //   fileSize: item.size,
-          // };
-          // setDownLoadRecord(data);
-
-          ws.send(JSON.stringify(json));
-        };
-
-        ws.onmessage = (event) => {
-          let received_msg = JSON.parse(event.data);
-          if (received_msg.error !== undefined) {
-            if (received_msg.error.code === 1) {
-              item.loading = false;
-              item.disable = false;
-              ElMessage.error('链接失败，请检查是否安装Motrix');
-              return;
-            }
-          }
-
-          switch (received_msg.method) {
-            case 'aria2.onDownloadStart':
-              ElMessage({
-                message: `${item.server_filename}开始下载！`,
-                type: 'success',
-              })
-              item.status = 1;
-              break;
-
-            case 'aria2.onDownloadError':
-              item.loading = false;
-              item.disable = false;
-              item.status = 0;
-              // ElMessage.error('下载失败，请检查是否安装Motrix');
-              break;
-
-            case 'aria2.onDownloadComplete':
-              ElMessage({
-                message: `${item.server_filename}下载完成！`,
-                type: 'success',
-              });
-              ws.close();
-              item.loading = false;
-              item.status = 2;
-              break;
-            default:
-              break;
-          }
+        showParse.value = false;
+        if(data.data.urls.length && data.data.urls[0].url){
+          loadData.url = data.data.urls[0].url;
+          sendToMotrix(item);
+        }else{
+          ElMessage.error("解析通道比较拥堵，请重试！")
         }
+
+
       }else{
         item.status = 0;
         item.disable = false;
@@ -542,6 +468,84 @@ async function confirm(item) {
       item.loading = false;
       // loadData.errorDia = true;
     });
+}
+
+function sendToMotrix(item){
+  //发送到下载器
+  let options = {
+    'user-agent': 'LogStatistic',
+    'X-forwarded-for':'1.94.42.208',
+    opt: item.server_filename.trim(),
+  };
+
+  let json = {
+    id: 'wp',
+    jsonrpc: '2.0',
+    method: 'aria2.addUri',
+    params: [[loadData.url], options],
+  };
+
+  json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
+  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
+  ws.onerror = (event) => {
+    item.loading = false;
+    item.disable = false;
+    ws.close();
+    ElMessage.error('链接失败，请检查是否安装Motrix');
+  };
+  ws.onopen = () => {
+    // const data = {
+    //   fileName: item.server_filename.trim(),
+    //   fileSize: item.size,
+    // };
+    // setDownLoadRecord(data);
+
+    ws.send(JSON.stringify(json));
+  };
+
+  ws.onmessage = (event) => {
+    let received_msg = JSON.parse(event.data);
+    if (received_msg.error !== undefined) {
+      if (received_msg.error.code === 1) {
+        item.loading = false;
+        item.disable = false;
+        ws.close();
+        ElMessage.error('链接失败，请检查Motrix!');
+        return;
+      }
+    }
+
+    switch (received_msg.method) {
+      case 'aria2.onDownloadStart':
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        })
+        item.status = 1;
+        break;
+
+      case 'aria2.onDownloadError':
+        item.loading = false;
+        item.disable = false;
+        item.status = 0;
+        ws.close();
+        // ElMessage.error('下载失败，请点击下方重试按钮!');
+        break;
+
+      case 'aria2.onDownloadComplete':
+        ElMessage({
+          message: `${item.server_filename}下载完成！`,
+          type: 'success',
+        });
+        ws.close();
+        item.loading = false;
+        item.status = 2;
+        break;
+      default:
+        break;
+    }
+  }
+
 }
 
 function goBack() {
