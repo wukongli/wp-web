@@ -37,18 +37,18 @@
                         创建日期
                         <div class="pull-right">{{ moment(state.user.createTime).format("YYYY-MM-DD") }}</div>
                      </li>
-                    <li class="list-group-item">
-                      vip验证码
-                      <div class="pull-right">{{state.user.vipCode }}</div>
+                    <li v-if="state.user.vipCode" class="list-group-item">
+                      我的地址
+                      <div class="pull-right">parse/login?userKey={{state.user.vipCode }}</div>
                     </li>
-                    <li class="list-group-item">
-                      验证码剩余时间
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>
-                    </li>
-                    <li class="list-group-item">
-                      验证码到期日期
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>
-                    </li>
+<!--                    <li class="list-group-item">-->
+<!--                      验证码剩余时间-->
+<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
+<!--                    </li>-->
+<!--                    <li class="list-group-item">-->
+<!--                      验证码到期日期-->
+<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>-->
+<!--                    </li>-->
                   </ul>
                </div>
             </el-card>

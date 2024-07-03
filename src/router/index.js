@@ -28,7 +28,7 @@ import Layout from '@/layout';
 export const constantRoutes = [
   {
     path: '/',
-    redirect: '/parse/login',
+    redirect: '/parse/login?userKey=main',
     component: () => import('@/views/parse/login.vue'),
   },
   {

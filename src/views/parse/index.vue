@@ -92,7 +92,8 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="qrCode" alt="" />
+      <img class="qr-code" :src="loadData.codeUrl" alt="" />
+      <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
       <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
         <el-form-item prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
@@ -113,15 +114,16 @@
       </template>
     </el-dialog>
     <!-- 限速提示弹窗 -->
-    <el-dialog title="提示" v-model="loadData.limitSpeedVisible" width="40%">
-      <img class="qr-code" :src="wechar" alt="" />
-      <div class="qr-hint">当前下载通道拥挤，请刷新重试或者稍后再试！</div>
-      <div class="qr-hint">如有问题，扫码联系管理员！</div>
+    <el-dialog title="提示" v-model="loadData.noLimit" width="40%">
+      <div class="qr-title">{{loadData.item.server_filename}}</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.limitSpeedVisible = false"
-            >确 定</el-button
-          >
+          <el-button v-if="showParse" type="primary" :loading="isSending"
+                     @click="noLimit"
+          >解 析</el-button>
+          <el-button v-else type="danger"
+                     @click="trySend"
+          >重 试</el-button>
         </span>
       </template>
     </el-dialog>
@@ -150,10 +152,10 @@
         </span>
       </template>
     </el-dialog>
-    <div class="we-chart">
-      <img :src="wechar" alt="" />
-      <p class="con">有问题联系管理员</p>
-    </div>
+<!--    <div class="we-chart">-->
+<!--      <img :src="wechar" alt="" />-->
+<!--      <p class="con">有问题联系管理员</p>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -170,6 +172,7 @@ import {generateRandomLetters, getFilesize, getIconClass, timestampToTime} from 
 import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import qrCode from "@/assets/images/qrcode.jpg";
+import {getToken} from "@/utils/auth";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -198,7 +201,7 @@ const loadData = reactive({
   // fileName: '',
   realLink: '',
   WeCharVisible: false,
-  limitSpeedVisible: false,
+  noLimit: false,
   errorDia: false,
   // codeNum: '',
   tableLoading: false,
@@ -208,6 +211,7 @@ const loadData = reactive({
   maxNum: false,
   item:null,
   url:"",
+  codeUrl:'',
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -291,11 +295,31 @@ function parseCopyLink(params) {
 
 function downLoad(item){
   loadData.item = item;
-  loadData.WeCharVisible = true;
-  form.code = "";
   isSending.value = false;
   showParse.value = true;
+  if(getToken()){
+    loadData.noLimit = true;
+  }else{
+    loadData.WeCharVisible = true;
+    form.code = "";
+  }
+
 }
+
+async function noLimit (){
+  //直接下载文件
+  isSending.value = true;
+  const result = await testDownLoad();
+  if (!result) {
+    loadData.dialogVisible = true;
+    userStore.delCodeNum(params);
+    isSending.value = false;
+    return;
+  }
+  confirm(loadData.item);
+
+}
+
 
 const onSubmit = () => {
 
@@ -303,7 +327,8 @@ const onSubmit = () => {
     if (valid) {
       isSending.value = true;
       const params = {
-        code:form.code
+        code:form.code,
+        userKey:loadData.query.userKey
       }
       const result = await testDownLoad();
       if (!result) {
@@ -319,7 +344,7 @@ const onSubmit = () => {
             if(res.code === 200){
               if(res.data == 100){
                 setTimeout(()=>{
-                  isSending.value =false;
+                  // isSending.value =false;
                   //loadData.WeCharVisible = false;
                   confirm(loadData.item);
                 },2000)
@@ -424,6 +449,7 @@ async function confirm(item) {
     sekey:loadData.parseLinkParams.seckey,
     fsId:item.fs_id,
     path:`/`+item.server_filename,
+    userKey:loadData.query.userKey
   };
   //过期重新获取时间戳
   // const date = new Date().getTime() / 1000;
@@ -442,7 +468,7 @@ async function confirm(item) {
     .then((data) => {
       if (data.code === 200) {
 
-
+        isSending.value =false;
         item.status = 0;
         item.loading = false;
         item.disable = false;
@@ -453,7 +479,6 @@ async function confirm(item) {
         }else{
           ElMessage.error("解析通道比较拥堵，请重试！")
         }
-
 
       }else{
         item.status = 0;
@@ -466,85 +491,116 @@ async function confirm(item) {
       item.status = 0;
       item.disable = false;
       item.loading = false;
+      isSending.value = false;
       // loadData.errorDia = true;
     });
 }
 
 function sendToMotrix(item){
   //发送到下载器
-  let options = {
-    'user-agent': 'LogStatistic',
-    'X-forwarded-for':'1.94.42.208',
-    opt: item.server_filename.trim(),
-  };
 
-  let json = {
+
+  const o = {
     id: 'wp',
-    jsonrpc: '2.0',
     method: 'aria2.addUri',
-    params: [[loadData.url], options],
+    params: [
+      'token:undefined',
+      [
+        loadData.url
+      ],
+      {
+        'user-agent': 'netdisk',
+      },
+    ],
   };
 
-  json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
-  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-  ws.onerror = (event) => {
-    item.loading = false;
-    item.disable = false;
-    ws.close();
-    ElMessage.error('链接失败，请检查是否安装Motrix');
-  };
-  ws.onopen = () => {
-    // const data = {
-    //   fileName: item.server_filename.trim(),
-    //   fileSize: item.size,
-    // };
-    // setDownLoadRecord(data);
-
-    ws.send(JSON.stringify(json));
-  };
-
-  ws.onmessage = (event) => {
-    let received_msg = JSON.parse(event.data);
-    if (received_msg.error !== undefined) {
-      if (received_msg.error.code === 1) {
-        item.loading = false;
-        item.disable = false;
-        ws.close();
-        ElMessage.error('链接失败，请检查Motrix!');
-        return;
-      }
-    }
-
-    switch (received_msg.method) {
-      case 'aria2.onDownloadStart':
+  fetch('http://localhost:16800/jsonrpc', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(o),
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        item.status = 2;
         ElMessage({
           message: `${item.server_filename}开始下载！`,
           type: 'success',
         })
-        item.status = 1;
-        break;
+      });
+  // let options = {
+  //   'user-agent': 'netdisk',
+  //   'X-forwarded-for':'1.94.42.208',
+  // };
 
-      case 'aria2.onDownloadError':
-        item.loading = false;
-        item.disable = false;
-        item.status = 0;
-        ws.close();
-        // ElMessage.error('下载失败，请点击下方重试按钮!');
-        break;
+  // let json = {
+  //   id: 'wp',
+  //   jsonrpc: '2.0',
+  //   method: 'aria2.addUri',
+  //   params: [[loadData.url], options],
+  // };
 
-      case 'aria2.onDownloadComplete':
-        ElMessage({
-          message: `${item.server_filename}下载完成！`,
-          type: 'success',
-        });
-        ws.close();
-        item.loading = false;
-        item.status = 2;
-        break;
-      default:
-        break;
-    }
-  }
+  // json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
+  // let ws = new WebSocket('ws://localhost:16800/jsonrpc');
+  // ws.onerror = (event) => {
+  //   item.loading = false;
+  //   item.disable = false;
+  //   ws.close();
+  //   ElMessage.error('链接失败，请检查是否安装Motrix');
+  // };
+  // ws.onopen = () => {
+  //   // const data = {
+  //   //   fileName: item.server_filename.trim(),
+  //   //   fileSize: item.size,
+  //   // };
+  //   // setDownLoadRecord(data);
+  //
+  //   ws.send(JSON.stringify(json));
+  // };
+  //
+  // ws.onmessage = (event) => {
+  //   let received_msg = JSON.parse(event.data);
+  //   if (received_msg.error !== undefined) {
+  //     if (received_msg.error.code === 1) {
+  //       item.loading = false;
+  //       item.disable = false;
+  //       ws.close();
+  //       ElMessage.error('链接失败，请检查Motrix!');
+  //       return;
+  //     }
+  //   }
+  //
+  //   switch (received_msg.method) {
+  //     case 'aria2.onDownloadStart':
+  //       ElMessage({
+  //         message: `${item.server_filename}开始下载！`,
+  //         type: 'success',
+  //       })
+  //       item.status = 1;
+  //       break;
+  //
+  //     case 'aria2.onDownloadError':
+  //       item.loading = false;
+  //       item.disable = false;
+  //       item.status = 0;
+  //       ws.close();
+  //       // ElMessage.error('下载失败，请点击下方重试按钮!');
+  //       break;
+  //
+  //     case 'aria2.onDownloadComplete':
+  //       ElMessage({
+  //         message: `${item.server_filename}下载完成！`,
+  //         type: 'success',
+  //       });
+  //       ws.close();
+  //       item.loading = false;
+  //       item.status = 2;
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
 }
 
@@ -570,24 +626,27 @@ function init() {
     !loadData.query.shorturl ||
     !loadData.query.pwd ||
     !loadData.query.dir ||
-    !loadData.query.root
+    !loadData.query.root ||
+    !loadData.query.userKey
   ) {
-    router.push({ path: '/parse/login' });
+    router.push({ path: '/401' });
     return;
   }
-  // const code = Cookies.get('code');
-  // if (code == null || code === '') {
-  //   router.push({ path: '/parse/login' });
-  //   return;
-  // }
-  // const params = {
-  //   shorturl: route.query.shorturl,
-  // };
   loadData.tableLoading = true;
+  getUserByUserKey();
   getList();
+  userStore.get
   // getDownNum();
 }
 init();
+
+function getUserByUserKey(){
+  userStore.getUserInfo({userKey:loadData.query.userKey}).then((res)=>{
+    if(res.code === 200){
+      loadData.codeUrl = res.data.codeUrl;
+    }
+  })
+}
 
 function testDownLoad() {
   return new Promise((resolve) => {
@@ -658,6 +717,12 @@ function testDownLoad() {
     font-size: 15px;
     font-weight: bold;
     color: #923333;
+  }
+  .file-name{
+    margin-top: 20px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
   }
   .qr-code {
     width: 170px;

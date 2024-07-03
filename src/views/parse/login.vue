@@ -6,7 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 class="title">网盘文件加速下载</h3>
+      <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>
+      <h3 v-else class="title">网盘文件加速下载</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
@@ -75,11 +76,11 @@
           <span v-if="!loading">提 取</span>
           <span v-else>提 取 中...</span>
         </el-button>
-        <div style="float: right" v-if="register">
-          <router-link class="link-type" :to="'/register'"
-          >立即注册</router-link
-          >
-        </div>
+<!--        <div style="float: right" v-if="register">-->
+<!--          <router-link class="link-type" :to="'/register'"-->
+<!--          >立即注册</router-link-->
+<!--          >-->
+<!--        </div>-->
       </el-form-item>
     </el-form>
     <!--  底部  -->
@@ -113,7 +114,8 @@ import useUserStore from '@/store/modules/user';
 const userStore = useUserStore();
 import qrCode from '@/assets/images/qrcode.jpg';
 import {SubmitLink} from "@/utils/wp";
-
+import {getToken} from "@/utils/auth";
+const route = useRoute();
 const loginForm = ref({
   username: '',
   password: '',
@@ -192,6 +194,7 @@ async function handleLogin() {
           pwd: encrypt(loginForm.value.pwd),
           dir: loginForm.value.dir,
           root: loginForm.value.root,
+          userKey:route.query.userKey
         },
       })
     }
@@ -209,6 +212,33 @@ function handleClose() {
   hint.getCodeVisible = false;
   loading.value = false;
 }
+function init(){
+  if(!route.query.userKey){
+    const userKey = sessionStorage.getItem("userKey")
+    if(userKey){
+      router.push({
+        path: '/parse/login',
+        query: {
+          userKey:userKey
+        },
+      })
+    }else{
+      router.push({
+        path: '/401',
+      })
+    }
+
+  }else{
+    sessionStorage.setItem("userKey",route.query.userKey)
+    router.push({
+      path: '/parse/login',
+      query: {
+        userKey:route.query.userKey
+      },
+    })
+  }
+}
+init();
 
 // getVipNums();
 </script>

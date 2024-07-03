@@ -7,7 +7,6 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['system:post:add']"
           >新增</el-button
         >
       </el-col>

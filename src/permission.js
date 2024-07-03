@@ -8,12 +8,13 @@ import { isRelogin } from '@/utils/request';
 import useUserStore from '@/store/modules/user';
 import useSettingsStore from '@/store/modules/settings';
 import usePermissionStore from '@/store/modules/permission';
+import {encrypt} from "@/utils/jsencrypt";
 // import Layout from "@/layout/index.vue";
 
 NProgress.configure({ showSpinner: false });
 
 const whiteList = [
-  '/login',
+  // '/login',
   '/register',
   '/vip/login',
   '/back/java/list',
@@ -22,6 +23,7 @@ const whiteList = [
   '/front/front/interview',
   '/parse/login',
   '/parse/index',
+  '/401'
 ];
 
 router.beforeEach((to, from, next) => {
@@ -62,14 +64,25 @@ router.beforeEach((to, from, next) => {
   } else {
     // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
-      // 在免登录白名单，直接进入
+      //在免登录白名单，直接进入
       next();
     } else {
-      // console.log(to.path);
       // const index = to.path.lastIndexOf("/");
       // const key = to.path.substring(index+1);
-      next(`/vip/login`); // 否则全部重定向到登录页
-      NProgress.done();
+      // sessionStorage.setItem("userKey",key)
+      // if(key.length === 6 ){
+      //   router.push({
+      //     path: '/parse/login',
+      //     query: {
+      //       userKey:key
+      //     },
+      //   })
+      //   NProgress.done();
+      // }else{
+      //
+      // }
+      next("/401")
+
     }
   }
 });

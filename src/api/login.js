@@ -132,6 +132,15 @@ export function getCode(data) {
   });
 }
 
+export function getInfoByUserKey(data) {
+  return request({
+    url: '/wp/getInfoByUserKey',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 export function delCode(data) {
   return request({
     url: '/wp/del/code',
