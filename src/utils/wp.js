@@ -11,11 +11,11 @@ export  function getFilesize(row, column, size) {
     if (size < Math.pow(num, 4)){
         let fileSize = (size / Math.pow(num, 3)).toFixed(2);
         if(fileSize > 7){
-            return fileSize + 'G' + ` ( 文件大于7G无法下载 )`; //G
+            return fileSize + 'G' + ` ( 文件大于9G无法下载 )`; //G
         }
         return fileSize + 'G'; //G
     }
-    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于7G无法下载)`; //T
+    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于9G无法下载)`; //T
 }
 
 export function getIconClass(row) {

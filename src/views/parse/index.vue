@@ -448,8 +448,9 @@ async function confirm(item) {
     from:loadData.parseLinkParams.uk,
     sekey:loadData.parseLinkParams.seckey,
     fsId:item.fs_id,
-    path:`/`+item.server_filename,
-    userKey:loadData.query.userKey
+    path:item.server_filename,
+    userKey:loadData.query.userKey,
+    version:"1.0.1"
   };
   //过期重新获取时间戳
   // const date = new Date().getTime() / 1000;
@@ -504,12 +505,11 @@ function sendToMotrix(item){
     id: 'wp',
     method: 'aria2.addUri',
     params: [
-      'token:undefined',
       [
         loadData.url
       ],
       {
-        'user-agent': 'netdisk',
+        'user-agent': 'netdisk;7.39.1.1',
       },
     ],
   };
