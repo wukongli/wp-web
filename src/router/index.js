@@ -46,16 +46,44 @@ export const constantRoutes = [
     component: () => import('@/views/register'),
     hidden: true,
   },
-  {
-    path: '/:pathMatch(.*)*',
-    component: () => import('@/views/error/404'),
-    hidden: true,
-  },
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   component: () => import('@/views/error/404'),
+  //   hidden: true,
+  // },
   {
     path: '/401',
     component: () => import('@/views/error/401'),
     hidden: true,
   },
+  // {
+  //   name: 'Video',
+  //   path: '/video',
+  //   hidden: true,
+  //   redirect: 'noRedirect',
+  //   component: Layout,
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '影视vip',
+  //     icon: 'front',
+  //     noCache: false,
+  //     link: null,
+  //   },
+  //   children: [
+  //     {
+  //       // name: "Front/list",
+  //       path: 'index',
+  //       hidden: false,
+  //       component: () => import('@/views/video/index.vue'),
+  //       meta: {
+  //         title: '观看列表',
+  //         icon: 'course',
+  //         noCache: false,
+  //         link: null,
+  //       },
+  //     }
+  //   ],
+  // },
   {
     name: 'Front',
     path: '/front',
@@ -66,7 +94,7 @@ export const constantRoutes = [
     meta: {
       title: '前端教程',
       icon: 'front',
-      noCache: false,
+      noCache: true,
       link: null,
     },
     children: [
@@ -78,7 +106,7 @@ export const constantRoutes = [
         meta: {
           title: '前端课程列表',
           icon: 'course',
-          noCache: false,
+          noCache: true,
           link: null,
         },
       },
@@ -90,7 +118,7 @@ export const constantRoutes = [
         meta: {
           title: '前端面试题',
           icon: 'documentation',
-          noCache: false,
+          noCache: true,
           link: null,
         },
       },
@@ -106,7 +134,7 @@ export const constantRoutes = [
     meta: {
       title: 'Java教程',
       icon: 'back',
-      noCache: false,
+      noCache: true,
       link: null,
     },
     children: [
@@ -117,7 +145,7 @@ export const constantRoutes = [
         meta: {
           title: 'Java课程列表',
           icon: 'course',
-          noCache: false,
+          noCache: true,
           link: null,
         },
         component: () => import('@/views/back/index.vue'),
@@ -129,7 +157,7 @@ export const constantRoutes = [
         meta: {
           title: 'Java面试题',
           icon: 'documentation',
-          noCache: false,
+          noCache: true,
           link: null,
         },
         component: () => import('@/views/back/interview.vue'),
@@ -146,8 +174,9 @@ export const constantRoutes = [
     meta: {
       title: '高速下载',
       icon: 'upload',
-      noCache: false,
+      noCache: true,
       link: null,
+      refresh:true
     },
     children: [
       {
@@ -160,6 +189,7 @@ export const constantRoutes = [
           icon: 'example',
           noCache: false,
           link: null,
+          refresh:true
         },
       },
       {
@@ -170,8 +200,9 @@ export const constantRoutes = [
         meta: {
           title: '解析列表',
           icon: 'example',
-          noCache: false,
+          noCache: true,
           link: null,
+          refresh:true
         },
       },
     ],

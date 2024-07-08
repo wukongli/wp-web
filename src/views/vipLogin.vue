@@ -141,7 +141,15 @@ function handleLogin() {
           //   ElMessage.error('会员已到期请联系管理员')
           //   return;
           // }
-          router.push({ path: '/parse/login' });
+          router.push({ path: '/parse/login'});
+          // userStore.getInfo().then((res)=>{
+          //   if(res.code === 200){
+          //     router.push({ path: '/parse/login',query:{
+          //       userKey:res.user.vipCode,
+          //       } });
+          //   }
+          // })
+
         })
         .catch(() => {
           loading.value = false;

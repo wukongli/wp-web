@@ -23,7 +23,8 @@ const whiteList = [
   '/front/front/interview',
   '/parse/login',
   '/parse/index',
-  '/401'
+  '/401',
+  '/video/index'
 ];
 
 router.beforeEach((to, from, next) => {
@@ -36,7 +37,7 @@ router.beforeEach((to, from, next) => {
       // 判断当前用户是否已拉取完user_info信息
       useUserStore()
         .getInfo()
-        .then(() => {
+        .then((res) => {
           isRelogin.show = false;
           usePermissionStore()
             .generateRoutes()
@@ -47,6 +48,15 @@ router.beforeEach((to, from, next) => {
                   router.addRoute(route); // 动态添加可访问路由表
                 }
               });
+                /**
+                 * 进入首页带上userKey
+                 */
+              if(to.path === "/parse/login"){
+                  next({ path: '/parse/login',query:{
+                          userKey:res.user.vipCode ? res.user.vipCode : "main",
+                      }
+                  })
+              }
               next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
             });
         })
@@ -81,7 +91,13 @@ router.beforeEach((to, from, next) => {
       // }else{
       //
       // }
-      next("/401")
+
+      router.push({
+        path: '/parse/login',
+        query: {
+          userKey:sessionStorage.getItem("userKey") ? sessionStorage.getItem("userKey") :"main"
+        },
+      })
 
     }
   }

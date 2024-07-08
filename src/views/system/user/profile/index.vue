@@ -45,10 +45,10 @@
 <!--                      验证码剩余时间-->
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
 <!--                    </li>-->
-<!--                    <li class="list-group-item">-->
-<!--                      验证码到期日期-->
-<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>-->
-<!--                    </li>-->
+                    <li class="list-group-item">
+                      赞助到期日期
+                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>
+                    </li>
                   </ul>
                </div>
             </el-card>

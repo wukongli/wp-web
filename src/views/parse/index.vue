@@ -53,8 +53,9 @@
 <!--          }}-->
 <!--          次</el-table-column-->
 <!--        >-->
-        <el-table-column label="操作">
+        <el-table-column  min-width="100px" label="操作">
           <template #default="scope">
+            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -113,7 +114,7 @@
         </span>
       </template>
     </el-dialog>
-    <!-- 限速提示弹窗 -->
+    <!-- 无限制下载 -->
     <el-dialog title="提示" v-model="loadData.noLimit" width="40%">
       <div class="qr-title">{{loadData.item.server_filename}}</div>
       <template #footer>
@@ -124,6 +125,19 @@
           <el-button v-else type="danger"
                      @click="trySend"
           >重 试</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+<!--    赞助下载弹窗-->
+    <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
+      <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
+      <div class="qr-title">快速下载无需验证码，不限下载次数！</div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary"
+                     @click="vipDownClick"
+          >解 析</el-button>
         </span>
       </template>
     </el-dialog>
@@ -208,7 +222,7 @@ const loadData = reactive({
   fileSize: 8698669056,
   routeData: [],
   rootBackTitle: '全部文件',
-  maxNum: false,
+  vipDown: false,
   item:null,
   url:"",
   codeUrl:'',
@@ -474,6 +488,12 @@ async function confirm(item) {
         item.loading = false;
         item.disable = false;
         showParse.value = false;
+        if(data.data.error_code === 31066){
+          item.status = 0;
+          showParse.value = true;
+          ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+          return;
+        }
         if(data.data.urls.length && data.data.urls[0].url){
           loadData.url = data.data.urls[0].url;
           sendToMotrix(item);
@@ -623,25 +643,24 @@ function goBack() {
 
 function init() {
   if (
-    !loadData.query.shorturl ||
-    !loadData.query.pwd ||
-    !loadData.query.dir ||
-    !loadData.query.root ||
-    !loadData.query.userKey
+    !route.query.shorturl ||
+    !route.query.pwd ||
+    !route.query.dir ||
+    !route.query.root ||
+    !route.query.userKey
   ) {
-    router.push({ path: '/401' });
+    router.push({ path: '/parse/login' });
     return;
   }
   loadData.tableLoading = true;
   getUserByUserKey();
   getList();
-  userStore.get
   // getDownNum();
 }
 init();
 
 function getUserByUserKey(){
-  userStore.getUserInfo({userKey:loadData.query.userKey}).then((res)=>{
+  userStore.getUserInfo({userKey:route.query.userKey}).then((res)=>{
     if(res.code === 200){
       loadData.codeUrl = res.data.codeUrl;
     }
@@ -666,6 +685,15 @@ function testDownLoad() {
       }
     };
   });
+}
+
+function vipDownLoad(item){
+  loadData.item = item;
+  loadData.vipDown = true;
+}
+
+function vipDownClick(){
+  ElMessage.error("请公众号联系管理员开通权限！")
 }
 </script>
 

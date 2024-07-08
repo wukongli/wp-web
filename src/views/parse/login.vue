@@ -56,7 +56,7 @@
 <!--          /></template>-->
 <!--        </el-input>-->
         <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
+          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明(注意：下载前一定要配置UA)</a>
           <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
 <!--      </el-form-item>-->
@@ -222,10 +222,6 @@ function init(){
           userKey:userKey
         },
       })
-    }else{
-      router.push({
-        path: '/401',
-      })
     }
 
   }else{
@@ -308,7 +304,7 @@ init();
   color: #bfbfbf;
 }
 .login-code {
-  width: 33%;
+  //width: 33%;
   height: 20px;
   line-height: 20px;
   margin-bottom: 18px;
