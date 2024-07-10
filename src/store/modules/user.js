@@ -8,7 +8,8 @@ import {
     getVip,
     getCode,
     loginNoPwd,
-    getCourseByType, delCode,getInfoByUserKey
+    getCourseByType, delCode,getInfoByUserKey,
+    tryDownUrl
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -195,6 +196,17 @@ const useUserStore = defineStore('user', {
       getUserInfo(data){
           return new Promise((resolve, reject) => {
               getInfoByUserKey(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      tryDown(data){
+          return new Promise((resolve, reject) => {
+              tryDownUrl(data)
                   .then((res) => {
                       resolve(res);
                   })

@@ -141,6 +141,15 @@ export function getInfoByUserKey(data) {
   });
 }
 
+export function tryDownUrl(data) {
+  return request({
+    url: '/wp/try/down',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 export function delCode(data) {
   return request({
     url: '/wp/del/code',

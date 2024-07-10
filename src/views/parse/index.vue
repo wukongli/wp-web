@@ -105,12 +105,12 @@
       <div class="qr-title">受网络波动影响有时候可能解析不出来，重试几次即可！！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button v-if="showParse" type="primary" :loading="isSending"
+          <el-button type="primary" :loading="isSending"
                      @click="onSubmit"
           >解 析</el-button>
-          <el-button v-else type="danger"
-                     @click="trySend"
-          >重 试</el-button>
+<!--          <el-button v-else type="danger"-->
+<!--                     @click="trySend"-->
+<!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -119,12 +119,12 @@
       <div class="qr-title">{{loadData.item.server_filename}}</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button v-if="showParse" type="primary" :loading="isSending"
+          <el-button type="primary" :loading="isSending"
                      @click="noLimit"
           >解 析</el-button>
-          <el-button v-else type="danger"
-                     @click="trySend"
-          >重 试</el-button>
+<!--          <el-button v-else type="danger"-->
+<!--                     @click="trySend"-->
+<!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -195,7 +195,7 @@ const form = reactive({
   code: '',
 })
 const isSending = ref(false);
-const showParse = ref(true);
+// const showParse = ref(true);
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -226,6 +226,7 @@ const loadData = reactive({
   item:null,
   url:"",
   codeUrl:'',
+  ckId:null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -310,7 +311,7 @@ function parseCopyLink(params) {
 function downLoad(item){
   loadData.item = item;
   isSending.value = false;
-  showParse.value = true;
+  // showParse.value = true;
   if(getToken()){
     loadData.noLimit = true;
   }else{
@@ -326,7 +327,6 @@ async function noLimit (){
   const result = await testDownLoad();
   if (!result) {
     loadData.dialogVisible = true;
-    userStore.delCodeNum(params);
     isSending.value = false;
     return;
   }
@@ -342,7 +342,9 @@ const onSubmit = () => {
       isSending.value = true;
       const params = {
         code:form.code,
-        userKey:loadData.query.userKey
+        userKey:loadData.query.userKey,
+        fsId:loadData.item.fs_id,
+        version:"1.0.2",
       }
       const result = await testDownLoad();
       if (!result) {
@@ -389,9 +391,23 @@ const onSubmit = () => {
   })
 }
 
-const trySend = ()=>{
-    sendToMotrix(loadData.item);
-}
+// const trySend = ()=>{
+//
+//     const params = {
+//       ckId:loadData.ckId,
+//       path:loadData.item.server_filename,
+//     }
+//     userStore.tryDown(params).then((res)=>{
+//       console.log(res);
+//       if(res.code === 200){
+//         loadData.url = res.data.urls[0].url;
+//         sendToMotrix(loadData.item);
+//       }else{
+//         ElMessage.error("重新下载失败！！")
+//       }
+//     })
+//
+// }
 
 async function downLoadConfirm(item) {
 
@@ -464,7 +480,7 @@ async function confirm(item) {
     fsId:item.fs_id,
     path:item.server_filename,
     userKey:loadData.query.userKey,
-    version:"1.0.1"
+    code:form.code,
   };
   //过期重新获取时间戳
   // const date = new Date().getTime() / 1000;
@@ -487,15 +503,16 @@ async function confirm(item) {
         item.status = 0;
         item.loading = false;
         item.disable = false;
-        showParse.value = false;
+        // showParse.value = false;
         if(data.data.error_code === 31066){
           item.status = 0;
-          showParse.value = true;
+          // showParse.value = true;
           ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
           return;
         }
         if(data.data.urls.length && data.data.urls[0].url){
           loadData.url = data.data.urls[0].url;
+          loadData.ckId = data.data.ckId;
           sendToMotrix(item);
         }else{
           ElMessage.error("解析通道比较拥堵，请重试！")
@@ -505,7 +522,7 @@ async function confirm(item) {
         item.status = 0;
         item.disable = false;
         item.loading = false;
-        loadData.limitSpeedVisible = true;
+        // loadData.limitSpeedVisible = true;
       }
     })
     .catch(() => {
@@ -693,7 +710,7 @@ function vipDownLoad(item){
 }
 
 function vipDownClick(){
-  ElMessage.error("请公众号联系管理员开通权限！")
+  ElMessage.error("请公众号内回复【快速下载】联系管理员开通权限！")
 }
 </script>
 
