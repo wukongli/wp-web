@@ -30,7 +30,7 @@
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-            v-model="loginForm.password"
+            v-model="loginForm.pwd"
             type="text"
             size="large"
             auto-complete="off"
@@ -158,8 +158,10 @@ const redirect = ref(undefined);
 function handleBlur() {
   const { url, pwd } = SubmitLink(loginForm.value.username);
   loginForm.value.shorturl = url;
-  loginForm.value.pwd = pwd;
-  loginForm.value.password = pwd;
+  if(pwd){
+    loginForm.value.pwd = pwd;
+  }
+  //loginForm.value.password = pwd;
 }
 
 async function handleLogin() {

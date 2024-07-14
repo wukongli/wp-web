@@ -11,11 +11,11 @@ export  function getFilesize(row, column, size) {
     if (size < Math.pow(num, 4)){
         let fileSize = (size / Math.pow(num, 3)).toFixed(2);
         if(fileSize > 7){
-            return fileSize + 'G' + ` ( 文件大于9G无法下载 )`; //G
+            return fileSize + 'G' + ` ( 文件大于10G请使用快速下载 )`; //G
         }
         return fileSize + 'G'; //G
     }
-    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于9G无法下载)`; //T
+    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于10G请使用快速下载)`; //T
 }
 
 export function getIconClass(row) {
@@ -82,10 +82,10 @@ export function SubmitLink(url) {
     if (pwd != null && pwd.length === 4) {
         pw = pwd[3];
     }
-    if (pw.length !== 0 && pw.length !== 4) {
-        ElMessage.error('验证码错误，请检查！');
-        return false;
-    }
+    // if (pw.length !== 0 && pw.length !== 4) {
+    //     ElMessage.error('验证码错误，请检查！');
+    //     return false;
+    // }
     return {
         url: surl,
         pwd: pw,

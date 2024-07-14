@@ -102,7 +102,7 @@
       </el-form>
       <div class="qr-hint">扫一扫获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">受网络波动影响有时候可能解析不出来，重试几次即可！！</div>
+      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
@@ -132,7 +132,7 @@
 <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-      <div class="qr-title">快速下载无需验证码，不限下载次数！</div>
+      <div class="qr-title">快速下载无需验证码，不限文件大小，不限下载次数！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"
@@ -219,7 +219,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: false,
-  fileSize: 8698669056,
+  fileSize: getToken() ? 200698669056 : 9698669056,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,

@@ -16,8 +16,8 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
-<!--    <span>关闭网盘限速短信提醒：</span-->
-<!--    ><el-switch @change="switchLimitMessage" v-model="value1" />-->
+    <span>开启稳定下载：</span
+    ><el-switch @change="startDown" v-model="value1" />
     <el-table
       v-loading="loading"
       :data="postList"
@@ -154,10 +154,10 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-// function switchLimitMessage(value) {
-//   const param = { limit: value ? 1 : 0 };
-//   sendMessage(param).then(() => {});
-// }
+function startDown(value) {
+  const param = { startDown: value};
+  sendMessage(param).then(() => {});
+}
 
 /** 查询vip列表 */
 function getList() {
@@ -245,7 +245,7 @@ function handleDelete(item) {
 function getMessageStatus() {
   getMessage().then((response) => {
     if ((response.code = 200)) {
-      value1.value = response.data === 1 ? true : false;
+      value1.value = response.data;
     }
   });
 }

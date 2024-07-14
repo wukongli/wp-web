@@ -89,7 +89,7 @@ export function getDownLoadRecord(data) {
 
 export function sendMessage(data) {
   return request({
-    url: '/vip/sendMessage',
+    url: '/vip/stable/down',
     method: 'post',
     data: data,
   });
@@ -97,7 +97,7 @@ export function sendMessage(data) {
 
 export function getMessage() {
   return request({
-    url: '/vip/getMessage',
+    url: '/vip/stable/down',
     method: 'get',
   });
 }
