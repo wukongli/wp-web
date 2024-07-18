@@ -86,12 +86,25 @@ export function getDownLoadRecord(data) {
     params: data,
   });
 }
-
 export function sendMessage(data) {
   return request({
     url: '/vip/stable/down',
     method: 'post',
     data: data,
+  });
+}
+export function pcStableDown(data) {
+  return request({
+    url: '/vip/pc/stable/down',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function getPcStableDown() {
+  return request({
+    url: '/vip/pc/stable/down',
+    method: 'get',
   });
 }
 

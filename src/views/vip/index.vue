@@ -16,8 +16,10 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
-    <span>开启稳定下载：</span
+    <span>开启油猴插件稳定下载：</span
     ><el-switch @change="startDown" v-model="value1" />
+    <span>开启PC网页版稳定下载：</span
+    ><el-switch @change="startPcDown" v-model="pcDown" />
     <el-table
       v-loading="loading"
       :data="postList"
@@ -122,7 +124,7 @@ import {
   addPost,
   deleteVip,
   getMessage,
-  sendMessage, putPost,
+  sendMessage, putPost, pcStableDown, getPcStableDown,
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
 import {getUser} from "@/api/system/user";
@@ -140,6 +142,7 @@ const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
 const value1 = ref(false);
+const pcDown = ref(false);
 const data = reactive({
   form: {},
   queryParams: {
@@ -157,6 +160,11 @@ const { queryParams, form, rules } = toRefs(data);
 function startDown(value) {
   const param = { startDown: value};
   sendMessage(param).then(() => {});
+}
+
+function startPcDown(value){
+  const param = { startDown: value};
+  pcStableDown(param).then(() => {});
 }
 
 /** 查询vip列表 */
@@ -246,6 +254,11 @@ function getMessageStatus() {
   getMessage().then((response) => {
     if ((response.code = 200)) {
       value1.value = response.data;
+    }
+  });
+  getPcStableDown().then((response) => {
+    if ((response.code = 200)) {
+      pcDown.value = response.data;
     }
   });
 }

@@ -93,7 +93,7 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="loadData.codeUrl" alt="" />
+      <img class="qr-code" src="https://lidognqialiyun.oss-cn-beijing.aliyuncs.com/gh_0dcc01011f5a_258%20%281%29.jpg" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
       <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
         <el-form-item prop="code" label="请输入验证码">
@@ -131,6 +131,7 @@
 
 <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
+      <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
       <div class="qr-title">快速下载无需验证码，不限文件大小，不限下载次数！</div>
       <template #footer>
@@ -344,12 +345,12 @@ const onSubmit = () => {
         code:form.code,
         userKey:loadData.query.userKey,
         fsId:loadData.item.fs_id,
-        version:"1.0.2",
+        version:"1.0.3",
       }
       const result = await testDownLoad();
       if (!result) {
         loadData.dialogVisible = true;
-        userStore.delCodeNum(params);
+        // userStore.delCodeNum(params);
         isSending.value = false;
         return;
       }
@@ -359,11 +360,7 @@ const onSubmit = () => {
           .then((res) => {
             if(res.code === 200){
               if(res.data == 100){
-                setTimeout(()=>{
-                  // isSending.value =false;
-                  //loadData.WeCharVisible = false;
-                  confirm(loadData.item);
-                },2000)
+                confirm(loadData.item);
               }else if(res.data == 80){
                 setTimeout(()=>{
                   isSending.value =false;
@@ -710,7 +707,7 @@ function vipDownLoad(item){
 }
 
 function vipDownClick(){
-  ElMessage.error("请公众号内回复【快速下载】联系管理员开通权限！")
+  ElMessage.error("请扫码公众号内回复【快速下载】联系管理员开通权限！")
 }
 </script>
 
@@ -770,7 +767,7 @@ function vipDownClick(){
     font-weight: bold;
   }
   .qr-code {
-    width: 170px;
+    width: 180px;
     height: 180px;
     margin: auto;
     display: block;
