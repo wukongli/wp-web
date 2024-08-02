@@ -10,12 +10,12 @@ export  function getFilesize(row, column, size) {
         return (size / Math.pow(num, 2)).toFixed(2) + 'M'; //M
     if (size < Math.pow(num, 4)){
         let fileSize = (size / Math.pow(num, 3)).toFixed(2);
-        if(fileSize > 7){
-            return fileSize + 'G' + ` ( 文件大于10G请使用快速下载 )`; //G
+        if(fileSize > 5){
+            return fileSize + 'G' + ` ( 文件大于5G请使用快速下载 )`; //G
         }
         return fileSize + 'G'; //G
     }
-    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于10G请使用快速下载)`; //T
+    return (size / Math.pow(num, 4)).toFixed(2) + 'T'+`(文件大于5G请使用快速下载)`; //T
 }
 
 export function getIconClass(row) {

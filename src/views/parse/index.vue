@@ -100,7 +100,7 @@
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">扫一扫获取验证码</div>
+      <div class="qr-hint">扫一扫上方二维码获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
       <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
       <template #footer>
@@ -220,7 +220,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: false,
-  fileSize: getToken() ? 200698669056 : 9698669056,
+  fileSize: getToken() ? 100698669056 : 5242880000,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
@@ -345,7 +345,7 @@ const onSubmit = () => {
         code:form.code,
         userKey:loadData.query.userKey,
         fsId:loadData.item.fs_id,
-        version:"1.0.3",
+        version:"1.0.7",
       }
       const result = await testDownLoad();
       if (!result) {
@@ -354,7 +354,6 @@ const onSubmit = () => {
         isSending.value = false;
         return;
       }
-
       userStore
           .getCodeNum(params)
           .then((res) => {
@@ -375,15 +374,14 @@ const onSubmit = () => {
               } else if(res.data == 50){
                 setTimeout(()=>{
                   isSending.value =false;
-                  ElMessage.error("您输入的验证码不正确，请重新获取!")
+                  ElMessage.error("验证码错误,一个验证码只能下载一个文件,请重新获取!")
                 },2000)
               }
 
-            }else{
-              isSending.value = false;
-              ElMessage.error("您输入的验证码不正确，请重新获取！！")
             }
-          })
+          }).catch(()=>{
+        isSending.value = false;
+      })
     }
   })
 }
@@ -540,10 +538,10 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        loadData.url
+        `${loadData.url}&origin=dlna`
       ],
       {
-        'user-agent': 'netdisk;7.39.1.1',
+        'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
       },
     ],
   };
