@@ -74,7 +74,6 @@
             type="primary"
             icon="Delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:post:remove']"
             >删除</el-button
           >
         </template>

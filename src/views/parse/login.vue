@@ -195,8 +195,7 @@ async function handleLogin() {
           shorturl: loginForm.value.shorturl,
           pwd: encrypt(loginForm.value.pwd),
           dir: loginForm.value.dir,
-          root: loginForm.value.root,
-          userKey:route.query.userKey
+          root: loginForm.value.root
         },
       })
     }
@@ -214,29 +213,29 @@ function handleClose() {
   hint.getCodeVisible = false;
   loading.value = false;
 }
-function init(){
-  if(!route.query.userKey){
-    const userKey = sessionStorage.getItem("userKey")
-    if(userKey){
-      router.push({
-        path: '/parse/login',
-        query: {
-          userKey:userKey
-        },
-      })
-    }
-
-  }else{
-    sessionStorage.setItem("userKey",route.query.userKey)
-    router.push({
-      path: '/parse/login',
-      query: {
-        userKey:route.query.userKey
-      },
-    })
-  }
-}
-init();
+// function init(){
+//   if(!route.query.userKey){
+//     const userKey = sessionStorage.getItem("userKey")
+//     if(userKey){
+//       router.push({
+//         path: '/parse/login',
+//         query: {
+//           userKey:userKey
+//         },
+//       })
+//     }
+//
+//   }else{
+//     sessionStorage.setItem("userKey",route.query.userKey)
+//     router.push({
+//       path: '/parse/login',
+//       query: {
+//         userKey:route.query.userKey
+//       },
+//     })
+//   }
+// }
+// init();
 
 // getVipNums();
 </script>

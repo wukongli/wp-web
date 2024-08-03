@@ -51,12 +51,12 @@ router.beforeEach((to, from, next) => {
                 /**
                  * 进入首页带上userKey
                  */
-              if(to.path === "/parse/login"){
-                  next({ path: '/parse/login',query:{
-                          userKey:res.user.vipCode ? res.user.vipCode : "main",
-                      }
-                  })
-              }
+              // if(to.path === "/parse/login"){
+              //     next({ path: '/parse/login',query:{
+              //             userKey:res.user.vipCode ? res.user.vipCode : "test",
+              //         }
+              //     })
+              // }
               next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
             });
         })

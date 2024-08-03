@@ -93,7 +93,7 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" src="https://lidognqialiyun.oss-cn-beijing.aliyuncs.com/gh_0dcc01011f5a_258%20%281%29.jpg" alt="" />
+      <img class="qr-code" :src="xiaochengxu" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
       <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
         <el-form-item prop="code" label="请输入验证码">
@@ -183,10 +183,11 @@ import Cookies from 'js-cookie';
 import wechar from '@/assets/images/wechar.png';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
-import {generateRandomLetters, getFilesize, getIconClass, timestampToTime} from '@/utils/wp';
+import {generateRandomLetters, getFilesize, getIconClass, timestampToTime,userKey} from '@/utils/wp';
 import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import qrCode from "@/assets/images/qrcode.jpg";
+import xiaochengxu from "@/assets/images/xiaochengxu.jpg"
 import {getToken} from "@/utils/auth";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -226,7 +227,7 @@ const loadData = reactive({
   vipDown: false,
   item:null,
   url:"",
-  codeUrl:'',
+  codeUrl:qrCode,
   ckId:null,
 });
 // 路由离开时的操作
@@ -343,7 +344,7 @@ const onSubmit = () => {
       isSending.value = true;
       const params = {
         code:form.code,
-        userKey:loadData.query.userKey,
+        userKey:userKey,
         fsId:loadData.item.fs_id,
         version:"1.0.7",
       }
@@ -474,7 +475,7 @@ async function confirm(item) {
     sekey:loadData.parseLinkParams.seckey,
     fsId:item.fs_id,
     path:item.server_filename,
-    userKey:loadData.query.userKey,
+    userKey:userKey,
     code:form.code,
   };
   //过期重新获取时间戳
@@ -658,26 +659,25 @@ function init() {
     !route.query.shorturl ||
     !route.query.pwd ||
     !route.query.dir ||
-    !route.query.root ||
-    !route.query.userKey
+    !route.query.root
   ) {
     router.push({ path: '/parse/login' });
     return;
   }
   loadData.tableLoading = true;
-  getUserByUserKey();
+  // getUserByUserKey();
   getList();
   // getDownNum();
 }
 init();
 
-function getUserByUserKey(){
-  userStore.getUserInfo({userKey:route.query.userKey}).then((res)=>{
-    if(res.code === 200){
-      loadData.codeUrl = res.data.codeUrl;
-    }
-  })
-}
+// function getUserByUserKey(){
+//   userStore.getUserInfo({userKey:userKey}).then((res)=>{
+//     if(res.code === 200){
+//       loadData.codeUrl = res.data.codeUrl;
+//     }
+//   })
+// }
 
 function testDownLoad() {
   return new Promise((resolve) => {
