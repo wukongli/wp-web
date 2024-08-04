@@ -118,4 +118,4 @@ export function generateRandomLetters(count) {
     return result;
 }
 
-export const userKey = "main";
+export const userKey = "test";

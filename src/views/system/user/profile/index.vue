@@ -39,7 +39,7 @@
                      </li>
                     <li v-if="state.user.vipCode" class="list-group-item">
                       我的地址
-                      <div class="pull-right">parse/login?userKey={{state.user.vipCode }}</div>
+                      <div class="pull-right">parse/login</div>
                     </li>
 <!--                    <li class="list-group-item">-->
 <!--                      验证码剩余时间-->
