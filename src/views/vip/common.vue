@@ -207,7 +207,7 @@ function setDownLoad(){
     ElMessage.success("设置成功")
   })
 }
-getDownLoad();
+// getDownLoad();
 getList();
 </script>
 <style scoped lang="scss">
