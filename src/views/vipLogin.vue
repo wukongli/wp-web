@@ -92,7 +92,7 @@ import { ElNotification } from 'element-plus'
 const userStore = useUserStore();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
-
+import {createBy} from "@/utils/wp";
 const loginForm = ref({
   username: '',
   password: '',
@@ -136,12 +136,28 @@ function handleLogin() {
       userStore
         .adminLogin(loginForm.value)
         .then((data) => {
+          console.log(data);
+          useUserStore()
+              .getInfo()
+              .then((res) => {
+                console.log(res);
+                if(res.code === 200){
+                  if(res.user.createBy === createBy || res.user.createBy === res.user.userName){
+                    router.push({ path: '/parse/login'});
+                  }else{
+                    loading.value = false;
+                    ElMessage.error("登录错误,无权限！")
+                  }
+                }else{
+                  ElMessage.error("登录错误！")
+                }
+              })
           // if(data.token === "会员已到期"){
           //   loading.value = false;
           //   ElMessage.error('会员已到期请联系管理员')
           //   return;
           // }
-          router.push({ path: '/parse/login'});
+
           // userStore.getInfo().then((res)=>{
           //   if(res.code === 200){
           //     router.push({ path: '/parse/login',query:{
