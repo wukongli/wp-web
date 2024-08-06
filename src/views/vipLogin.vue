@@ -6,7 +6,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">爱分享平台</h3>
+      <h3 class="title">爱互传平台</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -205,7 +205,7 @@ getCode();
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/images/bac.jpg');
+  background-image: url('../assets/images/bac.png');
   background-size: cover;
 }
 .title {

@@ -6,8 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>
-      <h3 v-else class="title">网盘文件加速下载</h3>
+<!--      <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>-->
+      <h3 class="title">网盘文件加速下载</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
@@ -247,7 +247,7 @@ function handleClose() {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 84px);
-  background-image: url('../../assets/images/apple.jpg');
+  background-image: url('../../assets/images/bac.png');
   background-size: cover;
   .qr-code {
     width: 180px;
