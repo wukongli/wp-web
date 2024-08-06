@@ -547,21 +547,21 @@ function sendToMotrix(item){
     ],
   };
 
-  fetch('http://localhost:16800/jsonrpc', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(o),
-  })
-      .then((resp) => resp.json())
-      .then((res) => {
-        item.status = 2;
-        ElMessage({
-          message: `${item.server_filename}开始下载！`,
-          type: 'success',
-        })
-      });
+  // fetch('http://127.0.0.1:16800/jsonrpc', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(o),
+  // })
+  //     .then((resp) => resp.json())
+  //     .then((res) => {
+  //       item.status = 2;
+  //       ElMessage({
+  //         message: `${item.server_filename}开始下载！`,
+  //         type: 'success',
+  //       })
+  //     });
   // let options = {
   //   'user-agent': 'netdisk',
   //   'X-forwarded-for':'1.94.42.208',
@@ -575,22 +575,19 @@ function sendToMotrix(item){
   // };
 
   // json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
-  // let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-  // ws.onerror = (event) => {
-  //   item.loading = false;
-  //   item.disable = false;
-  //   ws.close();
-  //   ElMessage.error('链接失败，请检查是否安装Motrix');
-  // };
-  // ws.onopen = () => {
-  //   // const data = {
-  //   //   fileName: item.server_filename.trim(),
-  //   //   fileSize: item.size,
-  //   // };
-  //   // setDownLoadRecord(data);
-  //
-  //   ws.send(JSON.stringify(json));
-  // };
+  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
+  ws.onerror = (event) => {
+    ws.close();
+  };
+  ws.onopen = () => {
+    item.status = 2;
+    ElMessage({
+      message: `${item.server_filename}开始下载！`,
+      type: 'success',
+    })
+    ws.send(JSON.stringify(o));
+    ws.close();
+  };
   //
   // ws.onmessage = (event) => {
   //   let received_msg = JSON.parse(event.data);
