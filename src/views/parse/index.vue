@@ -73,11 +73,11 @@
     </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
-      <div class="down-title">下载前，请安装下载器并运行！！</div>
+      <div class="down-title">系统检测到你没有安装Motrix,请安装下载器并运行！！</div>
       <div class="down-address">
         <span>下载地址：</span>
-        <a href="https://wwf.lanzouq.com/b05f548wf密码:hb1i" target="_blank">
-          https://wwf.lanzouq.com/b05f548wf 密码:hb1i</a
+        <a href="https://pan.quark.cn/s/b878b162bb5b" target="_blank">
+          https://pan.quark.cn/s/b878b162bb5b</a
         >
       </div>
       <template #footer>

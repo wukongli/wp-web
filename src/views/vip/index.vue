@@ -16,10 +16,10 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
-    <span>开启油猴插件稳定下载：</span
-    ><el-switch @change="startDown" v-model="value1" />
-    <span>开启PC网页版稳定下载：</span
-    ><el-switch @change="startPcDown" v-model="pcDown" />
+<!--    <span>开启油猴插件稳定下载：</span-->
+<!--    ><el-switch @change="startDown" v-model="value1" />-->
+<!--    <span>开启PC网页版稳定下载：</span-->
+<!--    ><el-switch @change="startPcDown" v-model="pcDown" />-->
     <el-table
       v-loading="loading"
       :data="postList"
@@ -261,6 +261,6 @@ function getMessageStatus() {
     }
   });
 }
-getMessageStatus();
+// getMessageStatus();
 getList();
 </script>

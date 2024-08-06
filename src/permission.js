@@ -10,7 +10,6 @@ import useSettingsStore from '@/store/modules/settings';
 import usePermissionStore from '@/store/modules/permission';
 import {encrypt} from "@/utils/jsencrypt";
 // import Layout from "@/layout/index.vue";
-
 NProgress.configure({ showSpinner: false });
 
 const whiteList = [
