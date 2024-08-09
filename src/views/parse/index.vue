@@ -186,7 +186,7 @@ const userStore = useUserStore();
 import {generateRandomLetters, getFilesize, getIconClass, timestampToTime,userKey} from '@/utils/wp';
 import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from "@/assets/images/qrcode.jpg";
+import qrCode from "@/assets/images/img.png";
 import xiaochengxu from "@/assets/images/xiaochengxu.jpg"
 import {getToken} from "@/utils/auth";
 const { proxy } = getCurrentInstance();
