@@ -346,7 +346,7 @@ const onSubmit = () => {
         code:form.code,
         userKey:userKey,
         fsId:loadData.item.fs_id,
-        version:"1.0.7",
+        version:"1.0.9",
       }
       const result = await testDownLoad();
       if (!result) {
@@ -471,12 +471,13 @@ async function confirm(item) {
 
   const params = {
     shareid:loadData.parseLinkParams.shareid,
-    from:loadData.parseLinkParams.uk,
+    uk:loadData.parseLinkParams.uk,
     sekey:loadData.parseLinkParams.seckey,
-    fsId:item.fs_id,
-    path:item.server_filename,
+    fsIdList:[item.fs_id],
+    // path:item.server_filename,
     userKey:userKey,
-    code:form.code,
+    size:item.size,
+    // code:form.code,
   };
   //过期重新获取时间戳
   // const date = new Date().getTime() / 1000;
@@ -495,24 +496,47 @@ async function confirm(item) {
     .then((data) => {
       if (data.code === 200) {
 
-        isSending.value =false;
-        item.status = 0;
-        item.loading = false;
-        item.disable = false;
+        // isSending.value =false;
+        // item.status = 0;
+        // item.loading = false;
+        // item.disable = false;
         // showParse.value = false;
-        if(data.data.error_code === 31066){
-          item.status = 0;
-          // showParse.value = true;
-          ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
-          return;
-        }
-        if(data.data.urls.length && data.data.urls[0].url){
-          loadData.url = data.data.urls[0].url;
-          loadData.ckId = data.data.ckId;
-          sendToMotrix(item);
-        }else{
-          ElMessage.error("解析通道比较拥堵，请重试！")
-        }
+        // if(data.data.error_code === 31066){
+        //   item.status = 0;
+        //   // showParse.value = true;
+        //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+        //   return;
+        // }
+        const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
+        const data = {
+          fsidlist: JSON.stringify([item.fs_id]),
+          shareid:loadData.parseLinkParams.shareid,
+          uk:loadData.parseLinkParams.uk,
+          sekey:loadData.parseLinkParams.seckey,
+          password:"745216",
+          size: item.size,
+        };
+        fetch(url, {
+          method: 'POST', // 指定请求方法
+          headers: {
+            'Content-Type': 'application/json' // 设置头部内容类型为JSON
+          },
+          body: JSON.stringify(data) // 将数据转换为JSON字符串
+        })
+            .then(response => response.json())
+            .then(res => {
+                if(res.code === 200){
+                  item.loading = false;
+                  isSending.value =false;
+                  loadData.url = res.data.dlink;
+                  sendToMotrix(item);
+                }else{
+                  ElMessage.error("解析通道比较拥堵，请重试！")
+                }
+            })
+            .catch(error => {
+                 ElMessage.error("解析通道比较拥堵，请重试！")
+            });
 
       }else{
         item.status = 0;
@@ -539,10 +563,10 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        `${loadData.url}&origin=dlna`
+        loadData.url
       ],
       {
-        'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
+        'user-agent': 'netdisk;7.44.0.4',
       },
     ],
   };

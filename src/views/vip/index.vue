@@ -16,6 +16,18 @@
         @queryTable="getList"
       ></right-toolbar>
     </el-row>
+    <div>
+      <span class = "code-down">免费下载次数：</span>
+      <el-input v-model="downNum" style="width: 240px" placeholder="请输入下载次数" />
+      <el-button style="margin-left: 20px;" @click="setDownLoad"  type="primary">保存</el-button>
+    </div>
+    <div style="margin-top:20px; ">
+      <span class = "code-down">赞助下载次数：</span>
+      <el-input v-model="vipDownNum" style="width: 240px" placeholder="请输入下载次数" />
+      <el-button style="margin-left: 20px;" @click="setVipDownLoad"  type="primary">保存</el-button>
+    </div>
+
+
 <!--    <span>开启油猴插件稳定下载：</span-->
 <!--    ><el-switch @change="startDown" v-model="value1" />-->
 <!--    <span>开启PC网页版稳定下载：</span-->
@@ -123,10 +135,13 @@ import {
   addPost,
   deleteVip,
   getMessage,
-  sendMessage, putPost, pcStableDown, getPcStableDown,
+  sendMessage, putPost, pcStableDown, getPcStableDown, getDownLoadNum, setDownLoadNum,
+  geVipDownLoadNum,
+  setVipDownLoadNum
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
 import {getUser} from "@/api/system/user";
+import {userKey} from "@/utils/wp";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -142,6 +157,8 @@ const total = ref(0);
 const title = ref('');
 const value1 = ref(false);
 const pcDown = ref(false);
+const downNum = ref('')
+const vipDownNum = ref('')
 const data = reactive({
   form: {},
   queryParams: {
@@ -262,5 +279,41 @@ function getMessageStatus() {
   });
 }
 // getMessageStatus();
+
+function getDownLoad(){
+  getDownLoadNum({userKey:userKey}).then(res=>{
+    if(res.code === 200){
+      downNum.value = res.data;
+    }
+  })
+}
+function setDownLoad(){
+  const data= {
+    downLoadNum:downNum.value,
+    userKey:userKey
+  }
+  setDownLoadNum(data).then(res=>{
+    ElMessage.success("设置成功")
+  })
+}
+
+function getVipDownLoad(){
+  geVipDownLoadNum({userKey:userKey}).then(res=>{
+    if(res.code === 200){
+      vipDownNum.value = res.data;
+    }
+  })
+}
+function setVipDownLoad(){
+  const data= {
+    downLoadNum:vipDownNum.value,
+    userKey:userKey
+  }
+  setVipDownLoadNum(data).then(res=>{
+    ElMessage.success("设置成功")
+  })
+}
+getDownLoad();
+getVipDownLoad()
 getList();
 </script>
