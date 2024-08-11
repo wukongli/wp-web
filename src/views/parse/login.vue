@@ -56,7 +56,7 @@
 <!--          /></template>-->
 <!--        </el-input>-->
         <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明(注意：下载前一定要配置UA)</a>
+          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
           <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
 <!--      </el-form-item>-->
@@ -247,7 +247,7 @@ function handleClose() {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 84px);
-  background-image: url('../../assets/images/apple.jpg');
+  background-image: url('../../assets/images/bac.png');
   background-size: cover;
   .qr-code {
     width: 180px;
