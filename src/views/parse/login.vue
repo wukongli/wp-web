@@ -55,10 +55,10 @@
 <!--          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"-->
 <!--          /></template>-->
 <!--        </el-input>-->
-<!--        <div class="login-code">-->
-<!--          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明(注意：下载前一定要配置UA)</a>-->
+        <div class="login-code">
+          <a target="_blank" href="https://zw3ov19cvri.feishu.cn/docx/EL2ddgCpwok9Lpxby01cY2gvnCf?from=from_copylink">点击查看使用说明</a>
 <!--          &lt;!&ndash;          <img :src="codeUrl" @click="getCode" class="login-code-img" />&ndash;&gt;-->
-<!--        </div>-->
+        </div>
 <!--      </el-form-item>-->
       <!-- <el-checkbox -->
       <!-- v-model="loginForm.rememberMe"

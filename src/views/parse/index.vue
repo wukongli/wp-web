@@ -76,7 +76,7 @@
       <div class="down-title">系统检测到你没有安装Motrix,请安装下载器并运行！！</div>
       <div class="down-address">
         <span>下载地址：</span>
-        <a href="https://pan.quark.cn/s/b878b162bb5b" target="_blank">
+        <a href="https://pan.quark.cn/s/ac21f8220c15" target="_blank">
           https://pan.quark.cn/s/b878b162bb5b</a
         >
       </div>
