@@ -55,7 +55,7 @@
 <!--        >-->
         <el-table-column  min-width="100px" label="操作">
           <template #default="scope">
-            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>
+<!--            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>-->
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -93,16 +93,17 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="xiaochengxu" alt="" />
+      <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
-        <el-form-item prop="code" label="请输入验证码">
-          <el-input v-model="form.code" auto-complete="off" />
-        </el-form-item>
-      </el-form>
-      <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
+<!--      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">-->
+<!--        <el-form-item prop="code" label="请输入验证码">-->
+<!--          <el-input v-model="form.code" auto-complete="off" />-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--      <div class="qr-hint">扫一扫上方二维码获取验证码</div>-->
+      <div class="qr-title">【每人每天的免费下载额度会刷新但是总额度有限(因为服务器资源紧张)如果提示下载不了
+        那就只可能是我在休息或有事还没来得及维护实在急的可以联系我</div>
+<!--      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
