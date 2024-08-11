@@ -344,7 +344,7 @@ const onSubmit = () => {
     if (valid) {
       isSending.value = true;
       const params = {
-        code:form.code,
+        // code:form.code,
         userKey:userKey,
         fsId:loadData.item.fs_id,
         version:"1.0.7",

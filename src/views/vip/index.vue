@@ -3,27 +3,39 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          >新增</el-button
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+        >新增</el-button
         >
       </el-col>
 
       <right-toolbar
-        v-model:showSearch="showSearch"
-        @queryTable="getList"
+          v-model:showSearch="showSearch"
+          @queryTable="getList"
       ></right-toolbar>
     </el-row>
-<!--    <span>开启油猴插件稳定下载：</span-->
-<!--    ><el-switch @change="startDown" v-model="value1" />-->
-<!--    <span>开启PC网页版稳定下载：</span-->
-<!--    ><el-switch @change="startPcDown" v-model="pcDown" />-->
+    <div>
+      <span class = "code-down">免费下载次数：</span>
+      <el-input v-model="downNum" style="width: 240px" placeholder="请输入下载次数" />
+      <el-button style="margin-left: 20px;" @click="setDownLoad"  type="primary">保存</el-button>
+    </div>
+    <div style="margin-top:20px; ">
+      <span class = "code-down">赞助下载次数：</span>
+      <el-input v-model="vipDownNum" style="width: 240px" placeholder="请输入下载次数" />
+      <el-button style="margin-left: 20px;" @click="setVipDownLoad"  type="primary">保存</el-button>
+    </div>
+
+
+    <!--    <span>开启油猴插件稳定下载：</span-->
+    <!--    ><el-switch @change="startDown" v-model="value1" />-->
+    <!--    <span>开启PC网页版稳定下载：</span-->
+    <!--    ><el-switch @change="startPcDown" v-model="pcDown" />-->
     <el-table
-      v-loading="loading"
-      :data="postList"
-      @selection-change="handleSelectionChange"
+        v-loading="loading"
+        :data="postList"
+        @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="vip名字" align="center" prop="name" />
@@ -36,10 +48,10 @@
       <el-table-column label="解析次数" align="center" prop="count" />
       <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
       <el-table-column
-        label="创建时间"
-        align="center"
-        prop="createTime"
-        width="180"
+          label="创建时间"
+          align="center"
+          prop="createTime"
+          width="180"
       >
         <template #default="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -56,36 +68,36 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="操作"
-        width="180"
-        align="center"
-        class-name="small-padding fixed-width"
+          label="操作"
+          width="180"
+          align="center"
+          class-name="small-padding fixed-width"
       >
         <template #default="scope">
-                    <el-button
-                      link
-                      type="primary"
-                      icon="Edit"
-                      @click="handleUpdate(scope.row)"
-                      >修改</el-button
-                    >
           <el-button
-            link
-            type="primary"
-            icon="Delete"
-            @click="handleDelete(scope.row)"
-            >删除</el-button
+              link
+              type="primary"
+              icon="Edit"
+              @click="handleUpdate(scope.row)"
+          >修改</el-button
+          >
+          <el-button
+              link
+              type="primary"
+              icon="Delete"
+              @click="handleDelete(scope.row)"
+          >删除</el-button
           >
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
-      v-show="total > 0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total > 0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改岗位对话框 -->
@@ -123,10 +135,13 @@ import {
   addPost,
   deleteVip,
   getMessage,
-  sendMessage, putPost, pcStableDown, getPcStableDown,
+  sendMessage, putPost, pcStableDown, getPcStableDown, getDownLoadNum, setDownLoadNum,
+  geVipDownLoadNum,
+  setVipDownLoadNum
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
 import {getUser} from "@/api/system/user";
+import {userKey} from "@/utils/wp";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -142,6 +157,8 @@ const total = ref(0);
 const title = ref('');
 const value1 = ref(false);
 const pcDown = ref(false);
+const downNum = ref('')
+const vipDownNum = ref('')
 const data = reactive({
   form: {},
   queryParams: {
@@ -204,14 +221,14 @@ function handleAdd() {
 }
 
 function handleUpdate(row) {
-    open.value = true;
-    title.value = "修改信息";
-    form.value = {
-      cookie: row.cookie,
-      name: row.name,
-      status:row.status,
-      id:row.id
-    };
+  open.value = true;
+  title.value = "修改信息";
+  form.value = {
+    cookie: row.cookie,
+    name: row.name,
+    status:row.status,
+    id:row.id
+  };
 
 }
 
@@ -262,5 +279,41 @@ function getMessageStatus() {
   });
 }
 // getMessageStatus();
+
+function getDownLoad(){
+  getDownLoadNum({userKey:userKey}).then(res=>{
+    if(res.code === 200){
+      downNum.value = res.data;
+    }
+  })
+}
+function setDownLoad(){
+  const data= {
+    downLoadNum:downNum.value,
+    userKey:userKey
+  }
+  setDownLoadNum(data).then(res=>{
+    ElMessage.success("设置成功")
+  })
+}
+
+function getVipDownLoad(){
+  geVipDownLoadNum({userKey:userKey}).then(res=>{
+    if(res.code === 200){
+      vipDownNum.value = res.data;
+    }
+  })
+}
+function setVipDownLoad(){
+  const data= {
+    downLoadNum:vipDownNum.value,
+    userKey:userKey
+  }
+  setVipDownLoadNum(data).then(res=>{
+    ElMessage.success("设置成功")
+  })
+}
+getDownLoad();
+getVipDownLoad()
 getList();
 </script>

@@ -57,15 +57,30 @@ export function deleteCommonCookie(data) {
     data: data,
   });
 }
-export function getDownLoadNum() {
+export function getDownLoadNum(data) {
   return request({
     url: 'wp/downLoadNum',
     method: 'get',
+    params: data,
   });
 }
 export function setDownLoadNum(data) {
   return request({
     url: 'wp/downLoadNum',
+    method: 'post',
+    data: data,
+  });
+}
+export function geVipDownLoadNum(data) {
+  return request({
+    url: 'wp/vip/downLoadNum',
+    method: 'get',
+    params: data,
+  });
+}
+export function setVipDownLoadNum(data) {
+  return request({
+    url: 'wp/vip/downLoadNum',
     method: 'post',
     data: data,
   });
