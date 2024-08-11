@@ -3,10 +3,10 @@
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
-          iconName="icon-fanhui"
-          width="30px"
-          height="30px"
-          size="30"
+            iconName="icon-fanhui"
+            width="30px"
+            height="30px"
+            size="30"
         ></MySvg>
         <span style="margin-left: 15px">{{ loadData.rootBackTitle }}</span>
       </div>
@@ -17,51 +17,51 @@
 
     <div id="content">
       <el-table
-        v-loading="loadData.tableLoading"
-        element-loading-text="数据正在加载中..."
-        :data="loadData.tableData"
-        height="calc(100vh - 200px)"
-        style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
-        class="wp-table"
+          v-loading="loadData.tableLoading"
+          element-loading-text="数据正在加载中..."
+          :data="loadData.tableData"
+          height="calc(100vh - 200px)"
+          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
+          class="wp-table"
       >
         <el-table-column
-          min-width="280px"
-          prop="server_filename"
-          label="文件名"
+            min-width="280px"
+            prop="server_filename"
+            label="文件名"
         >
           <template #default="scope">
             <div
-              @click="parseList(scope.row)"
-              style="display: flex; align-items: center"
+                @click="parseList(scope.row)"
+                style="display: flex; align-items: center"
             >
               <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
               <span style="margin-left: 10px">{{
-                scope.row.server_filename
-              }}</span>
+                  scope.row.server_filename
+                }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column
-          prop="server_mtime"
-          :formatter="timestampToTime"
-          label="修改时间"
+            prop="server_mtime"
+            :formatter="timestampToTime"
+            label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
-<!--        <el-table-column label="剩余下载次数"-->
-<!--          >{{-->
-<!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
-<!--          }}-->
-<!--          次</el-table-column-->
-<!--        >-->
+        <!--        <el-table-column label="剩余下载次数"-->
+        <!--          >{{-->
+        <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
+        <!--          }}-->
+        <!--          次</el-table-column-->
+        <!--        >-->
         <el-table-column  min-width="100px" label="操作">
           <template #default="scope">
-<!--            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>-->
+            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>
             <el-button
-              v-if="!parseInt(scope.row.isdir)"
-              :type="scope.row.status == 2 ? 'danger' : 'primary'"
-              @click="downLoad(scope.row)"
-              :disabled="scope.row.disable"
-              :loading="scope.row.loading"
+                v-if="!parseInt(scope.row.isdir)"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
+                @click="downLoad(scope.row)"
+                :disabled="scope.row.disable"
+                :loading="scope.row.loading"
             >
               <span v-if="scope.row.status === 0">下 载</span>
               <span v-if="scope.row.status === 1">下载中</span>
@@ -83,7 +83,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.dialogVisible = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -93,25 +93,24 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="loadData.codeUrl" alt="" />
+      <img class="qr-code" :src="xiaochengxu" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-<!--      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">-->
-<!--        <el-form-item prop="code" label="请输入验证码">-->
-<!--          <el-input v-model="form.code" auto-complete="off" />-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <div class="qr-hint">扫一扫上方二维码获取验证码</div>-->
-      <div class="qr-title">【每人每天的免费下载额度会刷新但是总额度有限(因为服务器资源紧张)如果提示下载不了
-        那就只可能是我在休息或有事还没来得及维护实在急的可以联系我</div>
-<!--      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>-->
+      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
+        <el-form-item prop="code" label="请输入验证码">
+          <el-input v-model="form.code" auto-complete="off" />
+        </el-form-item>
+      </el-form>
+      <div class="qr-hint">扫一扫上方二维码获取验证码</div>
+      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
+      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
                      @click="onSubmit"
           >解 析</el-button>
-<!--          <el-button v-else type="danger"-->
-<!--                     @click="trySend"-->
-<!--          >重 试</el-button>-->
+          <!--          <el-button v-else type="danger"-->
+          <!--                     @click="trySend"-->
+          <!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -123,14 +122,14 @@
           <el-button type="primary" :loading="isSending"
                      @click="noLimit"
           >解 析</el-button>
-<!--          <el-button v-else type="danger"-->
-<!--                     @click="trySend"-->
-<!--          >重 试</el-button>-->
+          <!--          <el-button v-else type="danger"-->
+          <!--                     @click="trySend"-->
+          <!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
 
-<!--    赞助下载弹窗-->
+    <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
@@ -151,7 +150,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.errorDia = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -163,15 +162,15 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.maxNum = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
     </el-dialog>
-<!--    <div class="we-chart">-->
-<!--      <img :src="wechar" alt="" />-->
-<!--      <p class="con">有问题联系管理员</p>-->
-<!--    </div>-->
+    <!--    <div class="we-chart">-->
+    <!--      <img :src="wechar" alt="" />-->
+    <!--      <p class="con">有问题联系管理员</p>-->
+    <!--    </div>-->
   </div>
 </template>
 
@@ -238,8 +237,8 @@ onBeforeRouteLeave((to, from) => {
 function getList() {
   // const userCode = Cookies.get('code');
   const data = Object.assign(
-    { index: 0 },
-    route.query
+      { index: 0 },
+      route.query
   );
   parseCopyLink(data);
 }
@@ -278,36 +277,36 @@ function parseCopyLink(params) {
   }
   // 获取文件列表
   userStore
-    .parseCopyLink(params)
-    .then((data) => {
-      loadData.tableLoading = false;
-      if (data.code === 200) {
-        if (parseInt(data.data.errno) === 0) {
-          const list = data.data.data.list;
-          const title = data.data.data.title;
-          loadData.bread = title;
-          // const code = Cookies.get('code');
-          list.forEach((item) => {
-            // 0 下载，1，下载中
-            item.status = 0;
-            if (parseInt(item.size) > loadData.fileSize) {
-              item.disable = true;
-            }
-          });
-          loadData.tableData = list;
-          loadData.parseLinkParams.seckey = data.data.data.seckey;
-          loadData.parseLinkParams.shareid = data.data.data.shareid;
-          loadData.parseLinkParams.uk = data.data.data.uk;
-        } else {
-          loadData.limitSpeedVisible = true;
-          return;
+      .parseCopyLink(params)
+      .then((data) => {
+        loadData.tableLoading = false;
+        if (data.code === 200) {
+          if (parseInt(data.data.errno) === 0) {
+            const list = data.data.data.list;
+            const title = data.data.data.title;
+            loadData.bread = title;
+            // const code = Cookies.get('code');
+            list.forEach((item) => {
+              // 0 下载，1，下载中
+              item.status = 0;
+              if (parseInt(item.size) > loadData.fileSize) {
+                item.disable = true;
+              }
+            });
+            loadData.tableData = list;
+            loadData.parseLinkParams.seckey = data.data.data.seckey;
+            loadData.parseLinkParams.shareid = data.data.data.shareid;
+            loadData.parseLinkParams.uk = data.data.data.uk;
+          } else {
+            loadData.limitSpeedVisible = true;
+            return;
+          }
         }
-      }
-    })
-    .catch(() => {
-      loadData.tableLoading = false;
-      // loadData.errorDia = true;
-    });
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+        // loadData.errorDia = true;
+      });
 }
 
 
@@ -344,10 +343,10 @@ const onSubmit = () => {
     if (valid) {
       isSending.value = true;
       const params = {
-        // code:form.code,
+        code:form.code,
         userKey:userKey,
         fsId:loadData.item.fs_id,
-        version:"1.0.7",
+        version:"1.0.9",
       }
       const result = await testDownLoad();
       if (!result) {
@@ -365,7 +364,7 @@ const onSubmit = () => {
               }else if(res.data == 80){
                 setTimeout(()=>{
                   isSending.value =false;
-                 // loadData.WeCharVisible = false;
+                  // loadData.WeCharVisible = false;
                   ElMessage.error("解析通道比较拥堵，请重试！")
                 },2000)
               } else if(res.data == 60){
@@ -472,12 +471,13 @@ async function confirm(item) {
 
   const params = {
     shareid:loadData.parseLinkParams.shareid,
-    from:loadData.parseLinkParams.uk,
+    uk:loadData.parseLinkParams.uk,
     sekey:loadData.parseLinkParams.seckey,
-    fsId:item.fs_id,
-    path:item.server_filename,
+    fsIdList:[item.fs_id],
+    // path:item.server_filename,
     userKey:userKey,
-    code:form.code,
+    size:item.size,
+    // code:form.code,
   };
   //过期重新获取时间戳
   // const date = new Date().getTime() / 1000;
@@ -492,43 +492,66 @@ async function confirm(item) {
   // }
   // 获取真实下载地址
   userStore
-    .parseLink(params)
-    .then((data) => {
-      if (data.code === 200) {
+      .parseLink(params)
+      .then((data) => {
+        if (data.code === 200) {
 
-        isSending.value =false;
-        item.status = 0;
-        item.loading = false;
-        item.disable = false;
-        // showParse.value = false;
-        if(data.data.error_code === 31066){
-          item.status = 0;
-          // showParse.value = true;
-          ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
-          return;
-        }
-        if(data.data.urls.length && data.data.urls[0].url){
-          loadData.url = data.data.urls[0].url;
-          loadData.ckId = data.data.ckId;
-          sendToMotrix(item);
+          // isSending.value =false;
+          // item.status = 0;
+          // item.loading = false;
+          // item.disable = false;
+          // showParse.value = false;
+          // if(data.data.error_code === 31066){
+          //   item.status = 0;
+          //   // showParse.value = true;
+          //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+          //   return;
+          // }
+          const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
+          const data = {
+            fsidlist: JSON.stringify([item.fs_id]),
+            shareid:loadData.parseLinkParams.shareid,
+            uk:loadData.parseLinkParams.uk,
+            sekey:loadData.parseLinkParams.seckey,
+            password:"745216",
+            size: item.size,
+          };
+          fetch(url, {
+            method: 'POST', // 指定请求方法
+            headers: {
+              'Content-Type': 'application/json' // 设置头部内容类型为JSON
+            },
+            body: JSON.stringify(data) // 将数据转换为JSON字符串
+          })
+              .then(response => response.json())
+              .then(res => {
+                if(res.code === 200){
+                  item.loading = false;
+                  isSending.value =false;
+                  loadData.url = res.data.dlink;
+                  sendToMotrix(item);
+                }else{
+                  ElMessage.error("解析通道比较拥堵，请重试！")
+                }
+              })
+              .catch(error => {
+                ElMessage.error("解析通道比较拥堵，请重试！")
+              });
+
         }else{
-          ElMessage.error("解析通道比较拥堵，请重试！")
+          item.status = 0;
+          item.disable = false;
+          item.loading = false;
+          // loadData.limitSpeedVisible = true;
         }
-
-      }else{
+      })
+      .catch(() => {
         item.status = 0;
         item.disable = false;
         item.loading = false;
-        // loadData.limitSpeedVisible = true;
-      }
-    })
-    .catch(() => {
-      item.status = 0;
-      item.disable = false;
-      item.loading = false;
-      isSending.value = false;
-      // loadData.errorDia = true;
-    });
+        isSending.value = false;
+        // loadData.errorDia = true;
+      });
 }
 
 function sendToMotrix(item){
@@ -540,42 +563,14 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        `${loadData.url}&origin=dlna`
+        loadData.url
       ],
       {
-        'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
+        'user-agent': 'netdisk;7.44.0.4',
       },
     ],
   };
 
-  // fetch('http://127.0.0.1:16800/jsonrpc', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify(o),
-  // })
-  //     .then((resp) => resp.json())
-  //     .then((res) => {
-  //       item.status = 2;
-  //       ElMessage({
-  //         message: `${item.server_filename}开始下载！`,
-  //         type: 'success',
-  //       })
-  //     });
-  // let options = {
-  //   'user-agent': 'netdisk',
-  //   'X-forwarded-for':'1.94.42.208',
-  // };
-
-  // let json = {
-  //   id: 'wp',
-  //   jsonrpc: '2.0',
-  //   method: 'aria2.addUri',
-  //   params: [[loadData.url], options],
-  // };
-
-  // json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
   let ws = new WebSocket('ws://localhost:16800/jsonrpc');
   ws.onerror = (event) => {
     ws.close();
@@ -589,6 +584,35 @@ function sendToMotrix(item){
     ws.send(JSON.stringify(o));
     ws.close();
   };
+  // let options = {
+  //   'user-agent': 'netdisk',
+  //   'X-forwarded-for':'1.94.42.208',
+  // };
+
+  // let json = {
+  //   id: 'wp',
+  //   jsonrpc: '2.0',
+  //   method: 'aria2.addUri',
+  //   params: [[loadData.url], options],
+  // };
+
+  // json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
+  // let ws = new WebSocket('ws://localhost:16800/jsonrpc');
+  // ws.onerror = (event) => {
+  //   item.loading = false;
+  //   item.disable = false;
+  //   ws.close();
+  //   ElMessage.error('链接失败，请检查是否安装Motrix');
+  // };
+  // ws.onopen = () => {
+  //   // const data = {
+  //   //   fileName: item.server_filename.trim(),
+  //   //   fileSize: item.size,
+  //   // };
+  //   // setDownLoadRecord(data);
+  //
+  //   ws.send(JSON.stringify(json));
+  // };
   //
   // ws.onmessage = (event) => {
   //   let received_msg = JSON.parse(event.data);
@@ -654,10 +678,10 @@ function goBack() {
 
 function init() {
   if (
-    !route.query.shorturl ||
-    !route.query.pwd ||
-    !route.query.dir ||
-    !route.query.root
+      !route.query.shorturl ||
+      !route.query.pwd ||
+      !route.query.dir ||
+      !route.query.root
   ) {
     router.push({ path: '/parse/login' });
     return;
