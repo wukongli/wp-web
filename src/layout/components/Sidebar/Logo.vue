@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('微下载');
+const title = ref('蜜蜂download');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
