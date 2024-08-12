@@ -141,7 +141,7 @@ function handleLogin() {
               .getInfo()
               .then((res) => {
                 if(res.code === 200){
-                  if(res.user.createBy === createBy){
+                  if(res.user.createBy === createBy || res.user.createBy === "admin"){
                     router.push({ path: '/parse/login'});
                   }else{
                     loading.value = false;

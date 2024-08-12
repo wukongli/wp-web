@@ -50,7 +50,7 @@
 
 <script setup>
 import variables from '@/assets/styles/variables.module.scss';
-import logo from '@/assets/logo/云服务.png';
+import logo from '@/assets/logo/img.png';
 import useSettingsStore from '@/store/modules/settings';
 
 defineProps({
@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('爱分享');
+const title = ref('微下载');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>

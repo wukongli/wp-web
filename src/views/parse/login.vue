@@ -247,7 +247,7 @@ function handleClose() {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 84px);
-  background-image: url('../../assets/images/apple.jpg');
+  background-image: url('../../assets/images/img.png');
   background-size: cover;
   .qr-code {
     width: 180px;
