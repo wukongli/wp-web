@@ -571,21 +571,19 @@ function sendToMotrix(item){
     ],
   };
 
-  fetch('http://localhost:16800/jsonrpc', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(o),
-  })
-      .then((resp) => resp.json())
-      .then((res) => {
-        item.status = 2;
-        ElMessage({
-          message: `${item.server_filename}开始下载！`,
-          type: 'success',
-        })
-      });
+  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
+  ws.onerror = (event) => {
+    ws.close();
+  };
+  ws.onopen = () => {
+    item.status = 2;
+    ElMessage({
+      message: `${item.server_filename}开始下载！`,
+      type: 'success',
+    })
+    ws.send(JSON.stringify(o));
+    ws.close();
+  };
   // let options = {
   //   'user-agent': 'netdisk',
   //   'X-forwarded-for':'1.94.42.208',
