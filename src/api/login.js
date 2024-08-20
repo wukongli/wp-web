@@ -98,8 +98,8 @@ export function parseCopyLink(data) {
 export function parseLinkReq(data) {
   return request({
     // url: '/wp/dlink',
-    url: '/wp/fast/pc/dlink',
-    // url: '/wp/parseLinkTest',
+    // url: '/wp/fast/pc/dlink',
+    url: '/wp/pc/dlink',
     method: 'post',
     timeout: 20000,
     data: data,

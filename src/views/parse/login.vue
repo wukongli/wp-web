@@ -193,7 +193,7 @@ async function handleLogin() {
         path: '/parse/index',
         query: {
           shorturl: loginForm.value.shorturl,
-          pwd: encrypt(loginForm.value.pwd),
+          pwd: loginForm.value.pwd,
           dir: loginForm.value.dir,
           root: loginForm.value.root
         },

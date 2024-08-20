@@ -189,6 +189,7 @@ import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import qrCode from "@/assets/images/qrcode.jpg";
 import xiaochengxu from "@/assets/images/xiaochengxu.jpg"
 import {getToken} from "@/utils/auth";
+import {decrypt} from "@/utils/jsencrypt";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -267,12 +268,14 @@ function parseList(item) {
     parseCopyLink(data);
   }
 }
-
 function parseCopyLink(params) {
   loadData.routeData.push(params);
   if (loadData.routeData.length === 1) {
     loadData.rootBackTitle = '全部文件';
+    loadData.parseLinkParams.dir = "/"
   } else {
+
+    loadData.parseLinkParams.dir = params.dir;
     loadData.rootBackTitle = '返回上一级';
   }
   // 获取文件列表
@@ -472,11 +475,14 @@ async function confirm(item) {
   const params = {
     shareid:loadData.parseLinkParams.shareid,
     uk:loadData.parseLinkParams.uk,
-    sekey:loadData.parseLinkParams.seckey,
-    fsIdList:[item.fs_id],
-    // path:item.server_filename,
+    randsk:loadData.parseLinkParams.seckey,
+    dir:loadData.parseLinkParams.dir,
+    fs_ids:[item.fs_id],
+    pwd:loadData.query.pwd,
+    surl:loadData.query.shorturl,
+    url:`https://pan.baidu.com/s/${loadData.query.shorturl}`,
     userKey:userKey,
-    size:item.size,
+    // path:item.server_filename,
     // code:form.code,
   };
   //过期重新获取时间戳
@@ -493,50 +499,54 @@ async function confirm(item) {
   // 获取真实下载地址
   userStore
     .parseLink(params)
-    .then((data) => {
-      if (data.code === 200) {
-
-        // isSending.value =false;
-        // item.status = 0;
-        // item.loading = false;
-        // item.disable = false;
-        // showParse.value = false;
-        // if(data.data.error_code === 31066){
+    .then((res) => {
+      if (res.code === 200) {
+        isSending.value =false;
+        item.status = 0;
+        item.loading = false;
+        item.disable = false;
+        // if(res.data.error_code === 31066){
         //   item.status = 0;
-        //   // showParse.value = true;
         //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
         //   return;
         // }
-        const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
-        const data = {
-          fsidlist: JSON.stringify([item.fs_id]),
-          shareid:loadData.parseLinkParams.shareid,
-          uk:loadData.parseLinkParams.uk,
-          sekey:loadData.parseLinkParams.seckey,
-          password:"745216",
-          size: item.size,
-        };
-        fetch(url, {
-          method: 'POST', // 指定请求方法
-          headers: {
-            'Content-Type': 'application/json' // 设置头部内容类型为JSON
-          },
-          body: JSON.stringify(data) // 将数据转换为JSON字符串
-        })
-            .then(response => response.json())
-            .then(res => {
-                if(res.code === 200){
-                  item.loading = false;
-                  isSending.value =false;
-                  loadData.url = res.data.dlink;
-                  sendToMotrix(item);
-                }else{
-                  ElMessage.error("解析通道比较拥堵，请重试！")
-                }
-            })
-            .catch(error => {
-                 ElMessage.error("解析通道比较拥堵，请重试！")
-            });
+        loadData.url = res.data[0].url;
+        loadData.ua = res.data[0].ua;
+        sendToMotrix(item);
+        // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
+        // const data = {
+        //   fsidlist: JSON.stringify([item.fs_id]),
+        //   shareid:loadData.parseLinkParams.shareid,
+        //   uk:loadData.parseLinkParams.uk,
+        //   sekey:loadData.parseLinkParams.seckey,
+        //   password:res.data,
+        //   size: item.size,
+        // };
+        // fetch(url, {
+        //   method: 'POST', // 指定请求方法
+        //   headers: {
+        //     'Content-Type': 'application/json' // 设置头部内容类型为JSON
+        //   },
+        //   body: JSON.stringify(data) // 将数据转换为JSON字符串
+        // })
+        //     .then(response => response.json())
+        //     .then(res => {
+        //         if(res.code === 200){
+        //           item.loading = false;
+        //           isSending.value =false;
+        //           loadData.url = res.data.dlink;
+        //           sendToMotrix(item);
+        //         }else{
+        //           item.loading = false;
+        //           isSending.value =false;
+        //           ElMessage.error("解析通道比较拥堵，请重试！")
+        //         }
+        //     })
+        //     .catch(error => {
+        //          item.loading = false;
+        //          isSending.value = false;
+        //          ElMessage.error("解析通道比较拥堵，请重试！")
+        //     });
 
       }else{
         item.status = 0;
@@ -566,7 +576,8 @@ function sendToMotrix(item){
         loadData.url
       ],
       {
-        'user-agent': 'netdisk;7.44.0.4',
+        // 'user-agent': 'netdisk;7.44.0.4',
+        'user-agent': loadData.ua,
       },
     ],
   };
@@ -586,79 +597,6 @@ function sendToMotrix(item){
           type: 'success',
         })
       });
-  // let options = {
-  //   'user-agent': 'netdisk',
-  //   'X-forwarded-for':'1.94.42.208',
-  // };
-
-  // let json = {
-  //   id: 'wp',
-  //   jsonrpc: '2.0',
-  //   method: 'aria2.addUri',
-  //   params: [[loadData.url], options],
-  // };
-
-  // json.params.unshift('token:undefined'); // 坑死了，必须要加在第一个
-  // let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-  // ws.onerror = (event) => {
-  //   item.loading = false;
-  //   item.disable = false;
-  //   ws.close();
-  //   ElMessage.error('链接失败，请检查是否安装Motrix');
-  // };
-  // ws.onopen = () => {
-  //   // const data = {
-  //   //   fileName: item.server_filename.trim(),
-  //   //   fileSize: item.size,
-  //   // };
-  //   // setDownLoadRecord(data);
-  //
-  //   ws.send(JSON.stringify(json));
-  // };
-  //
-  // ws.onmessage = (event) => {
-  //   let received_msg = JSON.parse(event.data);
-  //   if (received_msg.error !== undefined) {
-  //     if (received_msg.error.code === 1) {
-  //       item.loading = false;
-  //       item.disable = false;
-  //       ws.close();
-  //       ElMessage.error('链接失败，请检查Motrix!');
-  //       return;
-  //     }
-  //   }
-  //
-  //   switch (received_msg.method) {
-  //     case 'aria2.onDownloadStart':
-  //       ElMessage({
-  //         message: `${item.server_filename}开始下载！`,
-  //         type: 'success',
-  //       })
-  //       item.status = 1;
-  //       break;
-  //
-  //     case 'aria2.onDownloadError':
-  //       item.loading = false;
-  //       item.disable = false;
-  //       item.status = 0;
-  //       ws.close();
-  //       // ElMessage.error('下载失败，请点击下方重试按钮!');
-  //       break;
-  //
-  //     case 'aria2.onDownloadComplete':
-  //       ElMessage({
-  //         message: `${item.server_filename}下载完成！`,
-  //         type: 'success',
-  //       });
-  //       ws.close();
-  //       item.loading = false;
-  //       item.status = 2;
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
 }
 
 function goBack() {
