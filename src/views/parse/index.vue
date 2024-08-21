@@ -272,7 +272,9 @@ function parseCopyLink(params) {
   loadData.routeData.push(params);
   if (loadData.routeData.length === 1) {
     loadData.rootBackTitle = '全部文件';
+    loadData.parseLinkParams.dir = "/"
   } else {
+    loadData.parseLinkParams.dir = params.dir;
     loadData.rootBackTitle = '返回上一级';
   }
   // 获取文件列表
@@ -472,11 +474,14 @@ async function confirm(item) {
   const params = {
     shareid:loadData.parseLinkParams.shareid,
     uk:loadData.parseLinkParams.uk,
-    sekey:loadData.parseLinkParams.seckey,
-    fsIdList:[item.fs_id],
-    // path:item.server_filename,
+    randsk:loadData.parseLinkParams.seckey,
+    dir:loadData.parseLinkParams.dir,
+    fs_ids:[item.fs_id],
+    pwd:loadData.query.pwd,
+    surl:loadData.query.shorturl,
+    url:`https://pan.baidu.com/s/${loadData.query.shorturl}`,
     userKey:userKey,
-    size:item.size,
+    // path:item.server_filename,
     // code:form.code,
   };
   //过期重新获取时间戳
@@ -493,50 +498,47 @@ async function confirm(item) {
   // 获取真实下载地址
   userStore
       .parseLink(params)
-      .then((data) => {
-        if (data.code === 200) {
+      .then((res) => {
+        if (res.code === 200) {
 
-          // isSending.value =false;
-          // item.status = 0;
-          // item.loading = false;
-          // item.disable = false;
-          // showParse.value = false;
-          // if(data.data.error_code === 31066){
-          //   item.status = 0;
-          //   // showParse.value = true;
-          //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
-          //   return;
-          // }
-          const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
-          const data = {
-            fsidlist: JSON.stringify([item.fs_id]),
-            shareid:loadData.parseLinkParams.shareid,
-            uk:loadData.parseLinkParams.uk,
-            sekey:loadData.parseLinkParams.seckey,
-            password:"745216",
-            size: item.size,
-          };
-          fetch(url, {
-            method: 'POST', // 指定请求方法
-            headers: {
-              'Content-Type': 'application/json' // 设置头部内容类型为JSON
-            },
-            body: JSON.stringify(data) // 将数据转换为JSON字符串
-          })
-              .then(response => response.json())
-              .then(res => {
-                if(res.code === 200){
-                  item.loading = false;
-                  isSending.value =false;
-                  loadData.url = res.data.dlink;
-                  sendToMotrix(item);
-                }else{
-                  ElMessage.error("解析通道比较拥堵，请重试！")
-                }
-              })
-              .catch(error => {
-                ElMessage.error("解析通道比较拥堵，请重试！")
-              });
+          isSending.value =false;
+          item.status = 0;
+          item.loading = false;
+          item.disable = false;
+
+          loadData.url = res.data[0].url;
+          loadData.ua = res.data[0].ua;
+          sendToMotrix(item);
+          // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
+          // const data = {
+          //   fsidlist: JSON.stringify([item.fs_id]),
+          //   shareid:loadData.parseLinkParams.shareid,
+          //   uk:loadData.parseLinkParams.uk,
+          //   sekey:loadData.parseLinkParams.seckey,
+          //   password:"745216",
+          //   size: item.size,
+          // };
+          // fetch(url, {
+          //   method: 'POST', // 指定请求方法
+          //   headers: {
+          //     'Content-Type': 'application/json' // 设置头部内容类型为JSON
+          //   },
+          //   body: JSON.stringify(data) // 将数据转换为JSON字符串
+          // })
+          //     .then(response => response.json())
+          //     .then(res => {
+          //       if(res.code === 200){
+          //         item.loading = false;
+          //         isSending.value =false;
+          //         loadData.url = res.data.dlink;
+          //         sendToMotrix(item);
+          //       }else{
+          //         ElMessage.error("解析通道比较拥堵，请重试！")
+          //       }
+          //     })
+          //     .catch(error => {
+          //       ElMessage.error("解析通道比较拥堵，请重试！")
+          //     });
 
         }else{
           item.status = 0;
@@ -566,24 +568,26 @@ function sendToMotrix(item){
         loadData.url
       ],
       {
-        'user-agent': 'netdisk;7.44.0.4',
+        'user-agent': loadData.ua,
       },
     ],
   };
 
-  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-  ws.onerror = (event) => {
-    ws.close();
-  };
-  ws.onopen = () => {
-    item.status = 2;
-    ElMessage({
-      message: `${item.server_filename}开始下载！`,
-      type: 'success',
-    })
-    ws.send(JSON.stringify(o));
-    ws.close();
-  };
+  fetch('http://localhost:16800/jsonrpc', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(o),
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        item.status = 2;
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        })
+      });
   // let options = {
   //   'user-agent': 'netdisk',
   //   'X-forwarded-for':'1.94.42.208',
