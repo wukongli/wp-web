@@ -571,7 +571,8 @@ function sendToMotrix(item){
         loadData.url+"&origin=dlna"
       ],
       {
-        'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
+        //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
+        'user-agent': 'netdisk',
       },
     ],
   };
