@@ -507,6 +507,7 @@ async function confirm(item) {
           return;
         }
         loadData.url = res.data.urls[0].url;
+        loadData.ua = res.data.ua
         sendToMotrix(item);
         // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
         // const data = {
@@ -568,11 +569,11 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        loadData.url+"&origin=dlna"
+        loadData.url+"&ant=1&origin=dlna"
       ],
       {
         //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
-        'user-agent': 'netdisk',
+        'user-agent': loadData.ua,
       },
     ],
   };

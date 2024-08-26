@@ -136,7 +136,6 @@ function handleLogin() {
       userStore
         .adminLogin(loginForm.value)
         .then((data) => {
-          console.log(data);
           useUserStore()
               .getInfo()
               .then((res) => {

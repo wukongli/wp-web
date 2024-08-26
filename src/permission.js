@@ -37,6 +37,13 @@ router.beforeEach((to, from, next) => {
       useUserStore()
         .getInfo()
         .then((res) => {
+          if (res.roles && res.roles.length > 0) {
+            // 验证返回的roles是否是一个非空数组
+            useUserStore().roles = res.roles;
+            useUserStore().permissions = res.permissions;
+          } else {
+            useUserStore().roles = ['ROLE_DEFAULT'];
+          }
           isRelogin.show = false;
           usePermissionStore()
             .generateRoutes()
@@ -47,17 +54,9 @@ router.beforeEach((to, from, next) => {
                   router.addRoute(route); // 动态添加可访问路由表
                 }
               });
-                /**
-                 * 进入首页带上userKey
-                 */
-              // if(to.path === "/parse/login"){
-              //     next({ path: '/parse/login',query:{
-              //             userKey:res.user.vipCode ? res.user.vipCode : "test",
-              //         }
-              //     })
-              // }
-              next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
             });
+          next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
+
         })
         .catch((err) => {
           useUserStore()
