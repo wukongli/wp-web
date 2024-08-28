@@ -42,7 +42,7 @@
       <!-- <el-table-column label="vipCookie" align="center" prop="cookie" /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
+          <dict-tag :options="sys_vip_type" :value="scope.row.status" />
         </template>
       </el-table-column>
       <el-table-column label="解析次数" align="center" prop="count" />
@@ -144,7 +144,7 @@ import {getUser} from "@/api/system/user";
 import {userKey} from "@/utils/wp";
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
+const { sys_vip_type } = proxy.useDict('sys_vip_type');
 
 const postList = ref([]);
 const open = ref(false);
