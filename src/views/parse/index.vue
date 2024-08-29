@@ -569,7 +569,7 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        loadData.url+"&ant=1&origin=dlna"
+        loadData.url+"&origin=dlna"
       ],
       {
         //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',

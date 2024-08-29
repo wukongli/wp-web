@@ -37,13 +37,23 @@ router.beforeEach((to, from, next) => {
       useUserStore()
         .getInfo()
         .then((res) => {
-          if (res.roles && res.roles.length > 0) {
-            // 验证返回的roles是否是一个非空数组
-            useUserStore().roles = res.roles;
-            useUserStore().permissions = res.permissions;
-          } else {
-            useUserStore().roles = ['ROLE_DEFAULT'];
-          }
+          // if (res.roles && res.roles.length > 0) {
+          //   // 验证返回的roles是否是一个非空数组
+          //   useUserStore().roles = res.roles;
+          //   useUserStore().permissions = res.permissions;
+          // } else {
+          //   useUserStore().roles = ['ROLE_DEFAULT'];
+          // }
+          //       if(res.code === 200){
+          //         if(res.user.createBy === createBy){
+          //           router.push({ path: '/parse/login'});
+          //         }else{
+          //           loading.value = false;
+          //           ElMessage.error("登录错误,无权限！")
+          //         }
+          //       }else{
+          //         ElMessage.error("登录错误！")
+          //       }
           isRelogin.show = false;
           usePermissionStore()
             .generateRoutes()
@@ -67,6 +77,9 @@ router.beforeEach((to, from, next) => {
             });
         });
     } else {
+      console.log(11111);
+      console.log(router.getRoutes
+      ());
       next();
     }
   } else {
