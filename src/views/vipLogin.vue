@@ -136,21 +136,20 @@ function handleLogin() {
       userStore
         .adminLogin(loginForm.value)
         .then((data) => {
-          router.push({ path: '/parse/login'});
-          // useUserStore()
-          //     .getInfo()
-          //     .then((res) => {
-          //       if(res.code === 200){
-          //         if(res.user.createBy === createBy){
-          //           router.push({ path: '/parse/login'});
-          //         }else{
-          //           loading.value = false;
-          //           ElMessage.error("登录错误,无权限！")
-          //         }
-          //       }else{
-          //         ElMessage.error("登录错误！")
-          //       }
-          //     })
+          useUserStore()
+              .getInfo()
+              .then((res) => {
+                if(res.code === 200){
+                  if(res.user.createBy === createBy){
+                    router.push({ path: '/parse/login'});
+                  }else{
+                    loading.value = false;
+                    ElMessage.error("登录错误,无权限！")
+                  }
+                }else{
+                  ElMessage.error("登录错误！")
+                }
+              })
           // if(data.token === "会员已到期"){
           //   loading.value = false;
           //   ElMessage.error('会员已到期请联系管理员')

@@ -77,7 +77,6 @@ router.beforeEach((to, from, next) => {
             });
         });
     } else {
-      console.log(11111);
       console.log(router.getRoutes
       ());
       next();
