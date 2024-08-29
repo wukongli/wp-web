@@ -37,23 +37,13 @@ router.beforeEach((to, from, next) => {
       useUserStore()
         .getInfo()
         .then((res) => {
-          // if (res.roles && res.roles.length > 0) {
-          //   // 验证返回的roles是否是一个非空数组
-          //   useUserStore().roles = res.roles;
-          //   useUserStore().permissions = res.permissions;
-          // } else {
-          //   useUserStore().roles = ['ROLE_DEFAULT'];
-          // }
-          //       if(res.code === 200){
-          //         if(res.user.createBy === createBy){
-          //           router.push({ path: '/parse/login'});
-          //         }else{
-          //           loading.value = false;
-          //           ElMessage.error("登录错误,无权限！")
-          //         }
-          //       }else{
-          //         ElMessage.error("登录错误！")
-          //       }
+          if (res.roles && res.roles.length > 0) {
+            // 验证返回的roles是否是一个非空数组
+            useUserStore().roles = res.roles;
+            useUserStore().permissions = res.permissions;
+          } else {
+            useUserStore().roles = ['ROLE_DEFAULT'];
+          }
           isRelogin.show = false;
           usePermissionStore()
             .generateRoutes()
@@ -64,8 +54,8 @@ router.beforeEach((to, from, next) => {
                   router.addRoute(route); // 动态添加可访问路由表
                 }
               });
+              next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
             });
-          next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
 
         })
         .catch((err) => {
@@ -77,8 +67,6 @@ router.beforeEach((to, from, next) => {
             });
         });
     } else {
-      console.log(router.getRoutes
-      ());
       next();
     }
   } else {
