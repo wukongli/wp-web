@@ -3,10 +3,10 @@
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
-          iconName="icon-fanhui"
-          width="30px"
-          height="30px"
-          size="30"
+            iconName="icon-fanhui"
+            width="30px"
+            height="30px"
+            size="30"
         ></MySvg>
         <span style="margin-left: 15px">{{ loadData.rootBackTitle }}</span>
       </div>
@@ -17,43 +17,42 @@
 
     <div id="content">
       <el-table
-        v-loading="loadData.tableLoading"
-        element-loading-text="数据正在加载中..."
-        :data="loadData.tableData"
-        height="calc(100vh - 200px)"
-        style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
-        class="wp-table"
+          v-loading="loadData.tableLoading"
+          element-loading-text="数据正在加载中..."
+          :data="loadData.tableData"
+          height="calc(100vh - 200px)"
+          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
+          class="wp-table"
       >
         <el-table-column
-          min-width="280px"
-          prop="server_filename"
-          label="文件名"
+            min-width="280px"
+            prop="server_filename"
+            label="文件名"
         >
           <template #default="scope">
             <div
-              @click="parseList(scope.row)"
-              style="display: flex; align-items: center"
+                @click="parseList(scope.row)"
+                style="display: flex; align-items: center"
             >
               <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
               <span style="margin-left: 10px">{{
-                scope.row.server_filename
-              }}</span>
+                  scope.row.server_filename
+                }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column
-          prop="server_mtime"
-          :formatter="timestampToTime"
-          label="修改时间"
+            prop="server_mtime"
+            :formatter="timestampToTime"
+            label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
-              v-if="!parseInt(scope.row.isdir)"
-              :type="'primary'"
-              :disabled="!(scope.$index % 2 === 0)"
-              @click="downLoad(scope.row)"
+                v-if="parseInt(scope.row.isdir) === 0"
+                :type="'primary'"
+                @click="downLoad(scope.row)"
             >
               下 载
             </el-button>
@@ -67,21 +66,21 @@
     <!--    </div>-->
     <!-- 添加微信弹窗 -->
     <el-dialog
-      title="提示"
-      v-model="loadData.addWeCharVisible"
+        title="提示"
+        v-model="loadData.addWeCharVisible"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
-        <el-form-item prop="code" label="请输入验证码">
-          <el-input v-model="form.code" auto-complete="off" />
-        </el-form-item>
-      </el-form>
-      <div class="qr-hint">扫一扫输入验证码获取下载地址</div>
-      <div class="qr-title">{{loadData.downLoadUrl}}</div>
+      <!--      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">-->
+      <!--        <el-form-item prop="code" label="请输入验证码">-->
+      <!--          <el-input v-model="form.code" auto-complete="off" />-->
+      <!--        </el-form-item>-->
+      <!--      </el-form>-->
+      <div class="qr-hint">扫码联系管理员获取课程</div>
+      <!--      <div class="qr-title">{{loadData.downLoadUrl}}</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="onSubmit"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -144,39 +143,40 @@ const codeRules = {
 };
 
 const onSubmit = () => {
-  proxy.$refs.codeRef.validate(async (valid) => {
-    if (valid) {
-        const params = {
-          code:form.code
-        }
-      userStore
-          .getCodeNum(params)
-          .then((res) => {
-            if(res.code === 200 && res.data === "1"){
-
-              const data = {
-                fileId: loadData.itemData.fs_id,
-                pwd:generateRandomLetters(4)
-              };
-              shareUrl(data).then((res) => {
-                if(res.code ===200){
-                  loadData.downLoadUrl = `${res.data.shorturl}?pwd=${data.pwd}`
-                }
-
-              });
-            }else{
-              ElMessage.error("您输入的验证码不正确，请重新获取！！")
-            }
-          })
-    }
-  })
+  loadData.addWeCharVisible = false;
+  // proxy.$refs.codeRef.validate(async (valid) => {
+  //   if (valid) {
+  //     const params = {
+  //       code:form.code
+  //     }
+  //     userStore
+  //         .getCodeNum(params)
+  //         .then((res) => {
+  //           if(res.code === 200 && res.data === "1"){
+  //
+  //             const data = {
+  //               fileId: loadData.itemData.fs_id,
+  //               pwd:generateRandomLetters(4)
+  //             };
+  //             shareUrl(data).then((res) => {
+  //               if(res.code ===200){
+  //                 loadData.downLoadUrl = `${res.data.shorturl}?pwd=${data.pwd}`
+  //               }
+  //
+  //             });
+  //           }else{
+  //             ElMessage.error("您输入的验证码不正确，请重新获取！！")
+  //           }
+  //         })
+  //   }
+  // })
 }
 
 function getList() {
   // const userCode = Cookies.get('code');
   const data = Object.assign(
-    { index: loadData.parseLinkParams.index },
-    loadData.query
+      { index: loadData.parseLinkParams.index },
+      loadData.query
   );
   parseCopyLink(data);
 }
@@ -212,33 +212,33 @@ function parseCopyLink(params) {
   }
   // 获取文件列表
   userStore
-    .parseCopyLink(params)
-    .then((data) => {
-      loadData.tableLoading = false;
-      if (data.code === 200) {
-        if (parseInt(data.data.errno) === 0) {
-          const list = data.data.data.list;
-          const title = data.data.data.title;
-          loadData.bread = title;
-          list.forEach((item) => {
-            // 0 下载，1，下载中
-            item.status = 0;
-            if (parseInt(item.size) > loadData.fileSize) {
-              item.disable = true;
-            }
-          });
-          loadData.tableData = list;
-          loadData.parseLinkParams.randsk = data.data.data.seckey;
-          loadData.parseLinkParams.shareid = data.data.data.shareid;
-          loadData.parseLinkParams.uk = data.data.data.uk;
-        } else {
-          return;
+      .parseCopyLink(params)
+      .then((data) => {
+        loadData.tableLoading = false;
+        if (data.code === 200) {
+          if (parseInt(data.data.errno) === 0) {
+            const list = data.data.data.list;
+            const title = data.data.data.title;
+            loadData.bread = title;
+            list.forEach((item) => {
+              // 0 下载，1，下载中
+              item.status = 0;
+              if (parseInt(item.size) > loadData.fileSize) {
+                item.disable = true;
+              }
+            });
+            loadData.tableData = list;
+            loadData.parseLinkParams.randsk = data.data.data.seckey;
+            loadData.parseLinkParams.shareid = data.data.data.shareid;
+            loadData.parseLinkParams.uk = data.data.data.uk;
+          } else {
+            return;
+          }
         }
-      }
-    })
-    .catch(() => {
-      // loadData.errorDia = true;
-    });
+      })
+      .catch(() => {
+        // loadData.errorDia = true;
+      });
 }
 
 async function getSign(params) {
@@ -249,23 +249,23 @@ async function getSign(params) {
     uk: uk,
   };
   await userStore
-    .getSignData(param)
-    .then((response) => {
-      if (response.code === 200) {
-        if (parseInt(response.data.result.errno) === 0) {
-          if (shorturl) {
-            loadData.parseLinkParams.index = response.data.index;
+      .getSignData(param)
+      .then((response) => {
+        if (response.code === 200) {
+          if (parseInt(response.data.result.errno) === 0) {
+            if (shorturl) {
+              loadData.parseLinkParams.index = response.data.index;
+            }
+            loadData.parseLinkParams.timestamp =
+                response.data.result.data.timestamp;
+            loadData.parseLinkParams.sign = response.data.result.data.sign;
+            return response;
           }
-          loadData.parseLinkParams.timestamp =
-            response.data.result.data.timestamp;
-          loadData.parseLinkParams.sign = response.data.result.data.sign;
-          return response;
         }
-      }
-    })
-    .catch(() => {
-      loadData.tableLoading = false;
-    });
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
 }
 
 function goBack() {
@@ -300,9 +300,9 @@ function init() {
 init();
 function downLoad(item) {
   loadData.addWeCharVisible = true;
-  loadData.itemData = item;
-  loadData.downLoadUrl = "";
-  proxy.$refs.codeRef.resetFields();
+  // loadData.itemData = item;
+  // loadData.downLoadUrl = "";
+  // proxy.$refs.codeRef.resetFields();
 }
 </script>
 

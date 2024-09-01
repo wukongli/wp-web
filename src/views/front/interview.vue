@@ -50,7 +50,7 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-button
-                v-if="!parseInt(scope.row.isdir)"
+                v-if="parseInt(scope.row.isdir) === 0"
                 :type="'primary'"
                 @click="downLoad(scope.row)"
             >
@@ -70,13 +70,13 @@
         v-model="loadData.addWeCharVisible"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
-        <el-form-item prop="code" label="请输入验证码">
-          <el-input v-model="form.code" auto-complete="off" />
-        </el-form-item>
-      </el-form>
-      <div class="qr-hint">扫一扫输入验证码获取下载地址</div>
-      <div class="qr-title">{{loadData.downLoadUrl}}</div>
+      <!--      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">-->
+      <!--        <el-form-item prop="code" label="请输入验证码">-->
+      <!--          <el-input v-model="form.code" auto-complete="off" />-->
+      <!--        </el-form-item>-->
+      <!--      </el-form>-->
+      <div class="qr-hint">扫码联系管理员获取课程</div>
+      <!--      <div class="qr-title">{{loadData.downLoadUrl}}</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="onSubmit"
@@ -143,32 +143,33 @@ const codeRules = {
 };
 
 const onSubmit = () => {
-  proxy.$refs.codeRef.validate(async (valid) => {
-    if (valid) {
-      const params = {
-        code:form.code
-      }
-      userStore
-          .getCodeNum(params)
-          .then((res) => {
-            if(res.code === 200 && res.data === "1"){
-
-              const data = {
-                fileId: loadData.itemData.fs_id,
-                pwd:generateRandomLetters(4)
-              };
-              shareUrl(data).then((res) => {
-                if(res.code ===200){
-                  loadData.downLoadUrl = `${res.data.shorturl}?pwd=${data.pwd}`
-                }
-
-              });
-            }else{
-              ElMessage.error("您输入的验证码不正确，请重新获取！！")
-            }
-          })
-    }
-  })
+  loadData.addWeCharVisible = false;
+  // proxy.$refs.codeRef.validate(async (valid) => {
+  //   if (valid) {
+  //     const params = {
+  //       code:form.code
+  //     }
+  //     userStore
+  //         .getCodeNum(params)
+  //         .then((res) => {
+  //           if(res.code === 200 && res.data === "1"){
+  //
+  //             const data = {
+  //               fileId: loadData.itemData.fs_id,
+  //               pwd:generateRandomLetters(4)
+  //             };
+  //             shareUrl(data).then((res) => {
+  //               if(res.code ===200){
+  //                 loadData.downLoadUrl = `${res.data.shorturl}?pwd=${data.pwd}`
+  //               }
+  //
+  //             });
+  //           }else{
+  //             ElMessage.error("您输入的验证码不正确，请重新获取！！")
+  //           }
+  //         })
+  //   }
+  // })
 }
 
 function getList() {
@@ -299,9 +300,9 @@ function init() {
 init();
 function downLoad(item) {
   loadData.addWeCharVisible = true;
-  loadData.itemData = item;
-  loadData.downLoadUrl = "";
-  proxy.$refs.codeRef.resetFields();
+  // loadData.itemData = item;
+  // loadData.downLoadUrl = "";
+  // proxy.$refs.codeRef.resetFields();
 }
 </script>
 
