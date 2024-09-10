@@ -46,6 +46,7 @@
         </template>
       </el-table-column>
       <el-table-column label="解析次数" align="center" prop="count" />
+      <el-table-column label="解析大小" align="center" prop="size" :formatter="parseFilesize" />
       <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
       <el-table-column
         label="创建时间"
@@ -141,7 +142,7 @@ import {
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
 import {getUser} from "@/api/system/user";
-import {userKey} from "@/utils/wp";
+import {getFilesize, parseFilesize, userKey} from "@/utils/wp";
 
 const { proxy } = getCurrentInstance();
 const { sys_vip_type } = proxy.useDict('sys_vip_type');
