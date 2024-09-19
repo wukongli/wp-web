@@ -471,13 +471,16 @@ async function confirm(item) {
   item.status = 1;
   item.disable = true;
   const params = {
-    shareid:loadData.parseLinkParams.shareid,
-    uk:loadData.parseLinkParams.uk,
-    sekey:loadData.parseLinkParams.seckey,
-    fsId:item.fs_id,
-    path:item.server_filename,
-    userKey:userKey,
-    size:item.size,
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
+    dir: loadData.parseLinkParams.dir,
+    fs_ids: [item.fs_id],
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    userKey: userKey,
+    // path:item.server_filename,
     // code:form.code,
   };
   //过期重新获取时间戳
@@ -500,13 +503,13 @@ async function confirm(item) {
           item.status = 0;
           item.loading = false;
           item.disable = false;
-          if(res.data.error_code === 31066){
-            item.status = 0;
-            ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
-            return;
-          }
-          loadData.url = res.data.urls[0].url;
-          loadData.ua = res.data.ua
+          // if(res.data.error_code === 31066){
+          //   item.status = 0;
+          //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+          //   return;
+          // }
+          loadData.url = res.data[0].url;
+          loadData.ua = res.data[0].ua;
           sendToMotrix(item);
           // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
           // const data = {
@@ -568,7 +571,7 @@ function sendToMotrix(item){
     method: 'aria2.addUri',
     params: [
       [
-        loadData.url+"&ant=1&origin=dlna"
+        loadData.url
       ],
       {
         //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
