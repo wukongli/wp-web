@@ -35,38 +35,37 @@ router.beforeEach((to, from, next) => {
       isRelogin.show = true;
       // 判断当前用户是否已拉取完user_info信息
       useUserStore()
-        .getInfo()
-        .then((res) => {
-          isRelogin.show = false;
-          usePermissionStore()
-            .generateRoutes()
-            .then((accessRoutes) => {
-              // 根据roles权限生成可访问的路由表
-              accessRoutes.forEach((route) => {
-                if (!isHttp(route.path)) {
-                  router.addRoute(route); // 动态添加可访问路由表
-                }
-              });
-                /**
-                 * 进入首页带上userKey
-                 */
-              // if(to.path === "/parse/login"){
-              //     next({ path: '/parse/login',query:{
-              //             userKey:res.user.vipCode ? res.user.vipCode : "test",
-              //         }
-              //     })
-              // }
-              next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
-            });
-        })
-        .catch((err) => {
-          useUserStore()
-            .logOut()
-            .then(() => {
-              ElMessage.error(err);
-              next({ path: '/vip/login' });
-            });
-        });
+          .getInfo()
+          .then((res) => {
+            if (res.roles && res.roles.length > 0) {
+              // 验证返回的roles是否是一个非空数组
+              useUserStore().roles = res.roles;
+              useUserStore().permissions = res.permissions;
+            } else {
+              useUserStore().roles = ['ROLE_DEFAULT'];
+            }
+            isRelogin.show = false;
+            usePermissionStore()
+                .generateRoutes()
+                .then((accessRoutes) => {
+                  // 根据roles权限生成可访问的路由表
+                  accessRoutes.forEach((route) => {
+                    if (!isHttp(route.path)) {
+                      router.addRoute(route); // 动态添加可访问路由表
+                    }
+                  });
+                  next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
+                });
+
+          })
+          .catch((err) => {
+            useUserStore()
+                .logOut()
+                .then(() => {
+                  ElMessage.error(err);
+                  next({ path: '/vip/login' });
+                });
+          });
     } else {
       next();
     }

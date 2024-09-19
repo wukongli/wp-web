@@ -116,13 +116,13 @@ const useUserStore = defineStore('user', {
                 ? defAva
                 : import.meta.env.VITE_APP_BASE_API + user.avatar;
 
-            if (res.roles && res.roles.length > 0) {
-              // 验证返回的roles是否是一个非空数组
-              this.roles = res.roles;
-              this.permissions = res.permissions;
-            } else {
-              this.roles = ['ROLE_DEFAULT'];
-            }
+            // if (res.roles && res.roles.length > 0) {
+            //   // 验证返回的roles是否是一个非空数组
+            //   this.roles = res.roles;
+            //   this.permissions = res.permissions;
+            // } else {
+            //   this.roles = ['ROLE_DEFAULT'];
+            // }
             this.name = user.userName;
             this.avatar = avatar;
             resolve(res);
