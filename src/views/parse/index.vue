@@ -13,8 +13,17 @@
       <div :title="loadData.bread" class="back-title">
         {{ loadData.bread }}
       </div>
-    </header>
 
+
+    </header>
+      <el-button
+          style="margin: 10px 0;"
+          type="primary"
+          plain
+          icon="UploadFilled"
+          :disabled="multiple"
+          @click="handleParse"
+      >批量解析</el-button>
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -23,7 +32,10 @@
         height="calc(100vh - 200px)"
         style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
         class="wp-table"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="50" align="center" />
+
         <el-table-column
           min-width="280px"
           prop="server_filename"
@@ -99,10 +111,9 @@
         <el-form-item prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
-      </el-form>
+      </el-form>；
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
+      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-1aa0次</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
@@ -133,7 +144,7 @@
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-      <div class="qr-title">快速下载无需验证码，不限文件大小，不限下载次数！</div>
+      <div class="qr-title">快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"
@@ -197,6 +208,8 @@ const codeRef = ref();
 const form = reactive({
   code: '',
 })
+const fsIds = ref([]);
+const multiple = ref(true);
 const isSending = ref(false);
 // const showParse = ref(true);
 const loadData = reactive({
@@ -246,13 +259,6 @@ function getList() {
 const codeRules = {
   code: [{ required: true, trigger: 'blur', message: '请输入验证码' }],
 };
-
-function goToIndex() {
-  router.push({
-    path: '/parse/login',
-  });
-}
-
 function parseList(item) {
   const { isdir, path } = item;
   if (parseInt(isdir) === 1) {
@@ -390,48 +396,6 @@ const onSubmit = () => {
   })
 }
 
-// const trySend = ()=>{
-//
-//     const params = {
-//       ckId:loadData.ckId,
-//       path:loadData.item.server_filename,
-//     }
-//     userStore.tryDown(params).then((res)=>{
-//       console.log(res);
-//       if(res.code === 200){
-//         loadData.url = res.data.urls[0].url;
-//         sendToMotrix(loadData.item);
-//       }else{
-//         ElMessage.error("重新下载失败！！")
-//       }
-//     })
-//
-// }
-
-async function downLoadConfirm(item) {
-
-  //检查是否安装下载器
-
-  // const result = await testDownLoad();
-  // if (!result) {
-  //   loadData.dialogVisible = true;
-  //   return;
-  // }
-  // item.loading = true;
-  // item.status = 1;
-  // item.disable = true;
-  // const code = Cookies.get('code');
-  // if (code == null || code === '') {
-  //   router.push({ path: '/parse/login' });
-  //   return;
-  // }
-  // loadData.parseLinkParams.code = code;
-  // loadData.parseLinkParams.fs_id = item.fs_id;
-  // loadData.parseLinkParams.link = item.dlink;
-  // loadData.fileName = item.server_filename;
-  //真正开始下载
-  // confirm(item);
-}
 // function getDownNum() {
 //   //获取下载次数
 //   userStore.getCodeNum({ code: Cookies.get('code') }).then((res) => {
@@ -485,17 +449,6 @@ async function confirm(item) {
     // path:item.server_filename,
     // code:form.code,
   };
-  //过期重新获取时间戳
-  // const date = new Date().getTime() / 1000;
-  //
-  // if (date - loadData.parseLinkParams.timestamp > 300) {
-  //   const param = {
-  //     // shorturl: shorturl,
-  //     shareId: loadData.parseLinkParams.shareid,
-  //     uk: loadData.parseLinkParams.uk,
-  //   };
-  //   await getSign(param);
-  // }
   // 获取真实下载地址
   userStore
     .parseLink(params)
@@ -513,41 +466,6 @@ async function confirm(item) {
         loadData.url = res.data[0].url;
         loadData.ua = res.data[0].ua;
         sendToMotrix(item);
-        // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
-        // const data = {
-        //   fsidlist: JSON.stringify([item.fs_id]),
-        //   shareid:loadData.parseLinkParams.shareid,
-        //   uk:loadData.parseLinkParams.uk,
-        //   sekey:loadData.parseLinkParams.seckey,
-        //   password:res.data,
-        //   size: item.size,
-        // };
-        // fetch(url, {
-        //   method: 'POST', // 指定请求方法
-        //   headers: {
-        //     'Content-Type': 'application/json' // 设置头部内容类型为JSON
-        //   },
-        //   body: JSON.stringify(data) // 将数据转换为JSON字符串
-        // })
-        //     .then(response => response.json())
-        //     .then(res => {
-        //         if(res.code === 200){
-        //           item.loading = false;
-        //           isSending.value =false;
-        //           loadData.url = res.data.dlink;
-        //           sendToMotrix(item);
-        //         }else{
-        //           item.loading = false;
-        //           isSending.value =false;
-        //           ElMessage.error("解析通道比较拥堵，请重试！")
-        //         }
-        //     })
-        //     .catch(error => {
-        //          item.loading = false;
-        //          isSending.value = false;
-        //          ElMessage.error("解析通道比较拥堵，请重试！")
-        //     });
-
       }else{
         item.status = 0;
         item.disable = false;
@@ -612,10 +530,6 @@ function goBack() {
   }
 }
 
-// function goIndex(){
-//   router.push({ path: '/login' });
-// }
-
 function init() {
   if (
     !route.query.shorturl ||
@@ -667,7 +581,79 @@ function vipDownLoad(item){
 }
 
 function vipDownClick(){
-  ElMessage.error("请扫码公众号内回复【快速下载】联系管理员开通权限！")
+  ElMessage.error("请扫码点击公众号菜单【快速下载】联系管理员开通权限！")
+}
+
+function handleSelectionChange(selection) {
+   if(selection.length ===1 && parseInt(selection[0].isdir) === 1 ){
+     return false;
+   }
+   fsIds.value = selection.map(item => item.fs_id);
+   multiple.value = !selection.length;
+}
+
+function handleParse(){
+  const token = getToken();
+  if(!token){
+    ElMessage.error("批量下载需要开通快速下载权限！");
+    return false;
+  }
+  loadData.tableLoading = true;
+  const params = {
+    shareid:loadData.parseLinkParams.shareid,
+    uk:loadData.parseLinkParams.uk,
+    randsk:loadData.parseLinkParams.seckey,
+    dir:loadData.parseLinkParams.dir,
+    fs_ids:fsIds.value,
+    pwd:loadData.query.pwd,
+    surl:loadData.query.shorturl,
+    url:`https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    userKey:userKey,
+  };
+  userStore
+      .parseLink(params)
+      .then((res) => {
+        if (res.code === 200) {
+          loadData.tableLoading = false;
+          loadData.tableData.forEach((e)=>{
+            if(fsIds.value.includes(e.fs_id)){
+              e.status = 2;
+              e.disable  = true;
+            }
+          })
+            res.data.forEach(item=>{
+              const o = {
+                id: 'wp',
+                method: 'aria2.addUri',
+                params: [
+                  [
+                    item.url
+                  ],
+                  {
+                    'user-agent': item.ua,
+                  },
+                ],
+              };
+
+              fetch('http://localhost:16800/jsonrpc', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(o),
+              })
+                  .then((resp) => resp.json())
+                  .then((res) => {
+                    ElMessage({
+                      message: `${item.filename}开始下载！`,
+                      type: 'success',
+                    })
+                  });
+            })
+        }
+      }).catch(() => {
+         ElMessage.error("解析失败,请重试！")
+      });
 }
 </script>
 
