@@ -113,7 +113,7 @@
         </el-form-item>
       </el-form>；
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-1aa0次</div>
+      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
@@ -197,7 +197,7 @@ const userStore = useUserStore();
 import {generateRandomLetters, getFilesize, getIconClass, timestampToTime,userKey} from '@/utils/wp';
 import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from "@/assets/images/qrcode.jpg";
+import qrCode from "@/assets/images/WX20240914-235652@2x.png";
 import xiaochengxu from "@/assets/images/xiaochengxu.jpg"
 import {getToken} from "@/utils/auth";
 import {decrypt} from "@/utils/jsencrypt";
@@ -581,7 +581,8 @@ function vipDownLoad(item){
 }
 
 function vipDownClick(){
-  ElMessage.error("请扫码点击公众号菜单【快速下载】联系管理员开通权限！")
+  ElMessage.error("扫码联系管理员开通权限！")
+  // ElMessage.error("请扫码点击公众号菜单【快速下载】联系管理员开通权限！")
 }
 
 function handleSelectionChange(selection) {
