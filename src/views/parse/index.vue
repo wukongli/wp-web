@@ -495,66 +495,35 @@ async function confirm(item) {
   // }
   // 获取真实下载地址
   userStore
-    .parseLink(params)
-    .then((data) => {
-      if (data.code === 200) {
-
-        // isSending.value =false;
-        // item.status = 0;
-        // item.loading = false;
-        // item.disable = false;
-        // showParse.value = false;
-        // if(data.data.error_code === 31066){
-        //   item.status = 0;
-        //   // showParse.value = true;
-        //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
-        //   return;
-        // }
-        const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
-        const data = {
-          fsidlist: JSON.stringify([item.fs_id]),
-          shareid:loadData.parseLinkParams.shareid,
-          uk:loadData.parseLinkParams.uk,
-          sekey:loadData.parseLinkParams.seckey,
-          password:"745216",
-          size: item.size,
-        };
-        fetch(url, {
-          method: 'POST', // 指定请求方法
-          headers: {
-            'Content-Type': 'application/json' // 设置头部内容类型为JSON
-          },
-          body: JSON.stringify(data) // 将数据转换为JSON字符串
-        })
-            .then(response => response.json())
-            .then(res => {
-                if(res.code === 200){
-                  item.loading = false;
-                  isSending.value =false;
-                  loadData.url = res.data.dlink;
-                  sendToMotrix(item);
-                }else{
-                  ElMessage.error("解析通道比较拥堵，请重试！")
-                }
-            })
-            .catch(error => {
-                 ElMessage.error("解析通道比较拥堵，请重试！")
-            });
-
-      }else{
+      .parseLink(params)
+      .then((res) => {
+        if (res.code === 200) {
+          isSending.value =false;
+          item.status = 0;
+          item.loading = false;
+          item.disable = false;
+          // if(res.data.error_code === 31066){
+          //   item.status = 0;
+          //   ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+          //   return;
+          // }
+          loadData.url = res.data[0].url;
+          loadData.ua = res.data[0].ua;
+          sendToMotrix(item);
+        }else{
+          item.status = 0;
+          item.disable = false;
+          item.loading = false;
+          // loadData.limitSpeedVisible = true;
+        }
+      })
+      .catch(() => {
         item.status = 0;
         item.disable = false;
         item.loading = false;
-        // loadData.limitSpeedVisible = true;
-      }
-    })
-    .catch(() => {
-      item.status = 0;
-      item.disable = false;
-      item.loading = false;
-      isSending.value = false;
-      // loadData.errorDia = true;
-    });
+        isSending.value = false;
+        // loadData.errorDia = true;
+      });
 }
 
 function sendToMotrix(item){
