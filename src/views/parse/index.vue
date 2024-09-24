@@ -540,7 +540,7 @@ function sendToMotrix(item){
         loadData.url
       ],
       {
-        'user-agent': 'netdisk;7.44.0.4',
+        'user-agent': loadData.ua,
       },
     ],
   };
