@@ -472,11 +472,14 @@ async function confirm(item) {
   const params = {
     shareid:loadData.parseLinkParams.shareid,
     uk:loadData.parseLinkParams.uk,
-    sekey:loadData.parseLinkParams.seckey,
-    fsIdList:[item.fs_id],
-    // path:item.server_filename,
+    randsk:loadData.parseLinkParams.seckey,
+    dir:loadData.parseLinkParams.dir,
+    fs_ids:[item.fs_id],
+    pwd:loadData.query.pwd,
+    surl:loadData.query.shorturl,
+    url:`https://pan.baidu.com/s/${loadData.query.shorturl}`,
     userKey:userKey,
-    size:item.size,
+    // path:item.server_filename,
     // code:form.code,
   };
   //过期重新获取时间戳
