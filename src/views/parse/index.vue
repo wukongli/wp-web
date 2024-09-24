@@ -271,8 +271,10 @@ function parseList(item) {
 function parseCopyLink(params) {
   loadData.routeData.push(params);
   if (loadData.routeData.length === 1) {
+    loadData.parseLinkParams.dir = "/";
     loadData.rootBackTitle = '全部文件';
   } else {
+    loadData.parseLinkParams.dir = params.dir;
     loadData.rootBackTitle = '返回上一级';
   }
   // 获取文件列表
