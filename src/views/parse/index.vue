@@ -105,7 +105,7 @@
         title="提示"
         v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="xiaochengxu" alt="" />
+      <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
       <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
         <el-form-item prop="code" label="请输入验证码">
@@ -113,7 +113,7 @@
         </el-form-item>
       </el-form>；
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
+<!--      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending"
