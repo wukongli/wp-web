@@ -14,7 +14,7 @@
         {{ loadData.bread }}
       </div>
     </header>
-    <el-button
+    <!-- <el-button
       style="margin: 10px 0"
       type="primary"
       plain
@@ -22,7 +22,7 @@
       :disabled="multiple"
       @click="handleParse"
       >批量解析</el-button
-    >
+    > -->
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
