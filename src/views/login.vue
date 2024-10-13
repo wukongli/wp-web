@@ -55,8 +55,10 @@
           /></template>
         </el-input>
         <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
-<!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
+          <a target="_blank" href="https://docs.qq.com/doc/DR3ZOQnRhd2FRbGp5"
+            >点击查看使用说明</a
+          >
+          <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
       </el-form-item>
       <!-- <el-checkbox -->
@@ -94,7 +96,7 @@
       width="30%"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">{{hint.message}}</div>
+      <div class="qr-hint">{{ hint.message }}</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="confirm()" type="primary">确 定</el-button>
@@ -129,7 +131,7 @@ const loginForm = ref({
 const hint = reactive({
   show: false,
   getCodeVisible: false,
-  message:''
+  message: '',
 });
 
 const loginRules = {
@@ -163,24 +165,26 @@ function handleBlur() {
 }
 
 async function handleLogin() {
-  hint.message = "";
+  hint.message = '';
   proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
       if (loginForm.value.code === '' || loginForm.value.code == null) {
         hint.getCodeVisible = true;
-        hint.message = "请扫码关注获取验证码!"
+        hint.message = '请扫码关注获取验证码!';
         return;
       }
       //获取下载次数
-      const result = await userStore.getCodeNum({code: loginForm.value.code}).then((res) => {
-        return res;
-      })
+      const result = await userStore
+        .getCodeNum({ code: loginForm.value.code })
+        .then((res) => {
+          return res;
+        });
       if (result.code === 200) {
-        if (result.data === "验证码不正确") {
+        if (result.data === '验证码不正确') {
           loading.value = false;
           hint.getCodeVisible = true;
-          hint.message = "您输入的验证码不正确,请检查或者扫码重新获取！"
+          hint.message = '您输入的验证码不正确,请检查或者扫码重新获取！';
           return;
         }
       }
@@ -333,7 +337,7 @@ function handleClose() {
   //  vertical-align: middle;
   //}
 }
-.login-code:hover{
+.login-code:hover {
   text-decoration: underline; /* 鼠标滑过时显示下划线 */
 }
 .el-login-footer {
