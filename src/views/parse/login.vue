@@ -1,65 +1,69 @@
 <template>
   <div class="login app-container">
     <el-form
-        ref="loginRef"
-        :model="loginForm"
-        :rules="loginRules"
-        class="login-form"
+      ref="loginRef"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
     >
-      <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>
+      <h3 v-if="getToken()" class="title">
+        网盘文件加速下载<span style="color: red">(赞助版)</span>
+      </h3>
       <h3 v-else class="title">网盘文件加速下载</h3>
-<!--      <div v-if="hint.show" class="hint-box">-->
-<!--        <el-tag class="hint" type="danger" effect="dark" round>-->
-<!--          下载解析限速中管理员正在修复请稍后再试...-->
-<!--        </el-tag>-->
-<!--      </div>-->
+      <!--      <div v-if="hint.show" class="hint-box">-->
+      <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
+      <!--          下载解析限速中管理员正在修复请稍后再试...-->
+      <!--        </el-tag>-->
+      <!--      </div>-->
 
       <el-form-item prop="username">
         <el-input
-            v-model="loginForm.username"
-            type="text"
-            size="large"
-            auto-complete="off"
-            @blur="handleBlur"
-            placeholder="请输入分享的网盘链接(可输入带提取码链接)"
+          v-model="loginForm.username"
+          type="text"
+          size="large"
+          auto-complete="off"
+          @blur="handleBlur"
+          placeholder="请输入分享的网盘链接(可输入带提取码链接)"
         >
           <template #prefix
-          ><svg-icon icon-class="user" class="el-input__icon input-icon"
+            ><svg-icon icon-class="user" class="el-input__icon input-icon"
           /></template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-            v-model="loginForm.pwd"
-            type="text"
-            size="large"
-            auto-complete="off"
-            placeholder="提取码"
-            @keyup.enter="handleLogin"
+          v-model="loginForm.pwd"
+          type="text"
+          size="large"
+          auto-complete="off"
+          placeholder="提取码"
+          @keyup.enter="handleLogin"
         >
           <template #prefix
-          ><svg-icon icon-class="password" class="el-input__icon input-icon"
+            ><svg-icon icon-class="password" class="el-input__icon input-icon"
           /></template>
         </el-input>
       </el-form-item>
-<!--      <el-form-item prop="code" v-if="captchaEnabled">-->
-<!--        <el-input-->
-<!--            v-model="loginForm.code"-->
-<!--            size="large"-->
-<!--            auto-complete="off"-->
-<!--            placeholder="验证码"-->
-<!--            style="width: 63%"-->
-<!--            @keyup.enter="handleLogin"-->
-<!--        >-->
-<!--          <template #prefix-->
-<!--          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"-->
-<!--          /></template>-->
-<!--        </el-input>-->
-        <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
-          <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
-        </div>
-<!--      </el-form-item>-->
+      <!--      <el-form-item prop="code" v-if="captchaEnabled">-->
+      <!--        <el-input-->
+      <!--            v-model="loginForm.code"-->
+      <!--            size="large"-->
+      <!--            auto-complete="off"-->
+      <!--            placeholder="验证码"-->
+      <!--            style="width: 63%"-->
+      <!--            @keyup.enter="handleLogin"-->
+      <!--        >-->
+      <!--          <template #prefix-->
+      <!--          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"-->
+      <!--          /></template>-->
+      <!--        </el-input>-->
+      <div class="login-code">
+        <a target="_blank" href="https://docs.qq.com/doc/DR3ZOQnRhd2FRbGp5"
+          >点击查看使用说明</a
+        >
+        <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
+      </div>
+      <!--      </el-form-item>-->
       <!-- <el-checkbox -->
       <!-- v-model="loginForm.rememberMe"
         style="margin: 0px 0px 25px 0px"
@@ -67,35 +71,35 @@
       > -->
       <el-form-item style="width: 100%">
         <el-button
-            :loading="loading"
-            size="large"
-            type="primary"
-            style="width: 100%"
-            @click.prevent="handleLogin"
+          :loading="loading"
+          size="large"
+          type="primary"
+          style="width: 100%"
+          @click.prevent="handleLogin"
         >
           <span v-if="!loading">提 取</span>
           <span v-else>提 取 中...</span>
         </el-button>
-<!--        <div style="float: right" v-if="register">-->
-<!--          <router-link class="link-type" :to="'/register'"-->
-<!--          >立即注册</router-link-->
-<!--          >-->
-<!--        </div>-->
+        <!--        <div style="float: right" v-if="register">-->
+        <!--          <router-link class="link-type" :to="'/register'"-->
+        <!--          >立即注册</router-link-->
+        <!--          >-->
+        <!--        </div>-->
       </el-form-item>
     </el-form>
     <!--  底部  -->
-<!--    <div class="el-login-footer">-->
-<!--      <span>Copyright 2024 All Rights Reserved.</span>-->
-<!--    </div>-->
+    <!--    <div class="el-login-footer">-->
+    <!--      <span>Copyright 2024 All Rights Reserved.</span>-->
+    <!--    </div>-->
     <!-- 获取验证码弹窗 -->
     <el-dialog
-        @close="handleClose()"
-        title="提示"
-        v-model="hint.getCodeVisible"
-        width="30%"
+      @close="handleClose()"
+      title="提示"
+      v-model="hint.getCodeVisible"
+      width="30%"
     >
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">{{hint.message}}</div>
+      <div class="qr-hint">{{ hint.message }}</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="confirm()" type="primary">确 定</el-button>
@@ -113,8 +117,8 @@ const { proxy } = getCurrentInstance();
 import useUserStore from '@/store/modules/user';
 const userStore = useUserStore();
 import qrCode from '@/assets/images/qrcode.jpg';
-import {SubmitLink} from "@/utils/wp";
-import {getToken} from "@/utils/auth";
+import { SubmitLink } from '@/utils/wp';
+import { getToken } from '@/utils/auth';
 const route = useRoute();
 const loginForm = ref({
   username: '',
@@ -130,10 +134,12 @@ const loginForm = ref({
 const hint = reactive({
   show: false,
   getCodeVisible: false,
-  message:''
+  message: '',
 });
 const loginRules = {
-  username: [{ required: true, trigger: 'blur', message: '请输入分享的网盘链接' }],
+  username: [
+    { required: true, trigger: 'blur', message: '请输入分享的网盘链接' },
+  ],
   // password: [{ required: true, trigger: 'blur', message: '请输入您的密码' }],
   // code: [{ required: true, trigger: 'change', message: '请输入验证码' }],
 };
@@ -158,14 +164,14 @@ const redirect = ref(undefined);
 function handleBlur() {
   const { url, pwd } = SubmitLink(loginForm.value.username);
   loginForm.value.shorturl = url;
-  if(pwd){
+  if (pwd) {
     loginForm.value.pwd = pwd;
   }
   //loginForm.value.password = pwd;
 }
 
 async function handleLogin() {
-  hint.message = "";
+  hint.message = '';
   proxy.$refs.loginRef.validate(async (valid) => {
     if (valid) {
       loading.value = true;
@@ -195,14 +201,12 @@ async function handleLogin() {
           shorturl: loginForm.value.shorturl,
           pwd: loginForm.value.pwd,
           dir: loginForm.value.dir,
-          root: loginForm.value.root
+          root: loginForm.value.root,
         },
-      })
+      });
     }
   });
 }
-
-
 
 function confirm() {
   hint.getCodeVisible = false;
@@ -314,16 +318,15 @@ function handleClose() {
   font-weight: bold;
   text-decoration: none; /* 默认情况下不显示下划线 */
   transition: text-decoration 0.3s; /* 添加过渡效果使下划线出现更平滑 */
-  a{
+  a {
     color: red;
-
   }
   //img {
   //  cursor: pointer;
   //  vertical-align: middle;
   //}
 }
-.login-code:hover{
+.login-code:hover {
   text-decoration: underline; /* 鼠标滑过时显示下划线 */
 }
 .el-login-footer {
