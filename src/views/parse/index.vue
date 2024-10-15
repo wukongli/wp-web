@@ -47,15 +47,20 @@
           label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
-<!--        <el-table-column label="剩余下载次数"-->
-<!--          >{{-->
-<!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
-<!--          }}-->
-<!--          次</el-table-column-->
-<!--        >-->
-        <el-table-column  min-width="100px" label="操作">
+        <!--        <el-table-column label="剩余下载次数"-->
+        <!--          >{{-->
+        <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
+        <!--          }}-->
+        <!--          次</el-table-column-->
+        <!--        >-->
+        <el-table-column min-width="100px" label="操作">
           <template #default="scope">
-            <el-button @click="vipDownLoad(scope.row)" v-if="!parseInt(scope.row.isdir) && !getToken()" :type="'primary'">快速下载</el-button>
+            <el-button
+              @click="vipDownLoad(scope.row)"
+              v-if="!parseInt(scope.row.isdir) && !getToken()"
+              :type="'primary'"
+              >快速下载</el-button
+            >
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -73,7 +78,9 @@
     </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
-      <div class="down-title">系统检测到你没有安装Motrix,请安装下载器并运行！！</div>
+      <div class="down-title">
+        系统检测到你没有安装Motrix,请安装下载器并运行！！
+      </div>
       <div class="down-address">
         <span>下载地址：</span>
         <a href="https://pan.quark.cn/s/b878b162bb5b" target="_blank">
@@ -89,63 +96,68 @@
       </template>
     </el-dialog>
     <!-- 扫描获取验证码弹窗 -->
-    <el-dialog
-        title="提示"
-        v-model="loadData.WeCharVisible"
-    >
-      <img class="qr-code" :src="xiaochengxu" alt="" />
-      <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-      <el-form ref="codeRef" :model="form"  label-width="auto" :rules="codeRules" style="max-width: 600px;margin: 20px auto 0px">
+    <el-dialog title="提示" v-model="loadData.WeCharVisible">
+      <img class="qr-code" :src="qrCode" alt="" />
+      <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
+      <el-form
+        ref="codeRef"
+        :model="form"
+        label-width="auto"
+        :rules="codeRules"
+        style="max-width: 600px; margin: 20px auto 0px"
+      >
         <el-form-item prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！</div>
+      <div class="qr-title">
+        受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！
+      </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" :loading="isSending"
-                     @click="onSubmit"
-          >解 析</el-button>
-<!--          <el-button v-else type="danger"-->
-<!--                     @click="trySend"-->
-<!--          >重 试</el-button>-->
+          <el-button type="primary" :loading="isSending" @click="onSubmit"
+            >解 析</el-button
+          >
+          <!--          <el-button v-else type="danger"-->
+          <!--                     @click="trySend"-->
+          <!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
     <!-- 无限制下载 -->
     <el-dialog title="提示" v-model="loadData.noLimit" width="40%">
-      <div class="qr-title">{{loadData.item.server_filename}}</div>
+      <div class="qr-title">{{ loadData.item.server_filename }}</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" :loading="isSending"
-                     @click="noLimit"
-          >解 析</el-button>
-<!--          <el-button v-else type="danger"-->
-<!--                     @click="trySend"-->
-<!--          >重 试</el-button>-->
+          <el-button type="primary" :loading="isSending" @click="noLimit"
+            >解 析</el-button
+          >
+          <!--          <el-button v-else type="danger"-->
+          <!--                     @click="trySend"-->
+          <!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
 
-<!--    赞助下载弹窗-->
+    <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
-      <div class="file-name">文件名：{{loadData.item.server_filename}}</div>
-      <div class="qr-title">快速下载无需验证码，不限文件大小，不限下载次数！</div>
+      <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
+      <div class="qr-title">
+        快速下载无需验证码，不限文件大小，不限下载次数！
+      </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"
-                     @click="vipDownClick"
-          >解 析</el-button>
+          <el-button type="primary" @click="vipDownClick">解 析</el-button>
         </span>
       </template>
     </el-dialog>
 
     <!-- 解析出错弹窗 -->
     <el-dialog title="提示" v-model="loadData.errorDia" width="40%">
-      <img class="qr-code" :src="wechar" alt="" />
+      <img class="qr-code" :src="qrCode" alt="" />
       <div class="qr-hint">解析出错了，请联系管理员</div>
       <template #footer>
         <span class="dialog-footer">
@@ -167,10 +179,10 @@
         </span>
       </template>
     </el-dialog>
-<!--    <div class="we-chart">-->
-<!--      <img :src="wechar" alt="" />-->
-<!--      <p class="con">有问题联系管理员</p>-->
-<!--    </div>-->
+    <!--    <div class="we-chart">-->
+    <!--      <img :src="wechar" alt="" />-->
+    <!--      <p class="con">有问题联系管理员</p>-->
+    <!--    </div>-->
   </div>
 </template>
 
@@ -180,23 +192,28 @@ import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
-import wechar from '@/assets/images/wechar.png';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
-import {generateRandomLetters, getFilesize, getIconClass, timestampToTime,userKey} from '@/utils/wp';
-import {setDownLoadRecord, shareUrl} from '@/api/system/vip';
+import {
+  generateRandomLetters,
+  getFilesize,
+  getIconClass,
+  timestampToTime,
+  userKey,
+} from '@/utils/wp';
+import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from "@/assets/images/qrcode.jpg";
-import xiaochengxu from "@/assets/images/xiaochengxu.jpg"
-import {getToken} from "@/utils/auth";
-import {decrypt} from "@/utils/jsencrypt";
+import qrCode from '@/assets/images/wechart.jpg';
+import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import { getToken } from '@/utils/auth';
+import { decrypt } from '@/utils/jsencrypt';
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
 const codeRef = ref();
 const form = reactive({
   code: '',
-})
+});
 const isSending = ref(false);
 // const showParse = ref(true);
 const loadData = reactive({
@@ -226,10 +243,10 @@ const loadData = reactive({
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
-  item:null,
-  url:"",
-  codeUrl:qrCode,
-  ckId:null,
+  item: null,
+  url: '',
+  codeUrl: qrCode,
+  ckId: null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -237,10 +254,7 @@ onBeforeRouteLeave((to, from) => {
 });
 function getList() {
   // const userCode = Cookies.get('code');
-  const data = Object.assign(
-    { index: 0 },
-    route.query
-  );
+  const data = Object.assign({ index: 0 }, route.query);
   parseCopyLink(data);
 }
 const codeRules = {
@@ -272,9 +286,8 @@ function parseCopyLink(params) {
   loadData.routeData.push(params);
   if (loadData.routeData.length === 1) {
     loadData.rootBackTitle = '全部文件';
-    loadData.parseLinkParams.dir = "/"
+    loadData.parseLinkParams.dir = '/';
   } else {
-
     loadData.parseLinkParams.dir = params.dir;
     loadData.rootBackTitle = '返回上一级';
   }
@@ -312,21 +325,19 @@ function parseCopyLink(params) {
     });
 }
 
-
-function downLoad(item){
+function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
   // showParse.value = true;
-  if(getToken()){
+  if (getToken()) {
     loadData.noLimit = true;
-  }else{
+  } else {
     loadData.WeCharVisible = true;
-    form.code = "";
+    form.code = '';
   }
-
 }
 
-async function noLimit (){
+async function noLimit() {
   //直接下载文件
   isSending.value = true;
   const result = await testDownLoad();
@@ -336,21 +347,18 @@ async function noLimit (){
     return;
   }
   confirm(loadData.item);
-
 }
 
-
 const onSubmit = () => {
-
   proxy.$refs.codeRef.validate(async (valid) => {
     if (valid) {
       isSending.value = true;
       const params = {
-        code:form.code,
-        userKey:userKey,
-        fsId:loadData.item.fs_id,
-        version:"1.0.9",
-      }
+        code: form.code,
+        userKey: userKey,
+        fsId: loadData.item.fs_id,
+        version: '1.0.9',
+      };
       const result = await testDownLoad();
       if (!result) {
         loadData.dialogVisible = true;
@@ -359,36 +367,38 @@ const onSubmit = () => {
         return;
       }
       userStore
-          .getCodeNum(params)
-          .then((res) => {
-            if(res.code === 200){
-              if(res.data == 100){
-                confirm(loadData.item);
-              }else if(res.data == 80){
-                setTimeout(()=>{
-                  isSending.value =false;
-                 // loadData.WeCharVisible = false;
-                  ElMessage.error("解析通道比较拥堵，请重试！")
-                },2000)
-              } else if(res.data == 60){
-                setTimeout(()=>{
-                  isSending.value =false;
-                  ElMessage.error("今日解析次数已达上限，请明天再来！")
-                },2000)
-              } else if(res.data == 50){
-                setTimeout(()=>{
-                  isSending.value =false;
-                  ElMessage.error("验证码错误,一个验证码只能下载一个文件,请重新获取!")
-                },2000)
-              }
-
+        .getCodeNum(params)
+        .then((res) => {
+          if (res.code === 200) {
+            if (res.data == 100) {
+              confirm(loadData.item);
+            } else if (res.data == 80) {
+              setTimeout(() => {
+                isSending.value = false;
+                // loadData.WeCharVisible = false;
+                ElMessage.error('解析通道比较拥堵，请重试！');
+              }, 2000);
+            } else if (res.data == 60) {
+              setTimeout(() => {
+                isSending.value = false;
+                ElMessage.error('今日解析次数已达上限，请明天再来！');
+              }, 2000);
+            } else if (res.data == 50) {
+              setTimeout(() => {
+                isSending.value = false;
+                ElMessage.error(
+                  '验证码错误,一个验证码只能下载一个文件,请重新获取!'
+                );
+              }, 2000);
             }
-          }).catch(()=>{
-        isSending.value = false;
-      })
+          }
+        })
+        .catch(() => {
+          isSending.value = false;
+        });
     }
-  })
-}
+  });
+};
 
 // const trySend = ()=>{
 //
@@ -409,9 +419,7 @@ const onSubmit = () => {
 // }
 
 async function downLoadConfirm(item) {
-
   //检查是否安装下载器
-
   // const result = await testDownLoad();
   // if (!result) {
   //   loadData.dialogVisible = true;
@@ -472,13 +480,13 @@ async function confirm(item) {
   item.status = 1;
   item.disable = true;
   const params = {
-    shareid:loadData.parseLinkParams.shareid,
-    uk:loadData.parseLinkParams.uk,
-    sekey:loadData.parseLinkParams.seckey,
-    fsId:item.fs_id,
-    path:item.server_filename,
-    userKey:userKey,
-    size:item.size,
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    sekey: loadData.parseLinkParams.seckey,
+    fsId: item.fs_id,
+    path: item.server_filename,
+    userKey: userKey,
+    size: item.size,
     // code:form.code,
   };
   //过期重新获取时间戳
@@ -497,17 +505,17 @@ async function confirm(item) {
     .parseLink(params)
     .then((res) => {
       if (res.code === 200) {
-        isSending.value =false;
+        isSending.value = false;
         item.status = 0;
         item.loading = false;
         item.disable = false;
-        if(res.data.error_code === 31066){
+        if (res.data.error_code === 31066) {
           item.status = 0;
-          ElMessage.error("文件名含有特殊字符，请修改一下文件名重新下载！");
+          ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
           return;
         }
         loadData.url = res.data.urls[0].url;
-        loadData.ua = res.data.ua
+        loadData.ua = res.data.ua;
         sendToMotrix(item);
         // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
         // const data = {
@@ -543,8 +551,7 @@ async function confirm(item) {
         //          isSending.value = false;
         //          ElMessage.error("解析通道比较拥堵，请重试！")
         //     });
-
-      }else{
+      } else {
         item.status = 0;
         item.disable = false;
         item.loading = false;
@@ -560,20 +567,23 @@ async function confirm(item) {
     });
 }
 
-function sendToMotrix(item){
+function sendToMotrix(item) {
   //发送到下载器
 
+  let splitMax = true;
+  if (!loadData.url.includes('qdall01')) {
+    splitMax = false;
+  }
 
   const o = {
     id: 'wp',
     method: 'aria2.addUri',
     params: [
-      [
-        loadData.url+"&origin=dlna"
-      ],
+      [loadData.url + '&origin=dlna'],
       {
         //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
         'user-agent': loadData.ua,
+        split: splitMax ? '100' : '2',
       },
     ],
   };
@@ -585,14 +595,14 @@ function sendToMotrix(item){
     },
     body: JSON.stringify(o),
   })
-      .then((resp) => resp.json())
-      .then((res) => {
-        item.status = 2;
-        ElMessage({
-          message: `${item.server_filename}开始下载！`,
-          type: 'success',
-        })
+    .then((resp) => resp.json())
+    .then((res) => {
+      item.status = 2;
+      ElMessage({
+        message: `${item.server_filename}开始下载！`,
+        type: 'success',
       });
+    });
 }
 
 function goBack() {
@@ -657,13 +667,13 @@ function testDownLoad() {
   });
 }
 
-function vipDownLoad(item){
+function vipDownLoad(item) {
   loadData.item = item;
   loadData.vipDown = true;
 }
 
-function vipDownClick(){
-  ElMessage.error("请扫码公众号内回复【快速下载】联系管理员开通权限！")
+function vipDownClick() {
+  ElMessage.error('请扫码联系管理员开通权限！');
 }
 </script>
 
@@ -716,14 +726,14 @@ function vipDownClick(){
     font-weight: bold;
     color: #923333;
   }
-  .file-name{
+  .file-name {
     margin-top: 20px;
     text-align: center;
     font-size: 15px;
     font-weight: bold;
   }
   .qr-code {
-    width: 180px;
+    width: 200px;
     height: 180px;
     margin: auto;
     display: block;
