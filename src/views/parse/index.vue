@@ -476,6 +476,7 @@ async function confirm(item,vip) {
   const params = {
     shareid: loadData.parseLinkParams.shareid,
     uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
     sekey: loadData.parseLinkParams.seckey,
     fsId: item.fs_id,
     fs_ids: [item.fs_id],
