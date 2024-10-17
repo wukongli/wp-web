@@ -486,6 +486,7 @@ async function confirm(item,vip) {
     pwd: loadData.query.pwd,
     surl: loadData.query.shorturl,
     url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    dir: loadData.parseLinkParams.dir,
   };
   const token = getToken();
   if(token || !vip) {
