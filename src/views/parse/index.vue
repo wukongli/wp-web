@@ -489,18 +489,9 @@ async function confirm(item) {
     size: item.size,
     // code:form.code,
   };
-  //过期重新获取时间戳
-  // const date = new Date().getTime() / 1000;
-  //
-  // if (date - loadData.parseLinkParams.timestamp > 300) {
-  //   const param = {
-  //     // shorturl: shorturl,
-  //     shareId: loadData.parseLinkParams.shareid,
-  //     uk: loadData.parseLinkParams.uk,
-  //   };
-  //   await getSign(param);
-  // }
-  // 获取真实下载地址
+
+  const token = getToken();
+
   userStore
     .parseLink(params)
     .then((res) => {
