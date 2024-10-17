@@ -106,6 +106,15 @@ export function parseLinkReq(data) {
   });
 }
 
+export function parseLinkVisit(data) {
+  return request({
+    url: '/wp/pc/dlink',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 export function getSignReq(data) {
   return request({
     url: '/wp/getSign',

@@ -370,20 +370,14 @@ const onSubmit = () => {
         .getCodeNum(params)
         .then((res) => {
           if (res.code === 200) {
-            if (res.data == 100) {
-              confirm(loadData.item);
-            } else if (res.data == 80) {
-              setTimeout(() => {
-                isSending.value = false;
-                // loadData.WeCharVisible = false;
-                ElMessage.error('解析通道比较拥堵，请重试！');
-              }, 2000);
-            } else if (res.data == 60) {
+            if (res.data.data == 100) {
+              confirm(loadData.item,res.data.vip);
+            }  else if (res.data.data == 60) {
               setTimeout(() => {
                 isSending.value = false;
                 ElMessage.error('今日解析次数已达上限，请明天再来！');
               }, 2000);
-            } else if (res.data == 50) {
+            } else if (res.data.data == 50) {
               setTimeout(() => {
                 isSending.value = false;
                 ElMessage.error(
@@ -475,7 +469,7 @@ async function downLoadConfirm(item) {
 //     });
 // }
 
-async function confirm(item) {
+async function confirm(item,vip) {
   item.loading = true;
   item.status = 1;
   item.disable = true;
@@ -484,78 +478,75 @@ async function confirm(item) {
     uk: loadData.parseLinkParams.uk,
     sekey: loadData.parseLinkParams.seckey,
     fsId: item.fs_id,
+    fs_ids: [item.fs_id],
     path: item.server_filename,
     userKey: userKey,
     size: item.size,
-    // code:form.code,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
   };
-
   const token = getToken();
-
-  userStore
-    .parseLink(params)
-    .then((res) => {
-      if (res.code === 200) {
-        isSending.value = false;
-        item.status = 0;
-        item.loading = false;
-        item.disable = false;
-        if (res.data.error_code === 31066) {
+  if(token || !vip) {
+    userStore
+        .parseLink(params)
+        .then((res) => {
+          if (res.code === 200) {
+            isSending.value = false;
+            item.status = 0;
+            item.loading = false;
+            item.disable = false;
+            if (res.data.error_code === 31066) {
+              item.status = 0;
+              ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
+              return;
+            }
+            loadData.url = res.data.urls[0].url;
+            loadData.ua = res.data.ua;
+            sendToMotrix(item);
+          } else {
+            item.status = 0;
+            item.disable = false;
+            item.loading = false;
+            // loadData.limitSpeedVisible = true;
+          }
+        })
+        .catch(() => {
           item.status = 0;
-          ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
-          return;
-        }
-        loadData.url = res.data.urls[0].url;
-        loadData.ua = res.data.ua;
-        sendToMotrix(item);
-        // const url = 'https://api.moiu.cn/58/api/parse'; // 目标URL
-        // const data = {
-        //   fsidlist: JSON.stringify([item.fs_id]),
-        //   shareid:loadData.parseLinkParams.shareid,
-        //   uk:loadData.parseLinkParams.uk,
-        //   sekey:loadData.parseLinkParams.seckey,
-        //   password:res.data,
-        //   size: item.size,
-        // };
-        // fetch(url, {
-        //   method: 'POST', // 指定请求方法
-        //   headers: {
-        //     'Content-Type': 'application/json' // 设置头部内容类型为JSON
-        //   },
-        //   body: JSON.stringify(data) // 将数据转换为JSON字符串
-        // })
-        //     .then(response => response.json())
-        //     .then(res => {
-        //         if(res.code === 200){
-        //           item.loading = false;
-        //           isSending.value =false;
-        //           loadData.url = res.data.dlink;
-        //           sendToMotrix(item);
-        //         }else{
-        //           item.loading = false;
-        //           isSending.value =false;
-        //           ElMessage.error("解析通道比较拥堵，请重试！")
-        //         }
-        //     })
-        //     .catch(error => {
-        //          item.loading = false;
-        //          isSending.value = false;
-        //          ElMessage.error("解析通道比较拥堵，请重试！")
-        //     });
-      } else {
-        item.status = 0;
-        item.disable = false;
-        item.loading = false;
-        // loadData.limitSpeedVisible = true;
-      }
-    })
-    .catch(() => {
-      item.status = 0;
-      item.disable = false;
-      item.loading = false;
-      isSending.value = false;
-      // loadData.errorDia = true;
-    });
+          item.disable = false;
+          item.loading = false;
+          isSending.value = false;
+          // loadData.errorDia = true;
+        });
+
+  }else {
+    userStore
+        .parseLinkVisit(params)
+        .then((res) => {
+          if (res.code === 200) {
+            isSending.value = false;
+            item.status = 0;
+            item.loading = false;
+            item.disable = false;
+            loadData.url = res.data[0].url;
+            loadData.ua = res.data[0].ua;
+            sendToMotrix(item);
+          } else {
+            item.status = 0;
+            item.disable = false;
+            item.loading = false;
+            // loadData.limitSpeedVisible = true;
+          }
+        })
+        .catch(() => {
+          item.status = 0;
+          item.disable = false;
+          item.loading = false;
+          isSending.value = false;
+          // loadData.errorDia = true;
+        });
+
+  }
 }
 
 function sendToMotrix(item) {

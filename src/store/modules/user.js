@@ -8,8 +8,8 @@ import {
     getVip,
     getCode,
     loginNoPwd,
-    getCourseByType, delCode,getInfoByUserKey,
-    tryDownUrl
+    getCourseByType, delCode, getInfoByUserKey,
+    tryDownUrl, parseLinkVisit
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -75,7 +75,18 @@ const useUserStore = defineStore('user', {
             reject(error);
           });
       });
-    },
+   },
+  parseLinkVisit(parseLink) {
+      return new Promise((resolve, reject) => {
+          parseLinkVisit(parseLink)
+              .then((res) => {
+                  resolve(res);
+              })
+              .catch((error) => {
+                  reject(error);
+              });
+      });
+  },
     getSignData(params) {
       return new Promise((resolve, reject) => {
         getSignReq(params)
