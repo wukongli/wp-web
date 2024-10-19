@@ -371,20 +371,20 @@ const onSubmit = () => {
         .getCodeNum(params)
         .then((res) => {
           if (res.code === 200) {
-            if (res.data == 100) {
+            if (res.data.data == 100) {
               confirm(loadData.item);
-            } else if (res.data == 80) {
+            } else if (res.data.data == 80) {
               setTimeout(() => {
                 isSending.value = false;
                 // loadData.WeCharVisible = false;
                 ElMessage.error('解析通道比较拥堵，请重试！');
               }, 2000);
-            } else if (res.data == 60) {
+            } else if (res.data.data == 60) {
               setTimeout(() => {
                 isSending.value = false;
                 ElMessage.error('今日解析次数已达上限，请明天再来！');
               }, 2000);
-            } else if (res.data == 50) {
+            } else if (res.data.data == 50) {
               setTimeout(() => {
                 isSending.value = false;
                 ElMessage.error(
