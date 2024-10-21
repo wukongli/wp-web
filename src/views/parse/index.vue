@@ -112,9 +112,6 @@
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
-      <div class="qr-title">
-        受网络波动影响有时候可能解析失败，再次点击解析按钮重试几次即可！！
-      </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"

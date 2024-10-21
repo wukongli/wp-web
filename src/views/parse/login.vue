@@ -76,11 +76,11 @@
           <span v-if="!loading">提 取</span>
           <span v-else>提 取 中...</span>
         </el-button>
-<!--        <div style="float: right" v-if="register">-->
-<!--          <router-link class="link-type" :to="'/register'"-->
-<!--          >立即注册</router-link-->
-<!--          >-->
-<!--        </div>-->
+        <div style="float: right" v-if="register">
+          <router-link class="link-type" :to="'/vip/login'"
+          >使用卡密登录</router-link
+          >
+        </div>
       </el-form-item>
     </el-form>
     <!--  底部  -->
@@ -143,7 +143,7 @@ const loading = ref(false);
 // 验证码开关
 const captchaEnabled = ref(true);
 // 注册开关
-const register = ref(false);
+const register = ref(true);
 const redirect = ref(undefined);
 
 // function getVipNums(){
