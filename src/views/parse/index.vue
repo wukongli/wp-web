@@ -31,6 +31,7 @@
         height="calc(100vh - 200px)"
         style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
         class="wp-table"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column
           min-width="280px"
