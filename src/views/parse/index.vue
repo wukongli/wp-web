@@ -33,6 +33,7 @@
         class="wp-table"
         @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="50" align="center" />
         <el-table-column
           min-width="280px"
           prop="server_filename"
