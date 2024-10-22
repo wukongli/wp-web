@@ -407,82 +407,6 @@ const onSubmit = () => {
     }
   });
 };
-
-// const trySend = ()=>{
-//
-//     const params = {
-//       ckId:loadData.ckId,
-//       path:loadData.item.server_filename,
-//     }
-//     userStore.tryDown(params).then((res)=>{
-//       console.log(res);
-//       if(res.code === 200){
-//         loadData.url = res.data.urls[0].url;
-//         sendToMotrix(loadData.item);
-//       }else{
-//         ElMessage.error("重新下载失败！！")
-//       }
-//     })
-//
-// }
-
-async function downLoadConfirm(item) {
-  //检查是否安装下载器
-  // const result = await testDownLoad();
-  // if (!result) {
-  //   loadData.dialogVisible = true;
-  //   return;
-  // }
-  // item.loading = true;
-  // item.status = 1;
-  // item.disable = true;
-  // const code = Cookies.get('code');
-  // if (code == null || code === '') {
-  //   router.push({ path: '/parse/login' });
-  //   return;
-  // }
-  // loadData.parseLinkParams.code = code;
-  // loadData.parseLinkParams.fs_id = item.fs_id;
-  // loadData.parseLinkParams.link = item.dlink;
-  // loadData.fileName = item.server_filename;
-  //真正开始下载
-  // confirm(item);
-}
-// function getDownNum() {
-//   //获取下载次数
-//   userStore.getCodeNum({ code: Cookies.get('code') }).then((res) => {
-//     if (res.code === 200) {
-//       loadData.codeNum = res.data;
-//     }
-//   });
-// }
-// async function getSign(params) {
-//   const { shorturl, shareId, uk } = params;
-//   const param = {
-//     shorturl: shorturl,
-//     shareId: shareId,
-//     uk: uk,
-//   };
-//   await userStore
-//     .getSignData(param)
-//     .then((response) => {
-//       if (response.code === 200) {
-//         if (parseInt(response.data.result.errno) === 0) {
-//           if (shorturl) {
-//             loadData.parseLinkParams.index = response.data.index;
-//           }
-//           loadData.parseLinkParams.timestamp =
-//             response.data.result.data.timestamp;
-//           loadData.parseLinkParams.sign = response.data.result.data.sign;
-//           return response;
-//         }
-//       }
-//     })
-//     .catch(() => {
-//       loadData.tableLoading = false;
-//     });
-// }
-
 async function confirm(item,vip) {
   item.loading = true;
   item.status = 1;
@@ -752,6 +676,8 @@ async function handleParse() {
                   });
                 });
           }
+        }).catch((res)=>{
+          console.log(res);
         })
   }
 }

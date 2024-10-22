@@ -33,21 +33,21 @@
                         <svg-icon icon-class="peoples" />所属角色
                         <div class="pull-right">{{ state.roleGroup }}</div>
                      </li>
-                     <li class="list-group-item">
-                        创建日期
-                        <div class="pull-right">{{ moment(state.user.createTime).format("YYYY-MM-DD") }}</div>
-                     </li>
-                    <li v-if="state.user.vipCode" class="list-group-item">
-                      我的地址
-                      <div class="pull-right">parse/login?userKey={{state.user.vipCode }}</div>
-                    </li>
+<!--                     <li class="list-group-item">-->
+<!--                        创建日期-->
+<!--                        <div class="pull-right">{{ moment(state.user.createTime).format("YYYY-MM-DD HH:mm:ss") }}</div>-->
+<!--                     </li>-->
+<!--                    <li v-if="state.user.vipCode" class="list-group-item">-->
+<!--                      我的地址-->
+<!--                      <div class="pull-right">parse/login?userKey={{state.user.vipCode }}</div>-->
+<!--                    </li>-->
 <!--                    <li class="list-group-item">-->
 <!--                      验证码剩余时间-->
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
 <!--                    </li>-->
                     <li class="list-group-item">
-                      赞助到期日期
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD"):'' }}</div>
+                      到期日期
+                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
                     </li>
                   </ul>
                </div>
