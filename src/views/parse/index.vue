@@ -14,7 +14,15 @@
         {{ loadData.bread }}
       </div>
     </header>
-
+    <el-button
+      style="margin: 10px 0"
+      type="primary"
+      plain
+      icon="UploadFilled"
+      :disabled="multiple"
+      @click="handleParse"
+      >批量解析</el-button
+    >
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -212,6 +220,7 @@ const form = reactive({
   code: '',
 });
 const isSending = ref(false);
+const multiple = ref(true);
 // const showParse = ref(true);
 const loadData = reactive({
   bread: '',
@@ -659,6 +668,81 @@ function vipDownLoad(item) {
 
 function vipDownClick() {
   ElMessage.error('请扫码联系管理员开通权限！');
+}
+
+
+function handleSelectionChange(selection) {
+  if (selection.length === 1 && parseInt(selection[0].isdir) === 1) {
+    return false;
+  }
+  fsIds.value = selection.map((item) => item.fs_id);
+  multiple.value = !selection.length;
+}
+
+function handleParse() {
+  const token = getToken();
+  if (!token) {
+    ElMessage.error('批量下载需要开通快速下载权限！');
+  }
+  if (fsIds.value.length > 5) {
+    ElMessage.error('因网络原因，批量下载最大支持同时下载五个文件！');
+    return false;
+  }
+  loadData.tableLoading = true;
+  const params = {
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
+    dir: loadData.parseLinkParams.dir,
+    fs_ids: fsIds.value,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    userKey: userKey,
+  };
+  userStore
+      .parseLink(params)
+      .then((res) => {
+        if (res.code === 200) {
+          loadData.tableLoading = false;
+          loadData.tableData.forEach((e) => {
+            if (fsIds.value.includes(e.fs_id)) {
+              e.status = 2;
+              e.disable = true;
+            }
+          });
+          res.data.forEach((item) => {
+            const o = {
+              id: 'wp',
+              method: 'aria2.addUri',
+              params: [
+                [item.url],
+                {
+                  'user-agent': item.ua,
+                },
+              ],
+            };
+
+            fetch('http://localhost:16800/jsonrpc', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(o),
+            })
+                .then((resp) => resp.json())
+                .then((res) => {
+                  ElMessage({
+                    message: `${item.filename}开始下载！`,
+                    type: 'success',
+                  });
+                });
+          });
+        }
+      })
+      .catch(() => {
+        ElMessage.error('解析失败,请重试！');
+      });
 }
 </script>
 
