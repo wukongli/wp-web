@@ -153,7 +153,7 @@
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        快速下载无需验证码，不限文件大小，不限下载次数！
+        快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -223,7 +223,9 @@ const form = reactive({
 });
 const isSending = ref(false);
 const multiple = ref(true);
-// const showParse = ref(true);
+const fsIds = ref([]);
+const selectItem = ref([]);
+const pathList = ref([]);
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -677,54 +679,64 @@ function handleSelectionChange(selection) {
   if (selection.length === 1 && parseInt(selection[0].isdir) === 1) {
     return false;
   }
+  selectItem.value = selection;
   fsIds.value = selection.map((item) => item.fs_id);
+  pathList.value = selection.map((item) => item.server_filename);
   multiple.value = !selection.length;
 }
 
-function handleParse() {
+async function handleParse() {
   const token = getToken();
   if (!token) {
-    ElMessage.error('批量下载需要开通快速下载权限！');
+    ElMessage.error('批量解析请使用快速下载！');
+    return false;
   }
-  if (fsIds.value.length > 5) {
-    ElMessage.error('因网络原因，批量下载最大支持同时下载五个文件！');
+  const result = await testDownLoad();
+  if (!result) {
+    loadData.dialogVisible = true;
+    return;
+  }
+  if (fsIds.value.length > 10) {
+    ElMessage.error('因网络原因，批量下载最大支持同时下载10个文件！');
     return false;
   }
   loadData.tableLoading = true;
-  const params = {
-    shareid: loadData.parseLinkParams.shareid,
-    uk: loadData.parseLinkParams.uk,
-    randsk: loadData.parseLinkParams.seckey,
-    dir: loadData.parseLinkParams.dir,
-    fs_ids: fsIds.value,
-    pwd: loadData.query.pwd,
-    surl: loadData.query.shorturl,
-    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
-    userKey: userKey,
-  };
-  userStore
-      .parseLink(params)
-      .then((res) => {
-        if (res.code === 200) {
-          loadData.tableLoading = false;
-          loadData.tableData.forEach((e) => {
-            if (fsIds.value.includes(e.fs_id)) {
-              e.status = 2;
-              e.disable = true;
+  for (let i = 0; i < selectItem.value.length; i++) {
+    const params = {
+      shareid: loadData.parseLinkParams.shareid,
+      uk: loadData.parseLinkParams.uk,
+      randsk: loadData.parseLinkParams.seckey,
+      sekey: loadData.parseLinkParams.seckey,
+      fsId: fsIds.value[i],
+      path: pathList.value[i],
+      userKey:"main",
+      size:selectItem.value[i].size,
+    };
+    await userStore
+        .parseLink(params)
+        .then((res) => {
+          if (res.code === 200) {
+            if(i+1 === selectItem.value.length){
+              loadData.tableLoading = false;
             }
-          });
-          res.data.forEach((item) => {
+            loadData.tableData.forEach((e) => {
+              if (fsIds.value.includes(e.fs_id)) {
+                e.status = 2;
+                e.disable = true;
+              }
+            });
+            const url = res.data.urls[0].url;
+            const ua = res.data.ua;
             const o = {
               id: 'wp',
               method: 'aria2.addUri',
               params: [
-                [item.url],
+                [url + '&origin=dlna'],
                 {
-                  'user-agent': item.ua,
+                  'user-agent': ua,
                 },
               ],
             };
-
             fetch('http://localhost:16800/jsonrpc', {
               method: 'POST',
               headers: {
@@ -735,16 +747,13 @@ function handleParse() {
                 .then((resp) => resp.json())
                 .then((res) => {
                   ElMessage({
-                    message: `${item.filename}开始下载！`,
+                    message: `${selectItem.value[i].server_filename}开始下载！`,
                     type: 'success',
                   });
                 });
-          });
-        }
-      })
-      .catch(() => {
-        ElMessage.error('解析失败,请重试！');
-      });
+          }
+        })
+  }
 }
 </script>
 
