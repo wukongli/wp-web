@@ -147,7 +147,7 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="vipDownClick">解 析</el-button>
+          <el-button type="primary" @click="vipDownClick"><a href="https://panvip.mlover.site/" target="_blank">开通快速下载</a></el-button>
         </span>
       </template>
     </el-dialog>
@@ -236,7 +236,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: false,
-  fileSize: getToken() ? 100698669056 : 5242880000,
+  fileSize: getToken() ? 100698669056 : 3221225472,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
@@ -302,9 +302,9 @@ function parseCopyLink(params) {
           list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
-            if (parseInt(item.size) > loadData.fileSize) {
-              item.disable = true;
-            }
+            // if (parseInt(item.size) > loadData.fileSize) {
+            //   item.disable = true;
+            // }
           });
           loadData.tableData = list;
           loadData.parseLinkParams.seckey = data.data.data.seckey;
@@ -359,9 +359,13 @@ const onSubmit = () => {
       const result = await testDownLoad();
       if (!result) {
         loadData.dialogVisible = true;
-        // userStore.delCodeNum(params);
         isSending.value = false;
         return;
+      }
+      if (parseInt(loadData.item.size) > loadData.fileSize) {
+        ElMessage.error('文件大于3G,普通下载暂不支持，请使用快速下载！');
+        isSending.value = false;
+        return false;
       }
       userStore
         .getCodeNum(params)
