@@ -23,6 +23,7 @@
       @click="handleParse"
       >批量解析</el-button
     >
+    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我，每月挣的够生活费！</el-tag>
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -122,6 +123,7 @@
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
       <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
+      <div class="qr-title">想做网盘影视会员副业的可以联系我,每月挣的够生活费！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
@@ -155,6 +157,7 @@
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
       </div>
+      <div class="qr-title">想做网盘影视会员副业的可以联系我,每月挣的够生活费！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="vipDownClick"><a href="https://panvip.mlover.site/" target="_blank">开通快速下载</a></el-button>
