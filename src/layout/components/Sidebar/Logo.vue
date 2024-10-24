@@ -50,7 +50,7 @@
 
 <script setup>
 import variables from '@/assets/styles/variables.module.scss';
-import logo from '@/assets/logo/云服务.png';
+import logo from '@/assets/img/logo.png';
 import useSettingsStore from '@/store/modules/settings';
 
 defineProps({

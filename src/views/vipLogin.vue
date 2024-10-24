@@ -204,7 +204,7 @@ getCode();
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/images/bac.jpg');
+  background-image: url('../assets/img/loginBackGround.png');
   background-size: cover;
 }
 .title {
