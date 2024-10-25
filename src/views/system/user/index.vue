@@ -358,6 +358,7 @@
 import { getToken } from "@/utils/auth";
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user";
 import moment from 'moment';
+import store from "@/store/index";
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
@@ -586,7 +587,14 @@ function handleAdd() {
   reset();
   getUser().then(response => {
     postOptions.value = response.posts;
-    roleOptions.value = response.roles;
+    const username = store.state.value.user.name;
+    if(username === "admin"){
+      roleOptions.value = response.roles;
+    }else{
+      roleOptions.value = response.roles.filter(e=>{
+        return e.roleName !== "管理员";
+      });
+    }
     open.value = true;
     title.value = "添加用户";
     form.value.password = initPassword.value;
@@ -602,7 +610,14 @@ function handleUpdate(row) {
     }
     form.value = response.data;
     postOptions.value = response.posts;
-    roleOptions.value = response.roles;
+    const username = store.state.value.user.name;
+    if(username === "admin"){
+      roleOptions.value = response.roles;
+    }else{
+      roleOptions.value = response.roles.filter(e=>{
+        return e.roleName !== "管理员";
+      });
+    }
     form.value.postIds = response.postIds;
     form.value.roleIds = response.roleIds;
     open.value = true;
