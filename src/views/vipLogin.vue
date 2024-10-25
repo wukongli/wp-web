@@ -6,7 +6,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">爱分享平台</h3>
+      <h3 class="title">尽在此处，由此开始，妙不可言</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -204,7 +204,7 @@ getCode();
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url('../assets/img/loginBackGround.png');
+  background-image: url('../assets/img/parseBackGround.png');
   background-size: cover;
 }
 .title {
