@@ -6,8 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">尽在此处，由此开始，妙不可言<span style="color: red;">(赞助版)</span></h3>
-      <h3 v-else class="title">尽在此处，由此开始，妙不可言</h3>
+      <h3 v-if="getToken()" class="title">simple210<span style="color: red;">(赞助版)</span></h3>
+      <h3 v-else class="title">simple210</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->

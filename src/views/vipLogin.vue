@@ -6,7 +6,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">尽在此处，由此开始，妙不可言</h3>
+      <h3 class="title">simple210</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
