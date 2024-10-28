@@ -107,22 +107,20 @@
       </template>
     </el-dialog>
     <!-- 扫描获取验证码弹窗 -->
-    <el-dialog title="提示" v-model="loadData.WeCharVisible">
+    <el-dialog width="40%" height="300px" title="提示" v-model="loadData.WeCharVisible">
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <el-form
         ref="codeRef"
         :model="form"
-        label-width="auto"
         :rules="codeRules"
-        style="max-width: 600px; margin: 20px auto 0px"
       >
-        <el-form-item prop="code" label="请输入验证码">
+        <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">只为帮助真正有需求的朋友，随缘每天解析5-10次</div>
+      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>
       <div class="qr-title">想做网盘影视会员副业的可以联系我,每月挣的够生活费！</div>
       <template #footer>
         <span class="dialog-footer">
@@ -615,7 +613,7 @@ function handleSelectionChange(selection) {
 async function handleParse() {
   const token = getToken();
   if (!token) {
-    ElMessage.error('批量解析请使用快速下载！');
+    ElMessage.error('批量解析请开通快速下载！');
     return false;
   }
   const result = await testDownLoad();
