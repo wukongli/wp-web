@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('simple210');
+const title = ref('多多分享');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
