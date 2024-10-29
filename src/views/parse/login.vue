@@ -7,7 +7,7 @@
         class="login-form"
     >
       <h3 v-if="getToken()" class="title">多多分享<span style="color: red;">(赞助版)</span></h3>
-      <h3 v-else class="title">simple210</h3>
+      <h3 v-else class="title">多多分享</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
