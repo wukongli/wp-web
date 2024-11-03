@@ -90,7 +90,13 @@
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
-        系统检测到你没有安装Motrix,请安装下载器并运行！！
+        您还没有安装下载器，请安装下载器并配置好Ua和端口！！
+      </div>
+      <div class="down-address">
+        <span>配置说明：</span>
+        <a href="https://docs.qq.com/doc/DWnlpY2pkclpuUEFX?no_promotion=1" target="_blank">
+          https://docs.qq.com/doc/DWnlpY2pkclpuUEFX</a
+        >
       </div>
       <div class="down-address">
         <span>下载地址：</span>
@@ -215,6 +221,7 @@ import qrCode from '@/assets/images/wechart.jpg';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
+import { Client } from "@gopeed/rest";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -490,42 +497,67 @@ async function confirm(item,vip) {
   }
 }
 
-function sendToMotrix(item) {
+async function sendToMotrix(item) {
   //发送到下载器
 
-  let splitMax = true;
-  if (!loadData.url.includes('qdall01')) {
-    splitMax = false;
-  }
 
-  const o = {
-    id: 'wp',
-    method: 'aria2.addUri',
-    params: [
-      [loadData.url + '&origin=dlna'],
-      {
-        //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
-        'user-agent': loadData.ua,
-        split: splitMax ? '100' : '2',
-      },
-    ],
-  };
 
-  fetch('http://localhost:16800/jsonrpc', {
+  // 调用API创建任务
+
+  fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(o),
-  })
-    .then((resp) => resp.json())
-    .then((res) => {
-      item.status = 2;
-      ElMessage({
-        message: `${item.server_filename}开始下载！`,
-        type: 'success',
-      });
-    });
+    body: JSON.stringify({req:
+          {
+            url:loadData.url
+          }
+    }),
+  }).then((resp) => resp.json())
+      .then((res) => {
+        item.status = 2;
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        });
+      }).catch(e=>{
+      })
+  //
+  //
+  // let splitMax = true;
+  // if (!loadData.url.includes('qdall01')) {
+  //   splitMax = false;
+  // }
+  //
+  // const o = {
+  //   id: 'wp',
+  //   method: 'aria2.addUri',
+  //   params: [
+  //     [loadData.url + '&origin=dlna'],
+  //     {
+  //       //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
+  //       'user-agent': loadData.ua,
+  //       split: splitMax ? '100' : '2',
+  //     },
+  //   ],
+  // };
+  //
+  // fetch('http://localhost:16800/jsonrpc', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(o),
+  // })
+  //   .then((resp) => resp.json())
+  //   .then((res) => {
+  //     item.status = 2;
+  //     ElMessage({
+  //       message: `${item.server_filename}开始下载！`,
+  //       type: 'success',
+  //     });
+  //   });
 }
 
 function goBack() {
@@ -544,8 +576,17 @@ function goBack() {
 // function goIndex(){
 //   router.push({ path: '/login' });
 // }
-
 function init() {
+  setInterval(()=>{
+    fetch("http://127.0.0.1:9999/api/v1/tasks/pause",{
+      method:"put"
+    }).then((resp) => resp.json()).then((res)=>{
+      fetch("http://127.0.0.1:9999/api/v1/tasks/continue",{
+        method:"put"
+      }).then((resp) => resp.json()).then((res)=>{
+      })
+    })
+  },15000)
   if (
     !route.query.shorturl ||
     !route.query.pwd ||
@@ -570,26 +611,20 @@ init();
 //   })
 // }
 
-function testDownLoad() {
-  return new Promise((resolve) => {
-    let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-    ws.onopen = (event) => {
-      if (event.type === 'open') {
-        // console.log(event);
-        ws.close();
-        resolve(true);
-      }
-    };
-    ws.onerror = (event) => {
-      if (event.type === 'error') {
-        // console.log(event);
-        ws.close();
-        resolve(false);
-      }
-    };
-  });
+async function testDownLoad() {
+  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+  .then((resp) => resp.json())
+  .then((res) => {
+    return true;
+  }).catch(e=>{
+    return false;
+  })
 }
-
 function vipDownLoad(item) {
   loadData.item = item;
   loadData.vipDown = true;
@@ -651,31 +686,24 @@ async function handleParse() {
               }
             });
             const url = res.data.urls[0].url;
-            const ua = res.data.ua;
-            const o = {
-              id: 'wp',
-              method: 'aria2.addUri',
-              params: [
-                [url + '&origin=dlna'],
-                {
-                  'user-agent': ua,
-                },
-              ],
-            };
-            fetch('http://localhost:16800/jsonrpc', {
+            fetch('http://127.0.0.1:9999/api/v1/tasks', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
               },
-              body: JSON.stringify(o),
-            })
-                .then((resp) => resp.json())
+              body: JSON.stringify({req:
+                    {
+                      url:url
+                    }
+              }),
+            }).then((resp) => resp.json())
                 .then((res) => {
                   ElMessage({
                     message: `${selectItem.value[i].server_filename}开始下载！`,
                     type: 'success',
                   });
-                });
+                }).catch(e=>{
+            })
           }
         }).catch((res)=>{
           if(i+1 === selectItem.value.length){
