@@ -23,7 +23,8 @@
       @click="handleParse"
       >批量解析</el-button
     >
-    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我，每月挣的够生活费！</el-tag>
+    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>
+    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置Ua：netdisk;1.0.1 端口：127.0.0.1:9999</el-tag>
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -127,7 +128,7 @@
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
       <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>
-      <div class="qr-title">想做网盘影视会员副业的可以联系我,每月挣的够生活费！</div>
+      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
@@ -161,7 +162,7 @@
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
       </div>
-      <div class="qr-title">想做网盘影视会员副业的可以联系我,每月挣的够生活费！</div>
+      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="vipDownClick"><a href="https://panvip.mlover.site/" target="_blank">点击开通快速下载</a></el-button>
@@ -393,7 +394,7 @@ const onSubmit = () => {
         .then((res) => {
           if (res.code === 200) {
             if (res.data.data == 100) {
-              confirm(loadData.item,res.data.vip);
+              confirm(loadData.item);
             }  else if (res.data.data == 60) {
               setTimeout(() => {
                 isSending.value = false;
@@ -434,12 +435,12 @@ async function confirm(item,vip) {
     url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
     dir: loadData.parseLinkParams.dir,
   };
-  const token = getToken();
-  if(token || !vip) {
+  // const token = getToken();
     userStore
         .parseLink(params)
         .then((res) => {
           if (res.code === 200) {
+            console.log(res);
             isSending.value = false;
             item.status = 0;
             item.loading = false;
@@ -449,8 +450,13 @@ async function confirm(item,vip) {
               ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
               return;
             }
-            loadData.url = res.data.urls[0].url;
-            loadData.ua = res.data.ua;
+            if(res.data.vip){
+              loadData.url = res.data.data[0].url;
+              loadData.ua = res.data.data[0].ua;
+            }else{
+              loadData.url = res.data.data.urls[0].url;
+              loadData.ua = res.data.data.ua;
+            }
             sendToMotrix(item);
           } else {
             item.status = 0;
@@ -466,35 +472,6 @@ async function confirm(item,vip) {
           isSending.value = false;
           // loadData.errorDia = true;
         });
-
-  }else {
-    userStore
-        .parseLinkVisit(params)
-        .then((res) => {
-          if (res.code === 200) {
-            isSending.value = false;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            loadData.url = res.data[0].url;
-            loadData.ua = res.data[0].ua;
-            sendToMotrix(item);
-          } else {
-            item.status = 0;
-            item.disable = false;
-            item.loading = false;
-            // loadData.limitSpeedVisible = true;
-          }
-        })
-        .catch(() => {
-          item.status = 0;
-          item.disable = false;
-          item.loading = false;
-          isSending.value = false;
-          // loadData.errorDia = true;
-        });
-
-  }
 }
 
 async function sendToMotrix(item) {
@@ -512,6 +489,11 @@ async function sendToMotrix(item) {
     body: JSON.stringify({req:
           {
             url:loadData.url
+          },
+          opt:{
+            extra:{
+              connections:256,
+            }
           }
     }),
   }).then((resp) => resp.json())
@@ -578,13 +560,24 @@ function goBack() {
 // }
 function init() {
   setInterval(()=>{
-    fetch("http://127.0.0.1:9999/api/v1/tasks/pause",{
-      method:"put"
-    }).then((resp) => resp.json()).then((res)=>{
-      fetch("http://127.0.0.1:9999/api/v1/tasks/continue",{
-        method:"put"
-      }).then((resp) => resp.json()).then((res)=>{
-      })
+    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+        .then((resp) => resp.json()).then((res)=>{
+      if(res.code === 0){
+        const result = res.data.filter(e=>
+            e.status === "running"
+        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+        const ids = result.map((e)=>{
+          return `id=${e}`
+        }).join('&')
+        if(ids && ids.length){
+          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+              .then((resp) => resp.json()).then((res)=>{
+            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+                .then((resp) => resp.json()).then((res)=>{
+            })
+          })
+        }
+      }
     })
   },15000)
   if (
@@ -671,6 +664,11 @@ async function handleParse() {
       path: pathList.value[i],
       userKey:"main",
       size:selectItem.value[i].size,
+      fs_ids: [fsIds.value[i]],
+      pwd: loadData.query.pwd,
+      surl: loadData.query.shorturl,
+      url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+      dir: loadData.parseLinkParams.dir,
     };
     await userStore
         .parseLink(params)
@@ -685,17 +683,31 @@ async function handleParse() {
                 e.disable = true;
               }
             });
-            const url = res.data.urls[0].url;
+            if(res.data.vip){
+              loadData.url = res.data.data[0].url;
+              loadData.ua = res.data.data[0].ua;
+            }else{
+              loadData.url = res.data.data.urls[0].url;
+              loadData.ua = res.data.data.ua;
+            }
+            console.log(loadData.url)
             fetch('http://127.0.0.1:9999/api/v1/tasks', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({req:
+              body: JSON.stringify({
+                    req:
                     {
-                      url:url
+                      url:loadData.url
+                    },
+                    opt:{
+                      extra:{
+                        connections:256,
+                      }
                     }
-              }),
+              },
+              ),
             }).then((resp) => resp.json())
                 .then((res) => {
                   ElMessage({
