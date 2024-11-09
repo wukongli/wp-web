@@ -444,8 +444,13 @@ async function confirm(item,vip) {
               ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
               return;
             }
-            loadData.url = res.data.urls[0].url;
-            loadData.ua = res.data.ua;
+            if(res.data.vip){
+              loadData.url = res.data.data[0].url;
+              loadData.ua = res.data.data[0].ua;
+            }else{
+              loadData.url = res.data.data.urls[0].url;
+              loadData.ua = res.data.data.ua;
+            }
             sendToMotrix(item);
           } else {
             item.status = 0;
@@ -495,39 +500,30 @@ async function confirm(item,vip) {
 function sendToMotrix(item) {
   //发送到下载器
 
-  let splitMax = true;
-  if (!loadData.url.includes('qdall01')) {
-    splitMax = false;
-  }
-
-  const o = {
-    id: 'wp',
-    method: 'aria2.addUri',
-    params: [
-      [loadData.url + '&origin=dlna'],
-      {
-        //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
-        'user-agent': loadData.ua,
-        split: splitMax ? '100' : '2',
-      },
-    ],
-  };
-
-  fetch('http://localhost:16800/jsonrpc', {
+  fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(o),
+    body: JSON.stringify({req:
+          {
+            url:loadData.url
+          },
+      opt:{
+        extra:{
+          connections:256,
+        }
+      }
+    }),
+  }).then((resp) => resp.json())
+      .then((res) => {
+        item.status = 2;
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        });
+      }).catch(e=>{
   })
-    .then((resp) => resp.json())
-    .then((res) => {
-      item.status = 2;
-      ElMessage({
-        message: `${item.server_filename}开始下载！`,
-        type: 'success',
-      });
-    });
 }
 
 function goBack() {
@@ -548,6 +544,27 @@ function goBack() {
 // }
 
 function init() {
+  setInterval(()=>{
+    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+        .then((resp) => resp.json()).then((res)=>{
+      if(res.code === 0){
+        const result = res.data.filter(e=>
+            e.status === "running"
+        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+        const ids = result.map((e)=>{
+          return `id=${e}`
+        }).join('&')
+        if(ids && ids.length){
+          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+              .then((resp) => resp.json()).then((res)=>{
+            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+                .then((resp) => resp.json()).then((res)=>{
+            })
+          })
+        }
+      }
+    })
+  },15000)
   if (
     !route.query.shorturl ||
     !route.query.pwd ||
@@ -572,24 +589,19 @@ init();
 //   })
 // }
 
-function testDownLoad() {
-  return new Promise((resolve) => {
-    let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-    ws.onopen = (event) => {
-      if (event.type === 'open') {
-        // console.log(event);
-        ws.close();
-        resolve(true);
-      }
-    };
-    ws.onerror = (event) => {
-      if (event.type === 'error') {
-        // console.log(event);
-        ws.close();
-        resolve(false);
-      }
-    };
-  });
+async function testDownLoad() {
+  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        return true;
+      }).catch(e=>{
+        return false;
+      })
 }
 
 function vipDownLoad(item) {
@@ -634,10 +646,15 @@ async function handleParse() {
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
-      fsId: fsIds.value[i],
-      path: pathList.value[i],
-      userKey:"main",
-      size:selectItem.value[i].size,
+      fsId: item.fs_id,
+      fs_ids: [item.fs_id],
+      path: item.server_filename,
+      userKey: userKey,
+      size: item.size,
+      pwd: loadData.query.pwd,
+      surl: loadData.query.shorturl,
+      url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+      dir: loadData.parseLinkParams.dir,
     };
     await userStore
         .parseLink(params)
