@@ -627,7 +627,7 @@ function handleSelectionChange(selection) {
 async function handleParse() {
   const token = getToken();
   if (!token) {
-    ElMessage.error('批量解析请使用快速下载！');
+    ElMessage.error('批量解析请开通快速下载！');
     return false;
   }
   const result = await testDownLoad();
@@ -646,11 +646,11 @@ async function handleParse() {
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
-      fsId: item.fs_id,
-      fs_ids: [item.fs_id],
-      path: item.server_filename,
-      userKey: userKey,
-      size: item.size,
+      fsId: fsIds.value[i],
+      path: pathList.value[i],
+      userKey:"main",
+      size:selectItem.value[i].size,
+      fs_ids: [fsIds.value[i]],
       pwd: loadData.query.pwd,
       surl: loadData.query.shorturl,
       url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
@@ -669,32 +669,39 @@ async function handleParse() {
                 e.disable = true;
               }
             });
-            const url = res.data.urls[0].url;
-            const ua = res.data.ua;
-            const o = {
-              id: 'wp',
-              method: 'aria2.addUri',
-              params: [
-                [url + '&origin=dlna'],
-                {
-                  'user-agent': ua,
-                },
-              ],
-            };
-            fetch('http://localhost:16800/jsonrpc', {
+            if(res.data.vip){
+              loadData.url = res.data.data[0].url;
+              loadData.ua = res.data.data[0].ua;
+            }else{
+              loadData.url = res.data.data.urls[0].url;
+              loadData.ua = res.data.data.ua;
+            }
+            console.log(loadData.url)
+            fetch('http://127.0.0.1:9999/api/v1/tasks', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
               },
-              body: JSON.stringify(o),
-            })
-                .then((resp) => resp.json())
+              body: JSON.stringify({
+                    req:
+                        {
+                          url:loadData.url
+                        },
+                    opt:{
+                      extra:{
+                        connections:256,
+                      }
+                    }
+                  },
+              ),
+            }).then((resp) => resp.json())
                 .then((res) => {
                   ElMessage({
                     message: `${selectItem.value[i].server_filename}开始下载！`,
                     type: 'success',
                   });
-                });
+                }).catch(e=>{
+            })
           }
         }).catch((res)=>{
           if(i+1 === selectItem.value.length){
