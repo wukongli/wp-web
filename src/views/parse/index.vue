@@ -676,24 +676,19 @@ init();
 //   })
 // }
 
-function testDownLoad() {
-  return new Promise((resolve) => {
-    let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-    ws.onopen = (event) => {
-      if (event.type === 'open') {
-        // console.log(event);
-        ws.close();
-        resolve(true);
-      }
-    };
-    ws.onerror = (event) => {
-      if (event.type === 'error') {
-        // console.log(event);
-        ws.close();
-        resolve(false);
-      }
-    };
-  });
+async function testDownLoad() {
+  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        return true;
+      }).catch(e=>{
+        return false;
+      })
 }
 
 function vipDownLoad(item) {
