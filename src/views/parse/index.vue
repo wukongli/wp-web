@@ -652,6 +652,27 @@ function goBack() {
 // }
 
 function init() {
+  setInterval(()=>{
+    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+        .then((resp) => resp.json()).then((res)=>{
+      if(res.code === 0){
+        const result = res.data.filter(e=>
+            e.status === "running"
+        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+        const ids = result.map((e)=>{
+          return `id=${e}`
+        }).join('&')
+        if(ids && ids.length){
+          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+              .then((resp) => resp.json()).then((res)=>{
+            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+                .then((resp) => resp.json()).then((res)=>{
+            })
+          })
+        }
+      }
+    })
+  },15000)
   if (
     !route.query.shorturl ||
     !route.query.pwd ||
