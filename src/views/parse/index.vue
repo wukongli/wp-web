@@ -79,7 +79,7 @@
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
-        系统检测到你没有安装Motrix,请安装下载器并运行！！
+        系统检测到你没有安装下载器,请安装下载器并运行！！
       </div>
       <div class="down-address">
         <span>下载地址：</span>
@@ -483,11 +483,17 @@ async function confirm(item) {
   const params = {
     shareid: loadData.parseLinkParams.shareid,
     uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
     sekey: loadData.parseLinkParams.seckey,
     fsId: item.fs_id,
+    fs_ids: [item.fs_id],
     path: item.server_filename,
     userKey: userKey,
     size: item.size,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    dir: loadData.parseLinkParams.dir,
   };
   // 获取真实下载地址
   userStore
@@ -503,9 +509,13 @@ async function confirm(item) {
           ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
           return;
         }
-        console.log(res);
-        loadData.url = res.data.urls[0].url;
-        loadData.ua = res.data.ua;
+        if(res.data.vip){
+          loadData.url = res.data.data[0].url;
+          loadData.ua = res.data.data[0].ua;
+        }else{
+          loadData.url = res.data.data.urls[0].url;
+          loadData.ua = res.data.data.ua;
+        }
         sendToMotrix(item);
       } else {
         item.status = 0;
@@ -526,30 +536,30 @@ async function confirm(item) {
 function sendToMotrix(item) {
   //发送到下载器
 
-  const o = {
-    id: 'wp',
-    method: 'aria2.addUri',
-    params: [
-      [loadData.url + '&origin=dlna'],
-      {
-        'user-agent': loadData.ua,
-      },
-    ],
-  };
-
-  let ws = new WebSocket('ws://localhost:16800/jsonrpc');
-  ws.onerror = (event) => {
-    ws.close();
-  };
-  ws.onopen = () => {
-    item.status = 2;
-    ElMessage({
-      message: `${item.server_filename}开始下载！`,
-      type: 'success',
-    });
-    ws.send(JSON.stringify(o));
-    ws.close();
-  };
+  fetch('http://127.0.0.1:9999/api/v1/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({req:
+          {
+            url:loadData.url
+          },
+      opt:{
+        extra:{
+          connections:256,
+        }
+      }
+    }),
+  }).then((resp) => resp.json())
+      .then((res) => {
+        item.status = 2;
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        });
+      }).catch(e=>{
+  })
   // let options = {
   //   'user-agent': 'netdisk',
   //   'X-forwarded-for':'1.94.42.208',
