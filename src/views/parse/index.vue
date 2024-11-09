@@ -416,7 +416,7 @@ const onSubmit = () => {
     }
   });
 };
-async function confirm(item,vip) {
+async function confirm(item) {
   item.loading = true;
   item.status = 1;
   item.disable = true;
