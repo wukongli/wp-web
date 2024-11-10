@@ -90,7 +90,7 @@
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
-        系统检测到你没有安装Motrix,请安装下载器并运行！！
+        系统检测到你没有安装下载器,请安装下载器并运行！！
       </div>
       <div class="down-address">
         <span>下载地址：</span>

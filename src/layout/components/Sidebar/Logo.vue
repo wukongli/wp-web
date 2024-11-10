@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('多多分享');
+const title = ref('sudo分享');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
