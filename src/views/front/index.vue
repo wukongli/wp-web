@@ -52,9 +52,8 @@
             <el-button
                 v-if="parseInt(scope.row.isdir) === 0"
                 :type="'primary'"
-                @click="downLoad(scope.row)"
             >
-              下 载
+              <a href="https://panvip.mlover.site/" target="_blank">点击获取课程</a>
             </el-button>
           </template>
         </el-table-column>
