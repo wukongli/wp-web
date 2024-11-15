@@ -24,7 +24,7 @@
       >批量解析</el-button
     >
     <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置Ua：netdisk;1.0.1 端口：127.0.0.1:9999</el-tag>
+    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置Ua：netdisk;1.0.1 端口：127.0.0.1:9999，下载文件时请勿关闭此页面</el-tag>
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
