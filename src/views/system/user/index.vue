@@ -278,9 +278,17 @@
                </el-col>
             </el-row>
            <el-row>
+
              <el-col :span="12">
-               <el-form-item label="VIP验证码" prop="vipCode">
-                 <el-input v-model="form.vipCode" placeholder="请输VIP验证码" maxlength="11" />
+               <el-form-item label="到期时间">
+                 <el-select v-model="form.remark" placeholder="请选择">
+                   <el-option
+                       v-for="item in cardArray"
+                       :key="item.key"
+                       :label="item.label"
+                       :value="item.key"
+                   ></el-option>
+                 </el-select>
                </el-form-item>
              </el-col>
              <el-col :span="12">
@@ -292,23 +300,23 @@
            <el-row>
              <el-col :span="18">
 
-               <el-form-item label="到期时间">
-                 <el-date-picker
-                     v-model="form.vipEndTime"
-                     type="date"
-                     placeholder="选择日期">
-                 </el-date-picker>
-<!--                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>-->
-               </el-form-item>
+<!--               <el-form-item label="到期时间">-->
+<!--                 <el-date-picker-->
+<!--                     v-model="form.vipEndTime"-->
+<!--                     type="date"-->
+<!--                     placeholder="选择日期">-->
+<!--                 </el-date-picker>-->
+<!--&lt;!&ndash;                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>&ndash;&gt;-->
+<!--               </el-form-item>-->
              </el-col>
            </el-row>
-            <el-row>
-               <el-col :span="24">
-                  <el-form-item label="备注">
-                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
-                  </el-form-item>
-               </el-col>
-            </el-row>
+<!--            <el-row>-->
+<!--               <el-col :span="24">-->
+<!--                  <el-form-item label="备注">-->
+<!--                     <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>-->
+<!--                  </el-form-item>-->
+<!--               </el-col>-->
+<!--            </el-row>-->
          </el-form>
          <template #footer>
             <div class="dialog-footer">
@@ -379,6 +387,13 @@ const deptOptions = ref(undefined);
 const initPassword = ref(undefined);
 const postOptions = ref([]);
 const roleOptions = ref([]);
+const cardArray = ref([
+  { key: 30, label: `月卡`,  },
+  { key: 90, label: `季卡`,  },
+  { key: 180, label: `半年卡`,  },
+  { key: 365, label: `年卡`,  },
+  { key: 366, label: `永久卡`,  },
+]);
 /*** 用户导入参数 */
 const upload = reactive({
   // 是否显示弹出层（用户导入）
