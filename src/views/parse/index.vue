@@ -165,7 +165,7 @@
       <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="vipDownClick"><a href="https://panvip.mlover.site/" target="_blank">点击开通快速下载</a></el-button>
+          <el-button type="primary"><a href="https://panvip.mlover.site/" target="_blank">点击开通快速下载</a></el-button>
         </span>
       </template>
     </el-dialog>
