@@ -56,7 +56,7 @@
 <!--          /></template>-->
 <!--        </el-input>-->
         <div class="login-code">
-          <a target="_blank" href="https://ni21qzcmy6.feishu.cn/docx/B7UgdH6FHoM6ZIxrbGmcpaixnRb?from=from_copylink">点击查看使用说明</a>
+          <a target="_blank" href="https://flowus.cn/share/c68e3c55-67e5-460f-b937-7727e0378a34?code=BCRWJL">点击查看使用说明</a>
           <!--          <img :src="codeUrl" @click="getCode" class="login-code-img" />-->
         </div>
 <!--      </el-form-item>-->
