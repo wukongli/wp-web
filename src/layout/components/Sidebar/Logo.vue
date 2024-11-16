@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('sudo分享');
+const title = ref('文武PanDownload');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
