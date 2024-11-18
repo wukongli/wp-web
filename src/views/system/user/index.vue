@@ -280,12 +280,11 @@
            <el-row>
              <el-form-item label="到期时间">
                <el-select v-model="form.remark" placeholder="请选择">
-                 <el-option
-                     v-for="item in cardArray"
-                     :key="item.key"
-                     :label="item.label"
-                     :value="item.key"
-                 ></el-option>
+                 <el-option label="月卡" value="30" />
+                 <el-option label="季卡" value="90" />
+                 <el-option label="半年卡" value="180" />
+                 <el-option label="年卡" value="365" />
+                 <el-option label="永久卡" value="366" />
                </el-select>
              </el-form-item>
              <el-col :span="12">
