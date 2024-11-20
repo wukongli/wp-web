@@ -6,8 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">文武PanDownload<span style="color: red;">(赞助版)</span></h3>
-      <h3 v-else class="title">文武PanDownload</h3>
+      <h3 v-if="getToken()" class="title">FastCloudVidShare<span style="color: red;">(赞助版)</span></h3>
+      <h3 v-else class="title">FastCloudVidShare</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->

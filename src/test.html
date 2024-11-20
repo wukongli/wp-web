@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<script>
+    // fetch('http://127.0.0.1:9999/api/v1/tasks', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json', 'User-Agent':'netdisk'
+    //   },
+    //   body: JSON.stringify({
+    //       req:
+    //       {
+    //           url:"http://qdall01.baidupcs.com/file/e571c00fdra25c9dad2222019b7b37c7?bkt=en-d3a65691252603d30dea75f4886fc9edd3b62595fceeab1cb7a8fd54d02ed32ce9cc51996972bd0a&fid=1101517540537-250528-755035070488207&time=1730725976&sign=FDTAXUbGERQlBHSKfWaqir-DCb740ccc5511e5e8fedcff06b081203-%2BUD8qK90RQxoTmtfl%2BYyP1S%2BQV4%3D&to=34&size=1058206536&sta_dx=1058206536&sta_cs=0&sta_ft=rar&sta_ct=6&sta_mt=0&fm2=MH%2CBaoding%2CAnywhere%2C%2C%E5%8C%97%E4%BA%AC%2Cpbs&ctime=1708138839&mtime=1730725976&dt3=0&resv0=0&resv1=0&resv2=rlim&resv3=5&resv4=1058206536&vuk=1101517540537&iv=2&vl=1&htype=&randtype=em&tkbind_id=0&newver=1&newfm=1&secfm=1&flow_ver=3&pkey=en-37fcf852932280af68815162df314ae7f258478abfbf72ef6a3989c268960b57d7da6c198d9376b5&expires=8h&rt=pr&r=518593863&vbdid=3756786381&fin=%E7%AC%AC6%E7%AB%A0+%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B.rar&bflag=34-34&rtype=1&dp-logid=246362676357658673&dp-callid=0.1&tsl=0&csl=1000&fsl=0&csign=P1oHIeTVn283mNulQ%2FSPYjFjXKs%3D&so=1&ut=1&uter=0&serv=0&uc=1069429310&ti=d07a7c9c0a19b1693673ef19844d2ed796172c9735544301305a5e1275657320&hflag=30&from_type=3&adg=c_c04b3962be5b2087a46122987b8f21a2&reqlabel=250528_l_b5b24a9804ed001a6da28c90118748b4_-1_d07375d99aa332413707a8f513561c23&ibp=1&fpath=%E6%88%91%E7%9A%84%E8%B5%84%E6%BA%90&mt_scene=personal&by=themis"
+    //       },
+    //       opt:{
+    //           extra:{
+    //               connections:500,
+    //           }
+    //       }
+    //       }),
+    // })
+    //   .then((resp) => resp.json())
+    //   .then((res) => {
+    //       console.log(res);
+    //   }).catch(e=>{
+    //     alert(e)
+    //     console.log(e);
+    // })
+
+ // fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+ //        .then((resp) => resp.json()).then((res)=>{
+ //            if(res.code === 0){
+ //               const result = res.data.filter(e=>
+ //                    e.status === "running"
+ //                ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+ //                const ids = result.map((e)=>{
+ //                    return `id=${e}`
+ //                }).join('&')
+ //                console.log("所有任务");
+ //                console.log(ids);
+ //                fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+ //                    .then((resp) => resp.json()).then((res)=>{
+ //                        console.log("暂停任务");
+ //                     console.log(res);
+ //                    fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+ //                        .then((resp) => resp.json()).then((res)=>{
+ //                        console.log("开始任务");
+ //
+ //                        console.log(res);
+ //                    })
+ //                })
+ //            }
+ //    })
+
+
+
+
+    setInterval(()=>{
+        // fetch("http://127.0.0.1:9999/api/v1/tasks/pause",{
+        //     method:"put"
+        // }).then((resp) => resp.json()).then((res)=>{
+        //     console.log(res);
+        //     fetch("http://127.0.0.1:9999/api/v1/tasks/continue",{
+        //         method:"put"
+        //     }).then((resp) => resp.json()).then((res)=>{
+        //         console.log(res);
+        //     })
+        // })
+
+        // fetch("http://127.0.0.1:9999/api/v1/tasks/continue",{
+        //     method:"put"
+        // }).then((resp) => resp.json()).then((res)=>{
+        //     console.log(res);
+        // })
+
+        fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+            .then((resp) => resp.json()).then((res)=>{
+            if(res.code === 0){
+                const result = res.data.filter(e=>
+                    e.status === "running"
+                ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+                const ids = result.map((e)=>{
+                    return `id=${e}`
+                }).join('&')
+                if(ids && ids.length){
+                    fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+                        .then((resp) => resp.json()).then((res)=>{
+                        fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+                            .then((resp) => resp.json()).then((res)=>{
+                        })
+                    })
+                }
+
+            }
+        })
+
+    },10000)
+</script>
+
+</body>
+</html>

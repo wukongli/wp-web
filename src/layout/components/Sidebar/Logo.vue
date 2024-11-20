@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('文武PanDownload');
+const title = ref('FastCloudVidShare');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
