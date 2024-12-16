@@ -24,7 +24,7 @@
       >批量解析</el-button
     >
     <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置Ua：netdisk;1.0.1 端口：127.0.0.1:9999，下载文件时请勿关闭此页面</el-tag>
+    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999，下载文件时请勿关闭此页面</el-tag>
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -488,7 +488,12 @@ async function sendToMotrix(item) {
     },
     body: JSON.stringify({req:
           {
-            url:loadData.url
+            url:loadData.url,
+            extra:{
+              header:{
+                "User-Agent":loadData.ua,
+              }
+            }
           },
           opt:{
             extra:{
@@ -654,17 +659,13 @@ async function handleParse() {
     return false;
   }
   loadData.tableLoading = true;
-  for (let i = 0; i < selectItem.value.length; i++) {
     const params = {
       shareid: loadData.parseLinkParams.shareid,
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
-      fsId: fsIds.value[i],
-      path: pathList.value[i],
       userKey:"main",
-      size:selectItem.value[i].size,
-      fs_ids: [fsIds.value[i]],
+      fs_ids: [...fsIds.value],
       pwd: loadData.query.pwd,
       surl: loadData.query.shorturl,
       url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
@@ -674,9 +675,7 @@ async function handleParse() {
         .parseLink(params)
         .then((res) => {
           if (res.code === 200) {
-            if(i+1 === selectItem.value.length){
-              loadData.tableLoading = false;
-            }
+            loadData.tableLoading = false;
             loadData.tableData.forEach((e) => {
               if (fsIds.value.includes(e.fs_id)) {
                 e.status = 2;
@@ -699,7 +698,12 @@ async function handleParse() {
               body: JSON.stringify({
                     req:
                     {
-                      url:loadData.url
+                      url:loadData.url,
+                      extra:{
+                        header:{
+                          "User-Agent":loadData.ua,
+                        }
+                      }
                     },
                     opt:{
                       extra:{
@@ -718,12 +722,8 @@ async function handleParse() {
             })
           }
         }).catch((res)=>{
-          if(i+1 === selectItem.value.length){
-            loadData.tableLoading = false;
-          }
-          console.log(res);
+          loadData.tableLoading = false;
         })
-  }
 }
 </script>
 
