@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('FastCloudVidShare');
+const title = ref('红头船小店');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>
