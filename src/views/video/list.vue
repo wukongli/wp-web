@@ -7,17 +7,17 @@
     <div class="content">
       <div class="top">
         <a class="hint" href="https://ni21qzcmy6.feishu.cn/docx/JhgkduQxbo3oNUxYthHcrvr4nwf" target="_blank">点击查看使用方式</a>
-        <div class="left">如果播放卡顿可以切换线路！</div>
-        <div class="right">
-          <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">
-            <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            />
-          </el-select>
-        </div>
+<!--        <div class="left">如果播放卡顿可以切换线路！</div>-->
+<!--        <div class="right">-->
+<!--          <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">-->
+<!--            <el-option-->
+<!--                v-for="item in options"-->
+<!--                :key="item.value"-->
+<!--                :label="item.label"-->
+<!--                :value="item.value"-->
+<!--            />-->
+<!--          </el-select>-->
+<!--        </div>-->
       </div>
       <div class="video-play">
         <iframe allowfullscreen width="100%" height="100%" :src="videoUrl"></iframe>
@@ -62,8 +62,15 @@ watch(() => selectValue.value, (newValue, oldValue) => {
 });
 
 function playVideo(){
-  ElMessage.success("加载成功，视频开始播放！")
-  videoUrl.value = `${selectValue.value}${input.value}`
+  console.log(input.value);
+
+  if(input.value){
+    ElMessage.success("加载成功，视频开始播放！")
+    videoUrl.value = `https://jx.xmflv.com/?url=${input.value}`
+  }else{
+    ElMessage.error("请输入视频播放地址！")
+  }
+
 }
 </script>
 
@@ -71,7 +78,7 @@ function playVideo(){
 
 .video-header{
   width: 95%;
-  margin: 10px auto 0;
+  margin: 5px auto 0;
   height: 40px;
   border-radius: 50px;
   padding-left: 20px;
@@ -89,12 +96,15 @@ function playVideo(){
     border-radius: 0 50px 50px 0;
     border-left: 1px solid #5e5e5e;
     color: #fff;
+    font-weight: bold;
     text-decoration: none;
     background-image: linear-gradient(90deg, #7cbeff, #1e90ff);
     height: 100%;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    display: flex;
     justify-content: center;
     text-align: center;
+    align-items: center; /* 垂直居中 */
     flex: 1;
     cursor: pointer;
   }

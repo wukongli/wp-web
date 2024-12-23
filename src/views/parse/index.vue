@@ -659,23 +659,28 @@ async function handleParse() {
     return false;
   }
   loadData.tableLoading = true;
+  for (let i = 0; i < selectItem.value.length; i++) {
     const params = {
       shareid: loadData.parseLinkParams.shareid,
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
       userKey:"main",
-      fs_ids: [...fsIds.value],
+      fsId: fsIds.value[i],
+      path: pathList.value[i],
+      size:selectItem.value[i].size,
       pwd: loadData.query.pwd,
       surl: loadData.query.shorturl,
       url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
       dir: loadData.parseLinkParams.dir,
     };
-    await userStore
+    userStore
         .parseLink(params)
         .then((res) => {
           if (res.code === 200) {
-            loadData.tableLoading = false;
+            if(i+1 === selectItem.value.length){
+              loadData.tableLoading = false;
+            }
             loadData.tableData.forEach((e) => {
               if (fsIds.value.includes(e.fs_id)) {
                 e.status = 2;
@@ -689,7 +694,6 @@ async function handleParse() {
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
             }
-            console.log(loadData.url)
             fetch('http://127.0.0.1:9999/api/v1/tasks', {
               method: 'POST',
               headers: {
@@ -697,20 +701,20 @@ async function handleParse() {
               },
               body: JSON.stringify({
                     req:
-                    {
-                      url:loadData.url,
-                      extra:{
-                        header:{
-                          "User-Agent":loadData.ua,
-                        }
-                      }
-                    },
+                        {
+                          url:loadData.url,
+                          extra:{
+                            header:{
+                              "User-Agent":loadData.ua,
+                            }
+                          }
+                        },
                     opt:{
                       extra:{
                         connections:256,
                       }
                     }
-              },
+                  },
               ),
             }).then((resp) => resp.json())
                 .then((res) => {
@@ -722,8 +726,12 @@ async function handleParse() {
             })
           }
         }).catch((res)=>{
-          loadData.tableLoading = false;
+          if(i+1 === selectItem.value.length){
+            loadData.tableLoading = false;
+          }
         })
+  }
+
 }
 </script>
 
