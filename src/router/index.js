@@ -207,19 +207,11 @@ export const constantRoutes = [
       },
     ],
   },
-  // {
-  //   path: '/index',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [
-  //     {
-  //       path: '/index',
-  //       component: () => import('@/views/index'),
-  //       name: 'Index',
-  //       meta: { title: '首页', icon: 'dashboard', affix: true },
-  //     },
-  //   ],
-  // },
+  {
+    path: '/video/vip',
+    component: () => import('@/views/video/list.vue'),
+    hidden: true,
+  },
   {
     path: '/user',
     component: Layout,

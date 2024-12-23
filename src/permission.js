@@ -23,7 +23,7 @@ const whiteList = [
   '/parse/login',
   '/parse/index',
   '/401',
-  '/video/index'
+  '/video/vip'
 ];
 
 router.beforeEach((to, from, next) => {
