@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
-    <div class="video-header">
-      <input v-model="input" placeholder="请输入视频播放链接" />
-      <div @click="playVideo" class="play">播放</div>
-    </div>
-    <div class="content">
-      <div class="top">
-        <a class="hint" href="https://ni21qzcmy6.feishu.cn/docx/JhgkduQxbo3oNUxYthHcrvr4nwf" target="_blank">点击查看使用方式</a>
+<!--    <div class="video-header">-->
+<!--      <input v-model="input" placeholder="请输入视频播放链接" />-->
+<!--      <div @click="playVideo" class="play">播放</div>-->
+<!--    </div>-->
+<!--    <div class="content">-->
+<!--      <div class="top">-->
+<!--        <a class="hint" href="https://ni21qzcmy6.feishu.cn/docx/JhgkduQxbo3oNUxYthHcrvr4nwf" target="_blank">点击查看使用方式</a>-->
 <!--        <div class="left">如果播放卡顿可以切换线路！</div>-->
 <!--        <div class="right">-->
 <!--          <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">-->
@@ -18,11 +18,26 @@
 <!--            />-->
 <!--          </el-select>-->
 <!--        </div>-->
+<!--      </div>-->
+<!--      <div class="video-play">-->
+        <iframe ref="myElement" allowfullscreen width="100%" height="100%" src="https://video.aifenxiang.net.cn/"></iframe>
+<!--      </div>-->
+<!--    </div>-->
+
+    <el-dialog :close-on-press-escape="false" title="提示" v-model="loadData.dialog">
+      <!--      <img class="qr-code" :src="wechar" alt="" />-->
+      <div class="qr-hint">
+        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>
+        <div>无提示纯净版，享受完整观影体验点击下面按钮开通</div>
       </div>
-      <div class="video-play">
-        <iframe allowfullscreen width="100%" height="100%" :src="videoUrl"></iframe>
-      </div>
-    </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary"
+          ><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通</a></el-button
+          >
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -32,8 +47,11 @@ import { ref,watch } from 'vue'
 import { ElMessage } from 'element-plus';
 const input = ref('')
 const selectValue = ref('https://jx.xmflv.com/?url=')
-const videoUrl = ref('');
-
+const videoUrl = ref('https://video.aifenxiang.net.cn/');
+const myElement = ref(null);
+const loadData = reactive({
+  dialog:false
+})
 const options = [
   {
     value: 'https://jx.xmflv.com/?url=',
@@ -72,9 +90,37 @@ function playVideo(){
   }
 
 }
+
+onMounted(() => {
+  setInterval(() => {
+
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { /* Firefox */
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE/Edge */
+      document.msExitFullscreen();
+    }
+    loadData.dialog = true;
+   },2*60*1000);
+});
 </script>
 
 <style scoped lang="scss">
+
+.app-container{
+  width: 100%;
+  height:calc(100vh - 84px);
+  .qr-hint {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #e94242;
+  }
+}
 
 .video-header{
   width: 95%;

@@ -91,7 +91,7 @@
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
-        您还没有安装下载器，请安装下载器并配置好Ua和端口！！
+        您还没有安装下载器，请安装下载器并配置好端口！！
       </div>
       <div class="down-address">
         <span>配置说明：</span>
@@ -165,7 +165,7 @@
       <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://panvip.mlover.site/" target="_blank">点击开通快速下载</a></el-button>
+          <el-button type="primary"><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通快速下载</a></el-button>
         </span>
       </template>
     </el-dialog>
@@ -451,8 +451,8 @@ async function confirm(item) {
               return;
             }
             if(res.data.vip){
-              loadData.url = res.data.data[0].url;
-              loadData.ua = res.data.data[0].ua;
+              loadData.url = res.data.data.dlink;
+              loadData.ua = res.data.data.ua;
             }else{
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
@@ -667,6 +667,7 @@ async function handleParse() {
       sekey: loadData.parseLinkParams.seckey,
       userKey:"main",
       fsId: fsIds.value[i],
+      fs_ids: [fsIds.value[i]],
       path: pathList.value[i],
       size:selectItem.value[i].size,
       pwd: loadData.query.pwd,
@@ -688,8 +689,8 @@ async function handleParse() {
               }
             });
             if(res.data.vip){
-              loadData.url = res.data.data[0].url;
-              loadData.ua = res.data.data[0].ua;
+              loadData.url = res.data.data.dlink;
+              loadData.ua = res.data.data.ua;
             }else{
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;

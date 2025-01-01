@@ -208,10 +208,40 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/video/vip',
-    component: () => import('@/views/video/list.vue'),
-    hidden: true,
+    name: 'Video',
+    path: '/video',
+    hidden: false,
+    redirect: 'noRedirect',
+    component: Layout,
+    alwaysShow: true,
+    meta: {
+      title: '视频SVIP',
+      icon: 'tree',
+      noCache: true,
+      link: null,
+      refresh:true
+    },
+    children: [
+      {
+        name: 'List',
+        path: 'list',
+        hidden: false,
+        component: () => import('@/views/video/list.vue'),
+        meta: {
+          title: '在线观看',
+          icon: 'redis-list',
+          noCache: false,
+          link: null,
+          refresh:true
+        },
+      },
+    ],
   },
+  // {
+  //   path: '/video/vip',
+  //   component: () => import('@/views/video/list.vue'),
+  //   hidden: true,
+  // },
   {
     path: '/user',
     component: Layout,
