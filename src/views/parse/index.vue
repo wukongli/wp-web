@@ -445,8 +445,8 @@ async function confirm(item,vip) {
               return;
             }
             if(res.data.vip){
-              loadData.url = res.data.data[0].url;
-              loadData.ua = res.data.data[0].ua;
+              loadData.url = res.data.data.dlink;
+              loadData.ua = res.data.data.ua;
             }else{
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
@@ -646,11 +646,11 @@ async function handleParse() {
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
-      fsId: fsIds.value[i],
-      path: pathList.value[i],
       userKey:"main",
-      size:selectItem.value[i].size,
+      fsId: fsIds.value[i],
       fs_ids: [fsIds.value[i]],
+      path: pathList.value[i],
+      size:selectItem.value[i].size,
       pwd: loadData.query.pwd,
       surl: loadData.query.shorturl,
       url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
@@ -670,8 +670,8 @@ async function handleParse() {
               }
             });
             if(res.data.vip){
-              loadData.url = res.data.data[0].url;
-              loadData.ua = res.data.data[0].ua;
+              loadData.url = res.data.data.dlink;
+              loadData.ua = res.data.data.ua;
             }else{
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
