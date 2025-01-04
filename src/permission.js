@@ -63,7 +63,7 @@ router.beforeEach((to, from, next) => {
             .logOut()
             .then(() => {
               ElMessage.error(err);
-              next({ path: '/vip/login' });
+              next({ path: '/' });
             });
         });
     } else {

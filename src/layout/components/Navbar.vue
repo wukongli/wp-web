@@ -109,7 +109,7 @@ function logout() {
   })
     .then(() => {
       userStore.logOut().then(() => {
-        location.href = '/vip/login';
+        location.href = '/';
       });
     })
     .catch(() => {});
