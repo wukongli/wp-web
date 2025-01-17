@@ -20,7 +20,7 @@
 <!--        </div>-->
 <!--      </div>-->
 <!--      <div class="video-play">-->
-        <iframe ref="myElement" allowfullscreen width="100%" height="100%" src="https://video.aifenxiang.net.cn"></iframe>
+    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://video.aifenxiang.net.cn"></iframe>
 <!--      </div>-->
 <!--    </div>-->
 
@@ -28,7 +28,7 @@
       <!--      <img class="qr-code" :src="wechar" alt="" />-->
       <div class="qr-hint">
         <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>
-        <div>秒播，无提示纯净版，享受完整观影体验点击下面按钮开通</div>
+        <div>极速秒播，无提示纯净版，享受完整观影体验点击下面按钮开通</div>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -45,6 +45,9 @@
 import { ref,watch } from 'vue'
 // import video from "@/assets/images/video.png";
 import { ElMessage } from 'element-plus';
+// import导入
+import DisableDevtool from 'disable-devtool';
+DisableDevtool();
 const input = ref('')
 const selectValue = ref('https://jx.xmflv.com/?url=')
 const videoUrl = ref('https://video.aifenxiang.net.cn/');
