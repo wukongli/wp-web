@@ -107,7 +107,7 @@ onMounted(() => {
       document.msExitFullscreen();
     }
     loadData.dialog = true;
-   },2*60*1000);
+   },60*1000);
 });
 </script>
 
