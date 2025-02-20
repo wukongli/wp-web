@@ -278,9 +278,31 @@
                </el-col>
             </el-row>
            <el-row>
-
+             <el-col :span="12">
+               <el-form-item label="影视时间">
+                 <el-select v-model="form.videoMark" placeholder="请选择">
+                   <el-option label="月卡" value="30" />
+                   <el-option label="季卡" value="90" />
+                   <el-option label="半年卡" value="180" />
+                   <el-option label="年卡" value="365" />
+                   <el-option label="永久卡" value="366" />
+                 </el-select>
+               </el-form-item>
+             </el-col>
              <el-col :span="12">
                <el-form-item label="到期时间">
+                 <el-date-picker
+                     v-model="form.videoEndTime"
+                     type="date"
+                     placeholder="选择日期">
+                 </el-date-picker>
+               </el-form-item>
+             </el-col>
+           </el-row>
+
+           <el-row>
+             <el-col :span="12">
+               <el-form-item label="解析时间">
                  <el-select v-model="form.remark" placeholder="请选择">
                    <el-option label="月卡" value="30" />
                    <el-option label="季卡" value="90" />
@@ -291,22 +313,13 @@
                </el-form-item>
              </el-col>
              <el-col :span="12">
-               <el-form-item label="剩余天数" prop="vipNum">
-                 <el-input disabled v-model="form.vipNum" placeholder="0" maxlength="50" />
+               <el-form-item label="到期时间">
+                 <el-date-picker
+                     v-model="form.vipEndTime"
+                     type="date"
+                     placeholder="选择日期">
+                 </el-date-picker>
                </el-form-item>
-             </el-col>
-           </el-row>
-           <el-row>
-             <el-col :span="18">
-
-<!--               <el-form-item label="到期时间">-->
-<!--                 <el-date-picker-->
-<!--                     v-model="form.vipEndTime"-->
-<!--                     type="date"-->
-<!--                     placeholder="选择日期">-->
-<!--                 </el-date-picker>-->
-<!--&lt;!&ndash;                 <el-input v-model="form.vipEndTime" type="placeholder" placeholder="到期时间"></el-input>&ndash;&gt;-->
-<!--               </el-form-item>-->
              </el-col>
            </el-row>
 <!--            <el-row>-->
@@ -393,6 +406,9 @@ const cardArray = ref([
   { key: 365, label: `年卡`,  },
   { key: 366, label: `永久卡`,  },
 ]);
+
+const vipEndTime = ref('');
+const videoEndTime = ref('');
 /*** 用户导入参数 */
 const upload = reactive({
   // 是否显示弹出层（用户导入）
@@ -619,10 +635,12 @@ function handleUpdate(row) {
   reset();
   const userId = row.userId || ids.value;
   getUser(userId).then(response => {
-    if(response.data.vipEndTime){
-      response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
-    }
+    // if(response.data.vipEndTime){
+    //   response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
+    // }
     form.value = response.data;
+    console.log(form.value);
+
     postOptions.value = response.posts;
     const username = store.state.value.user.name;
     if(username === "admin"){

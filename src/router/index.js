@@ -237,11 +237,11 @@ export const constantRoutes = [
       },
     ],
   },
-  // {
-  //   path: '/video/vip',
-  //   component: () => import('@/views/video/list.vue'),
-  //   hidden: true,
-  // },
+  {
+    path: '/video/vip',
+    component: () => import('@/views/video/index.vue'),
+    hidden: false,
+  },
   {
     path: '/user',
     component: Layout,

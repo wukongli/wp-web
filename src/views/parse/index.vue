@@ -127,8 +127,8 @@
         </el-form-item>
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>
-      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
+<!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
+<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
@@ -166,6 +166,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通快速下载</a></el-button>
+<!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -218,7 +219,7 @@ import {
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from '@/assets/images/wechart.jpg';
+import qrCode from '@/assets/images/qrcode.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';

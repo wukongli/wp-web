@@ -20,20 +20,39 @@
 <!--        </div>-->
 <!--      </div>-->
 <!--      <div class="video-play">-->
-    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://video.aifenxiang.net.cn"></iframe>
+    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://vparse.aifenxiang.net.cn"></iframe>
 <!--      </div>-->
 <!--    </div>-->
 
-    <el-dialog :close-on-press-escape="false" title="提示" v-model="loadData.dialog">
-      <!--      <img class="qr-code" :src="wechar" alt="" />-->
+    <el-dialog width="500px;" :close-on-press-escape="false" title="提示" v-model="loadData.dialog">
+            <img class="qr-code" :src="qrCode" alt="" />
       <div class="qr-hint">
-        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>
-        <div>极速秒播，无提示纯净版，享受完整观影体验点击下面按钮开通</div>
+<!--        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>-->
+        <div>极速秒播，无提示纯净版，扫一扫开通权限！</div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+<!--          <el-button type="primary"-->
+<!--          ><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通</a></el-button-->
+<!--          >-->
+
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+        :visible.sync="dialogVisible"
+        :show-close="false"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+               title="提示" v-model="loadData.browseDia">
+      <div>
+        <div>移动端观看视频请联系管理员下载移动端app</div>
       </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"
-          ><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通</a></el-button
+          ><router-link :to="'/parse/login'">确定</router-link></el-button
           >
         </span>
       </template>
@@ -43,8 +62,12 @@
 
 <script setup name="List">
 import { ref,watch } from 'vue'
+import moment from 'moment';
 // import video from "@/assets/images/video.png";
 import { ElMessage } from 'element-plus';
+import { getToken, setToken, removeToken } from '@/utils/auth';
+import qrCode from '@/assets/images/wechart.jpg';
+
 // import导入
 import DisableDevtool from 'disable-devtool';
 DisableDevtool();
@@ -52,8 +75,13 @@ const input = ref('')
 const selectValue = ref('https://jx.xmflv.com/?url=')
 const videoUrl = ref('https://video.aifenxiang.net.cn/');
 const myElement = ref(null);
+import {getUserProfile} from "@/api/system/user";
+const state = reactive({
+  user: {},
+});
 const loadData = reactive({
-  dialog:false
+  dialog:false,
+  browseDia:false,
 })
 const options = [
   {
@@ -95,20 +123,69 @@ function playVideo(){
 }
 
 onMounted(() => {
-  setInterval(() => {
+  const isMobile = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isMobileScreen = window.innerWidth <= 768;
+    return isMobileUserAgent && isMobileScreen;
+  };
 
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { /* Firefox */
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { /* IE/Edge */
-      document.msExitFullscreen();
+  if (isMobile()) {
+   loadData.browseDia = true;
+  } else {
+
+    const token = getToken();
+
+    if(token){
+      setInterval(() => {
+        const date1 = moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss");
+        const date2 = moment().format("YYYY-MM-DD HH:mm:ss")
+        if(date1 < date2){
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+          }
+          loadData.dialog = true;
+        }
+
+      },15* 1000);
+    }else{
+      setInterval(() => {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+          document.msExitFullscreen();
+        }
+        loadData.dialog = true;
+      },15* 1000);
     }
-    loadData.dialog = true;
-   },60*1000);
+
+
+  }
+
 });
+
+function getUser() {
+  const token = getToken();
+  if(token){
+    getUserProfile().then(response => {
+      state.user = response.data;
+    });
+  }
+
+};
+getUser();
+
+
 </script>
 
 <style scoped lang="scss">
@@ -122,6 +199,12 @@ onMounted(() => {
     font-size: 20px;
     font-weight: bold;
     color: #e94242;
+  }
+  .qr-code {
+    width: 200px;
+    height: 180px;
+    margin: auto;
+    display: block;
   }
 }
 
