@@ -235,6 +235,19 @@ export const constantRoutes = [
           refresh:true
         },
       },
+      // {
+      //   name: 'Out',
+      //   path: 'out',
+      //   hidden: false,
+      //   component: () => import('@/views/video/out.vue'),
+      //   meta: {
+      //     title: '站外观看',
+      //     icon: 'redis-list',
+      //     noCache: false,
+      //     link: null,
+      //     refresh:true
+      //   },
+      // },
     ],
   },
   {

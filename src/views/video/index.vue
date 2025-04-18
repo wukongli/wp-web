@@ -2,12 +2,12 @@
   <div class="app-container">
         <div class="video-header">
           <input v-model="input" placeholder="请输入视频播放链接" />
-          <div @click="playVideo" class="play">播放刷新</div>
+          <div @click="playVideo" class="play">刷新播放</div>
         </div>
         <div class="content">
           <div class="top">
-            <div class="hint">如果播放卡顿可以切换线路！</div>
-            <a class="hint" href="https://aifenxiang.net.cn/video/list" target="_blank">各种4K,1080P高清影视极速秒播，点击前往搜索</a>
+<!--            <div class="hint">如果播放卡顿可以切换线路！</div>-->
+            <a class="hint" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank">4K,1080P,更多资源，点击前往观看</a>
             <div class="right">
               <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">
                 <el-option
@@ -37,7 +37,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth';
 import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
-const selectValue = ref('https://jx.xmflv.com/?url=')
+const selectValue = ref('https://play.xiaomianyang.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -50,12 +50,12 @@ const loadData = reactive({
 })
 const options = [
   {
-    value: 'https://jx.xmflv.com/?url=',
+    value: 'https://play.xiaomianyang.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
   {
-    value: 'https://play.xiaomianyang.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
-    label: '高清线路',
+    value: 'https://player.aifenxiang.net.cn/?url=',
+    label: '备用线路',
   },
 ]
 watch(() => selectValue.value, (newValue, oldValue) => {
@@ -64,6 +64,8 @@ watch(() => selectValue.value, (newValue, oldValue) => {
 });
 
 function playVideo(){
+  // ElMessage.success("加载成功，视频开始播放！");
+  // window.location.reload();
   if(input.value){
     ElMessage.success("加载成功，视频开始播放！");
     videoUrl.value = `${selectValue.value}${playUrl}`;
@@ -81,7 +83,6 @@ onMounted(() => {
   input.value = playUrl;
   // videoUrl.value = `https://jx.xmflv.com/?url=${playUrl}`;
   videoUrl.value = `${selectValue.value}${playUrl}`;
-  console.log(videoUrl.value);
 
 });
 

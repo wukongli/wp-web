@@ -20,7 +20,7 @@
 <!--        </div>-->
 <!--      </div>-->
 <!--      <div class="video-play">-->
-    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://vparse.aifenxiang.net.cn"></iframe>
+    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://mac.aifenxiang.net.cn"></iframe>
 <!--      </div>-->
 <!--    </div>-->
 
@@ -28,7 +28,7 @@
             <img class="qr-code" :src="qrCode" alt="" />
       <div class="qr-hint">
 <!--        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>-->
-        <div>极速秒播，无提示纯净版，扫一扫开通权限！</div>
+        <div>获得完整观看权限地址，以及移动端APP，扫一扫开通权限！</div>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -153,7 +153,7 @@ onMounted(() => {
           loadData.dialog = true;
         }
 
-      },15* 1000);
+      },180* 1000);
     }else{
       setInterval(() => {
         if (document.exitFullscreen) {
@@ -166,7 +166,7 @@ onMounted(() => {
           document.msExitFullscreen();
         }
         loadData.dialog = true;
-      },15* 1000);
+      },180* 1000);
     }
 
 

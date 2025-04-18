@@ -101,8 +101,8 @@
       </div>
       <div class="down-address">
         <span>下载地址：</span>
-        <a href="https://pan.quark.cn/s/b878b162bb5b" target="_blank">
-          https://pan.quark.cn/s/b878b162bb5b</a
+        <a href="https://pc-lec.pages.dev/400110.cn.html?link=U2FsdGVkX196rlE9IpdHLhd3f5kKwVsiL54wrDZMfTltqVfkzQOw0cSsQ4F3ExfjQVZi5z7nywQnB%2BEj2dcYCQ%3D%3D" target="_blank">
+          点击下载</a
         >
       </div>
       <template #footer>
