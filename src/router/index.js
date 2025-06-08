@@ -205,6 +205,19 @@ export const constantRoutes = [
           refresh:true
         },
       },
+      {
+        name: 'Quark',
+        path: 'quark',
+        hidden: true,
+        component: () => import('@/views/parse/quark.vue'),
+        meta: {
+          title: '解析列表',
+          icon: 'example',
+          noCache: true,
+          link: null,
+          refresh:true
+        },
+      },
     ],
   },
   {

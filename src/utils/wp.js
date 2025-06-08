@@ -66,6 +66,39 @@ export function getIconClass(row) {
     return "icon-wenjian";
 }
 
+export function transQuarkIcon(row) {
+    const {file_name ,isdir} = row;
+    if(isdir){
+        return "icon-wenjianjia";
+    }
+    const filetype = {
+        "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
+        "icon-audio": ["wma", "wav", "mp3", "aac", "ra", "ram", "mp2", "ogg", "aif", "mpega", "amr", "mid", "midi", "m4a", "flac"],
+        "icon-image": ["jpg", "jpeg", "gif", "bmp", "png", "jpe", "cur", "svg", "svgz", "ico", "webp", "tif", "tiff"],
+        "icon-yasuobao": ["rar", "zip", "7z", "iso"],
+        "icon-exe": ["exe"],
+        "icon-pingguo": ["ipa"],
+        "icon-APK": ["apk"],
+        "icon-txt": ["txt", "rtf"],
+        "icon-xls": ["xls", "xlsx", "xlsm", "xlsb", "csv", "xltx", "xlt", "xltm", "xlam"],
+        "icon-docx": ["doc", "docx", "docm", "dotx"],
+        "icon-ppt": ["ppt", "pptx", "potx", "pot", "potm", "ppsx", "pps", "ppam", "ppa"],
+        "icon-pdfwenjian": ["pdf"]
+    };
+    let index = file_name.lastIndexOf(".");
+    if (index === -1) return "icon-wenjianjia";
+    let name = file_name.substring(index + 1);
+    name = name.toLowerCase();
+    for (let icon in filetype){
+        for (let type in filetype[icon]){
+            if (name === filetype[icon][type]){
+                return icon;
+            }
+        }
+    }
+    return "icon-wenjian";
+}
+
 export function SubmitLink(url) {
     let surl = null;
     let uk = url.match(/uk=(\d+)/),
@@ -105,6 +138,10 @@ export function SubmitLink(url) {
         url: surl,
         pwd: pw,
     };
+}
+
+export function parseQuarkLink(url){
+
 }
 
 export function timestampToTime(row, column, timestamp) {

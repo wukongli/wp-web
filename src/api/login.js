@@ -176,3 +176,30 @@ export function getCourseByType(type) {
   });
 }
 
+export function getSToken(data){
+  return request({
+    url: '/quark/getToken',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function getQuarkFileList(data){
+  return request({
+    url: '/quark/getList',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function quarkTransfer(data){
+  return request({
+    url: '/quark/transfer',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+

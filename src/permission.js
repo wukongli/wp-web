@@ -22,6 +22,7 @@ const whiteList = [
   '/front/front/interview',
   '/parse/login',
   '/parse/index',
+  '/parse/quark',
   '/401',
   '/video/list',
   '/video/vip',

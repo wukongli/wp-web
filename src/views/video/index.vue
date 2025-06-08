@@ -6,8 +6,9 @@
         </div>
         <div class="content">
           <div class="top">
-<!--            <div class="hint">如果播放卡顿可以切换线路！</div>-->
-            <a class="hint" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank">4K,1080P,更多资源，点击前往观看</a>
+            <el-link style="font-size: 20px;margin-top:10px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">4K、1080P、更多资源、点击前往观看</el-link>
+            <el-link style="font-size: 20px; margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" target="_blank" type="primary">夸克网盘不限速下载教程</el-link>
+            <el-link style="font-size: 20px;margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" type="success">百度网盘不限速下载教程</el-link>
             <div class="right">
               <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">
                 <el-option
@@ -37,7 +38,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth';
 import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
-const selectValue = ref('https://play.xiaomianyang.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -50,7 +51,7 @@ const loadData = reactive({
 })
 const options = [
   {
-    value: 'https://play.xiaomianyang.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
+    value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
   {
@@ -97,7 +98,7 @@ onMounted(() => {
   margin: auto;
   height:calc(100vh - 84px);
   .qr-hint {
-    margin-top: 20px;
+    margin-top: 30px;
     text-align: center;
     font-size: 20px;
     font-weight: bold;
@@ -108,7 +109,7 @@ onMounted(() => {
 
 .video-header{
   width: 70%;
-  margin: 5px auto 0;
+  margin: 10px auto 0;
   height: 40px;
   border-radius: 50px;
   padding-left: 20px;
@@ -142,18 +143,18 @@ onMounted(() => {
 
 .content{
   width: 70%;
-  margin:10px auto 0;
+  margin:20px auto 0;
   box-shadow: 0 0 5px #1c93d8;
   //border-radius: 50px;
   .top{
-    height: 40px;
+    height: 50px;
     //border-radius: 50px;
     font-weight: bold;
+    font-size: 20px;
     .left{
       float: left;
       margin-left: 10px;
-      line-height: 40px;
-
+      line-height: 50px;
 
     }
     .hint{

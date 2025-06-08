@@ -45,6 +45,11 @@
           <dict-tag :options="sys_vip_type" :value="scope.row.status" />
         </template>
       </el-table-column>
+      <el-table-column label="网盘类型" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="pan_type" :value="scope.row.panType" />
+        </template>
+      </el-table-column>
       <el-table-column label="解析次数" align="center" prop="count" />
       <el-table-column label="解析大小" align="center" prop="size" :formatter="parseFilesize" />
       <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
@@ -116,8 +121,11 @@
         <el-form-item label="cookie" prop="cookie">
           <el-input v-model="form.cookie" placeholder="请输入cookie" />
         </el-form-item>
-        <el-form-item label="status" prop="status">
+        <el-form-item label="状态" prop="status">
           <el-input v-model="form.status" placeholder="0正常1停用" />
+        </el-form-item>
+        <el-form-item label="网盘类型" prop="status">
+          <el-input v-model="form.panType" placeholder="0百度网盘1夸克网盘" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -145,7 +153,7 @@ import {getUser} from "@/api/system/user";
 import {getFilesize, parseFilesize, userKey} from "@/utils/wp";
 
 const { proxy } = getCurrentInstance();
-const { sys_vip_type } = proxy.useDict('sys_vip_type');
+const { sys_vip_type ,pan_type} = proxy.useDict('sys_vip_type','pan_type');
 
 const postList = ref([]);
 const open = ref(false);
@@ -228,7 +236,8 @@ function handleUpdate(row) {
       cookie: row.cookie,
       name: row.name,
       status:row.status,
-      id:row.id
+      id:row.id,
+      panType:row.panType
     };
 
 }

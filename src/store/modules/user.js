@@ -9,7 +9,8 @@ import {
     getCode,
     loginNoPwd,
     getCourseByType, delCode, getInfoByUserKey,
-    tryDownUrl, parseLinkVisit
+    tryDownUrl, parseLinkVisit,
+    getSToken,getQuarkFileList,quarkTransfer
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -217,6 +218,39 @@ const useUserStore = defineStore('user', {
       tryDown(data){
           return new Promise((resolve, reject) => {
               tryDownUrl(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      getToken(data){
+          return new Promise((resolve, reject) => {
+              getSToken(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      getQuarkList(data){
+          return new Promise((resolve, reject) => {
+              getQuarkFileList(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      quarkTransfer(data){
+          return new Promise((resolve, reject) => {
+              quarkTransfer(data)
                   .then((res) => {
                       resolve(res);
                   })

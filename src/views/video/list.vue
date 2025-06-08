@@ -28,7 +28,7 @@
             <img class="qr-code" :src="qrCode" alt="" />
       <div class="qr-hint">
 <!--        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>-->
-        <div>获得完整观看权限地址，以及移动端APP，扫一扫开通权限！</div>
+        <div>获得完整观看地址，支持移动端APP,TV端APP，联系管理员开通权限！</div>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -134,40 +134,18 @@ onMounted(() => {
    loadData.browseDia = true;
   } else {
 
-    const token = getToken();
-
-    if(token){
-      setInterval(() => {
-        const date1 = moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss");
-        const date2 = moment().format("YYYY-MM-DD HH:mm:ss")
-        if(date1 < date2){
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          } else if (document.mozCancelFullScreen) { /* Firefox */
-            document.mozCancelFullScreen();
-          } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-            document.webkitExitFullscreen();
-          } else if (document.msExitFullscreen) { /* IE/Edge */
-            document.msExitFullscreen();
-          }
-          loadData.dialog = true;
-        }
-
-      },180* 1000);
-    }else{
-      setInterval(() => {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) { /* Firefox */
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { /* IE/Edge */
-          document.msExitFullscreen();
-        }
-        loadData.dialog = true;
-      },180* 1000);
-    }
+    setInterval(() => {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) { /* Firefox */
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE/Edge */
+        document.msExitFullscreen();
+      }
+      loadData.dialog = true;
+    },10* 1000);
 
 
   }

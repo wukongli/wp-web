@@ -3,10 +3,10 @@
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
-          iconName="icon-fanhui"
-          width="30px"
-          height="30px"
-          size="30"
+            iconName="icon-fanhui"
+            width="30px"
+            height="30px"
+            size="30"
         ></MySvg>
         <span style="margin-left: 15px">{{ loadData.rootBackTitle }}</span>
       </div>
@@ -15,13 +15,13 @@
       </div>
     </header>
     <el-button
-      style="margin: 10px 0"
-      type="primary"
-      plain
-      icon="UploadFilled"
-      :disabled="multiple"
-      @click="handleParse"
-      >批量解析</el-button
+        style="margin: 10px 0"
+        type="primary"
+        plain
+        icon="UploadFilled"
+        :disabled="multiple"
+        @click="handleParse"
+    >批量解析</el-button
     >
     <el-button
         style="margin-left: 20px"
@@ -33,36 +33,36 @@
     <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
     <div id="content">
       <el-table
-        v-loading="loadData.tableLoading"
-        element-loading-text="数据正在加载中..."
-        :data="loadData.tableData"
-        height="calc(100vh - 200px)"
-        style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
-        class="wp-table"
-        @selection-change="handleSelectionChange"
+          v-loading="loadData.tableLoading"
+          element-loading-text="数据正在加载中..."
+          :data="loadData.tableData"
+          height="calc(100vh - 200px)"
+          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
+          class="wp-table"
+          @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column
-          min-width="280px"
-          prop="server_filename"
-          label="文件名"
+            min-width="280px"
+            prop="file_name"
+            label="文件名"
         >
           <template #default="scope">
             <div
-              @click="parseList(scope.row)"
-              style="display: flex; align-items: center"
+                @click="parseList(scope.row)"
+                style="display: flex; align-items: center"
             >
-              <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <MySvg :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
               <span style="margin-left: 10px">{{
-                scope.row.server_filename
-              }}</span>
+                  scope.row.file_name
+                }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column
-          prop="server_mtime"
-          :formatter="timestampToTime"
-          label="修改时间"
+            prop="updated_at"
+            :formatter="timestampToTime"
+            label="修改时间"
         />
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
@@ -74,17 +74,17 @@
         <el-table-column min-width="100px" label="操作">
           <template #default="scope">
             <el-button
-              @click="vipDownLoad(scope.row)"
-              v-if="!parseInt(scope.row.isdir) && !getToken()"
-              :type="'primary'"
-              >快速下载</el-button
+                @click="vipDownLoad(scope.row)"
+                v-if="!scope.row.dir && !getToken()"
+                :type="'primary'"
+            >快速下载</el-button
             >
             <el-button
-              v-if="!parseInt(scope.row.isdir)"
-              :type="scope.row.status == 2 ? 'danger' : 'primary'"
-              @click="downLoad(scope.row)"
-              :disabled="scope.row.disable"
-              :loading="scope.row.loading"
+                v-if="!scope.row.dir"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
+                @click="downLoad(scope.row)"
+                :disabled="scope.row.disable"
+                :loading="scope.row.loading"
             >
               <span v-if="scope.row.status === 0">下 载</span>
               <span v-if="scope.row.status === 1">下载中</span>
@@ -107,14 +107,14 @@
       </div>
       <div class="down-address">
         <span>下载地址：</span>
-        <a href="https://pc-lec.pages.dev/400110.cn.html?link=U2FsdGVkX196rlE9IpdHLhd3f5kKwVsiL54wrDZMfTltqVfkzQOw0cSsQ4F3ExfjQVZi5z7nywQnB%2BEj2dcYCQ%3D%3D" target="_blank">
+        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">
           点击下载</a
         >
       </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.dialogVisible = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -122,23 +122,23 @@
     <!-- 扫描获取验证码弹窗 -->
     <el-dialog width="40%" height="300px" title="提示" v-model="loadData.WeCharVisible">
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
+      <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <el-form
-        ref="codeRef"
-        :model="form"
-        :rules="codeRules"
+          ref="codeRef"
+          :model="form"
+          :rules="codeRules"
       >
         <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-<!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
-<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
+      <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
+      <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-            >解 析</el-button
+          >解 析</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -148,11 +148,11 @@
     </el-dialog>
     <!-- 无限制下载 -->
     <el-dialog title="提示" v-model="loadData.noLimit" width="40%">
-      <div class="qr-title">{{ loadData.item.server_filename }}</div>
+      <div class="qr-title">{{ loadData.item.file_name }}</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="noLimit"
-            >解 析</el-button
+          >解 析</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -164,7 +164,7 @@
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
-      <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
+      <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
       </div>
@@ -172,7 +172,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通快速下载</a></el-button>
-<!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
+          <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -184,7 +184,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.errorDia = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -196,7 +196,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.maxNum = false"
-            >确 定</el-button
+          >确 定</el-button
           >
         </span>
       </template>
@@ -220,7 +220,7 @@ import {
   generateRandomLetters,
   getFilesize,
   getIconClass,
-  timestampToTime,
+  timestampToTime, transQuarkIcon,
   userKey,
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
@@ -240,6 +240,7 @@ const form = reactive({
 const isSending = ref(false);
 const multiple = ref(true);
 const fsIds = ref([]);
+const fTokenId = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
 const loadData = reactive({
@@ -278,11 +279,45 @@ const loadData = reactive({
 onBeforeRouteLeave((to, from) => {
   proxy.$tab.closeOpenPage();
 });
-function getList() {
-  // const userCode = Cookies.get('code');
-  const data = Object.assign({ index: 0 }, route.query);
-  parseCopyLink(data);
+// function getList() {
+//   const data = Object.assign({ index: 0 }, route.query);
+//   parseQuark();
+// }
+async function parseQuark(params){
+  loadData.tableLoading = true;
+  let req;
+  if(params.pid){
+      req = {
+      pwd_id:route.query.shorturl,
+      pdir_fid:params.pid,
+    }
+  }else{
+    console.log(loadData);
+    req = {
+      pwd_id:route.query.shorturl,
+    }
+  }
+
+  await userStore
+      .getQuarkList(req)
+      .then((data) => {
+        loadData.tableLoading = false;
+        if(data.code === 200){
+          console.log(data)
+          data.data.list.forEach((item) => {
+            // 0 下载，1，下载中
+            item.status = 0;
+          });
+          loadData.tableData = data.data.list;
+        }
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
 }
+
+
+
 const codeRules = {
   code: [{ required: true, trigger: 'blur', message: '请输入验证码' }],
 };
@@ -294,18 +329,12 @@ function goToIndex() {
 }
 
 function parseList(item) {
-  const { isdir, path } = item;
-  if (parseInt(isdir) === 1) {
-    loadData.tableLoading = true;
-    const data = {
-      dir: path,
-      root: '0', // 1 文件夹，0 文件
-      shorturl: loadData.query.shorturl,
-      pwd: loadData.query.pwd,
-      index: loadData.parseLinkParams.index,
-      // code:Cookies.get("code")
-    };
-    parseCopyLink(data);
+  console.log(item)
+  const {fid,dir} = item;
+  if(dir){
+    parseQuark({
+      pid:fid
+    });
   }
 }
 function parseCopyLink(params) {
@@ -319,36 +348,36 @@ function parseCopyLink(params) {
   }
   // 获取文件列表
   userStore
-    .parseCopyLink(params)
-    .then((data) => {
-      loadData.tableLoading = false;
-      if (data.code === 200) {
-        if (parseInt(data.data.errno) === 0) {
-          const list = data.data.data.list;
-          const title = data.data.data.title;
-          loadData.bread = title;
-          // const code = Cookies.get('code');
-          list.forEach((item) => {
-            // 0 下载，1，下载中
-            item.status = 0;
-            // if (parseInt(item.size) > loadData.fileSize) {
-            //   item.disable = true;
-            // }
-          });
-          loadData.tableData = list;
-          loadData.parseLinkParams.seckey = data.data.data.seckey;
-          loadData.parseLinkParams.shareid = data.data.data.shareid;
-          loadData.parseLinkParams.uk = data.data.data.uk;
-        } else {
-          loadData.limitSpeedVisible = true;
-          return;
+      .parseCopyLink(params)
+      .then((data) => {
+        loadData.tableLoading = false;
+        if (data.code === 200) {
+          if (parseInt(data.data.errno) === 0) {
+            const list = data.data.data.list;
+            const title = data.data.data.title;
+            loadData.bread = title;
+            // const code = Cookies.get('code');
+            list.forEach((item) => {
+              // 0 下载，1，下载中
+              item.status = 0;
+              // if (parseInt(item.size) > loadData.fileSize) {
+              //   item.disable = true;
+              // }
+            });
+            loadData.tableData = list;
+            loadData.parseLinkParams.seckey = data.data.data.seckey;
+            loadData.parseLinkParams.shareid = data.data.data.shareid;
+            loadData.parseLinkParams.uk = data.data.data.uk;
+          } else {
+            loadData.limitSpeedVisible = true;
+            return;
+          }
         }
-      }
-    })
-    .catch(() => {
-      loadData.tableLoading = false;
-      // loadData.errorDia = true;
-    });
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+        // loadData.errorDia = true;
+      });
 }
 
 function downLoad(item) {
@@ -382,7 +411,7 @@ const onSubmit = () => {
       const params = {
         code: form.code,
         userKey: userKey,
-        fsId: loadData.item.fs_id,
+        fsId: loadData.item.fid,
         version: '1.0.9',
       };
       const result = await testDownLoad();
@@ -397,97 +426,74 @@ const onSubmit = () => {
         return false;
       }
       userStore
-        .getCodeNum(params)
-        .then((res) => {
-          if (res.code === 200) {
-            if (res.data.data == 100) {
-              confirm(loadData.item);
-            }  else if (res.data.data == 60) {
-              setTimeout(() => {
-                isSending.value = false;
-                ElMessage.error('今日解析次数已达上限，请明天再来！');
-              }, 2000);
-            } else if (res.data.data == 50) {
-              setTimeout(() => {
-                isSending.value = false;
-                ElMessage.error(
-                  '验证码错误,一个验证码只能下载一个文件,请重新获取!'
-                );
-              }, 2000);
+          .getCodeNum(params)
+          .then((res) => {
+            if (res.code === 200) {
+              if (res.data.data == 100) {
+                confirm(loadData.item);
+              }  else if (res.data.data == 60) {
+                setTimeout(() => {
+                  isSending.value = false;
+                  ElMessage.error('今日解析次数已达上限，请明天再来！');
+                }, 2000);
+              } else if (res.data.data == 50) {
+                setTimeout(() => {
+                  isSending.value = false;
+                  ElMessage.error(
+                      '验证码错误,一个验证码只能下载一个文件,请重新获取!'
+                  );
+                }, 2000);
+              }
             }
-          }
-        })
-        .catch(() => {
-          isSending.value = false;
-        });
+          })
+          .catch(() => {
+            isSending.value = false;
+          });
     }
   });
 };
 async function confirm(item) {
+  console.log(item);
+  const{fid,share_fid_token} = item;
   item.loading = true;
   item.status = 1;
   item.disable = true;
   const params = {
-    shareid: loadData.parseLinkParams.shareid,
-    uk: loadData.parseLinkParams.uk,
-    randsk: loadData.parseLinkParams.seckey,
-    sekey: loadData.parseLinkParams.seckey,
-    fsId: item.fs_id,
-    fs_ids: [item.fs_id],
-    path: item.server_filename,
-    userKey: userKey,
-    size: item.size,
-    pwd: loadData.query.pwd,
-    surl: loadData.query.shorturl,
-    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
-    dir: loadData.parseLinkParams.dir,
+    pwd_id: route.query.shorturl,
+    fid_list:[fid],
+    // fid_token_list:[share_fid_token]
   };
-  // const token = getToken();
-    userStore
-        .parseLink(params)
-        .then((res) => {
-          if (res.code === 200) {
-            console.log(res);
-            isSending.value = false;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            if (res.data.error_code === 31066) {
-              item.status = 0;
-              ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
-              return;
-            }
-            if(res.data.vip){
-              loadData.url = res.data.data.dlink;
-              loadData.ua = res.data.data.ua;
-            }else{
-              loadData.url = res.data.data.urls[0].url;
-              loadData.ua = res.data.data.ua;
-            }
-            sendToMotrix(item);
-          } else {
-            item.status = 0;
-            item.disable = false;
-            item.loading = false;
-            // loadData.limitSpeedVisible = true;
-          }
-        })
-        .catch(() => {
+  userStore
+      .quarkTransfer(params)
+      .then((res) => {
+        if (res.code === 200) {
+          console.log(res);
+          isSending.value = false;
+          item.loading = false;
+          item.disable = false;
+          res.data.data.data.forEach((data)=>{
+            sendToMotrix(data,res.data.id);
+            item.status = 2;
+          })
+        } else {
           item.status = 0;
           item.disable = false;
           item.loading = false;
-          isSending.value = false;
-          // loadData.errorDia = true;
-        });
+          // loadData.limitSpeedVisible = true;
+        }
+      })
+      .catch(() => {
+        item.status = 0;
+        item.disable = false;
+        item.loading = false;
+        isSending.value = false;
+        // loadData.errorDia = true;
+      });
 }
 
-async function sendToMotrix(item) {
+async function sendToMotrix(data,id) {
   //发送到下载器
-
-
-
-  // 调用API创建任务
-
+  console.log(data);
   fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
@@ -495,118 +501,75 @@ async function sendToMotrix(item) {
     },
     body: JSON.stringify({req:
           {
-            url:loadData.url,
+            url:data.download_url,
             extra:{
               header:{
-                "User-Agent":loadData.ua,
+                "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.0.2 Chrome/100.0.4896.160 Electron/18.3.5.12-a038f7b798 Safari/537.36 Channel/pckk_clouddrive_share_ch",
+                "Cookie":id
               }
             }
           },
-          opt:{
-            extra:{
-              connections:256,
-            }
-          }
+      opt:{
+        extra:{
+          connections:256,
+        }
+      }
     }),
   }).then((resp) => resp.json())
       .then((res) => {
-        item.status = 2;
+        data.satus = 2;
         ElMessage({
-          message: `${item.server_filename}开始下载！`,
+          message: `文件开始下载！`,
           type: 'success',
         });
       }).catch(e=>{
-      })
-  //
-  //
-  // let splitMax = true;
-  // if (!loadData.url.includes('qdall01')) {
-  //   splitMax = false;
-  // }
-  //
-  // const o = {
-  //   id: 'wp',
-  //   method: 'aria2.addUri',
-  //   params: [
-  //     [loadData.url + '&origin=dlna'],
-  //     {
-  //       //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
-  //       'user-agent': loadData.ua,
-  //       split: splitMax ? '100' : '2',
-  //     },
-  //   ],
-  // };
-  //
-  // fetch('http://localhost:16800/jsonrpc', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify(o),
-  // })
-  //   .then((resp) => resp.json())
-  //   .then((res) => {
-  //     item.status = 2;
-  //     ElMessage({
-  //       message: `${item.server_filename}开始下载！`,
-  //       type: 'success',
-  //     });
-  //   });
+  })
 }
 
 function goBack() {
-  if (loadData.routeData.length === 1) {
-    ElMessage.error('当前已是全部文件');
-    return;
-  }
-  if (loadData.routeData.length > 1) {
-    loadData.tableLoading = true;
-    loadData.routeData.pop();
-    const route = loadData.routeData.pop();
-    parseCopyLink(route);
-  }
+  // if (loadData.routeData.length === 1) {
+  //   ElMessage.error('当前已是全部文件');
+  //   return;
+  // }
+  // if (loadData.routeData.length > 1) {
+  //   loadData.tableLoading = true;
+  //   loadData.routeData.pop();
+  //   const route = loadData.routeData.pop();
+  //   parseCopyLink(route);
+  // }
+  parseQuark({pid:false});
 }
 
 // function goIndex(){
 //   router.push({ path: '/login' });
 // }
-function init() {
-  setInterval(()=>{
-    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
-        .then((resp) => resp.json()).then((res)=>{
-      if(res.code === 0){
-        const result = res.data.filter(e=>
-            e.status === "running"
-        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
-        const ids = result.map((e)=>{
-          return `id=${e}`
-        }).join('&')
-        if(ids && ids.length){
-          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
-              .then((resp) => resp.json()).then((res)=>{
-            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
-                .then((resp) => resp.json()).then((res)=>{
-            })
-          })
-        }
-      }
-    })
-  },15000)
+async function init() {
   if (
-    !route.query.shorturl ||
-    !route.query.pwd ||
-    !route.query.dir ||
-    !route.query.root
+      !route.query.shorturl
   ) {
     router.push({ path: '/parse/login' });
     return;
   }
-  loadData.tableLoading = true;
-  // getUserByUserKey();
-  getList();
-  // getDownNum();
+  await initToken();
+  parseQuark({pid:false});
 }
 init();
+
+async function initToken(){
+  const req = {
+    pwd_id:route.query.shorturl,
+    passcode:route.query.pwd,
+  }
+   await userStore
+      .getToken(req)
+      .then((data) => {
+        // if(data.code === 200){
+        // }
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
+}
 
 // function getUserByUserKey(){
 //   userStore.getUserInfo({userKey:userKey}).then((res)=>{
@@ -623,12 +586,12 @@ async function testDownLoad() {
       'Content-Type': 'application/json'
     },
   })
-  .then((resp) => resp.json())
-  .then((res) => {
-    return true;
-  }).catch(e=>{
-    return false;
-  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        return true;
+      }).catch(e=>{
+        return false;
+      })
 }
 function vipDownLoad(item) {
   loadData.item = item;
@@ -645,8 +608,9 @@ function handleSelectionChange(selection) {
     return false;
   }
   selectItem.value = selection;
-  fsIds.value = selection.map((item) => item.fs_id);
-  pathList.value = selection.map((item) => item.server_filename);
+  fsIds.value = selection.map((item) => item.fid);
+  fTokenId.value = selection.map((item) => item.share_fid_token);
+  // pathList.value = selection.map((item) => item.server_filename);
   multiple.value = !selection.length;
 }
 
@@ -666,79 +630,26 @@ async function handleParse() {
     return false;
   }
   loadData.tableLoading = true;
-  for (let i = 0; i < selectItem.value.length; i++) {
-    const params = {
-      shareid: loadData.parseLinkParams.shareid,
-      uk: loadData.parseLinkParams.uk,
-      randsk: loadData.parseLinkParams.seckey,
-      sekey: loadData.parseLinkParams.seckey,
-      userKey:"main",
-      fsId: fsIds.value[i],
-      fs_ids: [fsIds.value[i]],
-      path: pathList.value[i],
-      size:selectItem.value[i].size,
-      pwd: loadData.query.pwd,
-      surl: loadData.query.shorturl,
-      url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
-      dir: loadData.parseLinkParams.dir,
-    };
-    userStore
-        .parseLink(params)
-        .then((res) => {
-          if (res.code === 200) {
-            if(i+1 === selectItem.value.length){
+  const params = {
+    pwd_id: route.query.shorturl,
+    fid_list:fsIds.value,
+    fid_token_list:fTokenId.value
+  };
+  userStore
+      .quarkTransfer(params)
+      .then((res) => {
+        if (res.code === 200) {
+          res.data.data.data.forEach((data,index)=>{
+            sendToMotrix(data,res.data.id);
+            if(index + 1 === fsIds.value.length){
               loadData.tableLoading = false;
             }
-            loadData.tableData.forEach((e) => {
-              if (fsIds.value.includes(e.fs_id)) {
-                e.status = 2;
-                e.disable = true;
-              }
-            });
-            if(res.data.vip){
-              loadData.url = res.data.data.dlink;
-              loadData.ua = res.data.data.ua;
-            }else{
-              loadData.url = res.data.data.urls[0].url;
-              loadData.ua = res.data.data.ua;
-            }
-            fetch('http://127.0.0.1:9999/api/v1/tasks', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                    req:
-                        {
-                          url:loadData.url,
-                          extra:{
-                            header:{
-                              "User-Agent":loadData.ua,
-                            }
-                          }
-                        },
-                    opt:{
-                      extra:{
-                        connections:256,
-                      }
-                    }
-                  },
-              ),
-            }).then((resp) => resp.json())
-                .then((res) => {
-                  ElMessage({
-                    message: `${selectItem.value[i].server_filename}开始下载！`,
-                    type: 'success',
-                  });
-                }).catch(e=>{
-            })
-          }
-        }).catch((res)=>{
-          if(i+1 === selectItem.value.length){
-            loadData.tableLoading = false;
-          }
-        })
-  }
+          })
+        }
+      })
+      .catch(() => {
+        loadData.tableLoading = false;
+      });
 
 }
 </script>

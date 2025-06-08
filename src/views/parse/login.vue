@@ -7,7 +7,7 @@
         class="login-form"
     >
       <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>
-      <h3 v-else class="title">网盘文件加速下载</h3>
+      <h3 v-else class="title">网盘文件加速下载(支持百度网盘,夸克网盘)</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
@@ -126,6 +126,7 @@ const loginForm = ref({
   pwd: '',
   dir: '1',
   root: '1',
+  panType: 0, //0:百度网盘，1：夸克网盘
 });
 const hint = reactive({
   show: false,
@@ -156,13 +157,38 @@ const redirect = ref(undefined);
 //   });
 // }
 function handleBlur() {
-  const { url, pwd } = SubmitLink(loginForm.value.username);
-  loginForm.value.shorturl = url;
-  if(pwd){
-    loginForm.value.pwd = pwd;
+  if(loginForm.value.username.includes("quark")){
+    loginForm.value.panType = 1;
+    const pwdId =  loginForm.value.username.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
+    const info = extractQuarkInfo(loginForm.value.username);
+    loginForm.value.shorturl = pwdId;
+    if(info.password){
+      loginForm.value.pwd = info.password;
+    }
+  }else{
+    loginForm.value.panType = 0;
+    const { url, pwd } = SubmitLink(loginForm.value.username);
+    loginForm.value.shorturl = url;
+    if(pwd){
+      loginForm.value.pwd = pwd;
+    }
   }
   //loginForm.value.password = pwd;
 }
+
+function extractQuarkInfo(text) {
+  const urlRegex = /https?:\/\/pan\.quark\.cn\/s\/[a-z0-9]+/i;
+  const passwordRegex = /提取码[：:]\s*([a-zA-Z0-9]{4})/;
+
+  const urlMatch = text.match(urlRegex);
+  const passwordMatch = text.match(passwordRegex);
+
+  return {
+    url: urlMatch ? urlMatch[0] : null,
+    password: passwordMatch ? passwordMatch[1] : null
+  };
+}
+
 
 async function handleLogin() {
   hint.message = "";
@@ -189,15 +215,26 @@ async function handleLogin() {
       // //过期时间十分钟
       // Cookies.set('code', loginForm.value.code, { expires: 1 });
       // showLogin.value = false;
-      router.push({
-        path: '/parse/index',
-        query: {
-          shorturl: loginForm.value.shorturl,
-          pwd: loginForm.value.pwd,
-          dir: loginForm.value.dir,
-          root: loginForm.value.root
-        },
-      })
+      if(loginForm.value.panType === 0){
+        router.push({
+          path: '/parse/index',
+          query: {
+            shorturl: loginForm.value.shorturl,
+            pwd: loginForm.value.pwd,
+            dir: loginForm.value.dir,
+            root: loginForm.value.root
+          },
+        })
+      }else if(loginForm.value.panType === 1){
+        router.push({
+          path: '/parse/quark',
+          query: {
+            shorturl: loginForm.value.shorturl,
+            pwd: loginForm.value.pwd,
+          },
+        })
+      }
+
     }
   });
 }
