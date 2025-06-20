@@ -1,5 +1,11 @@
 <template>
   <div class="app-container home">
+    <div class="logo">
+      <a href="/source">
+        <img :src="logo" alt="">
+        <span>深度搜索</span>
+      </a>
+    </div>
     <div class="header-search">
       <el-select
           v-model="searchValue"
@@ -31,6 +37,9 @@
     </div>
 
     <div v-if="tagShow" class="tag">
+      <div class="tag-title">
+        <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
+      </div>
       <el-tag
           class="tag-inner"
           size="large"
@@ -49,7 +58,7 @@
         <template #default="{row}">
           <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
           <span style="margin-left: 80px;" @click="goParse(row)">{{
-              row.url.includes("quark") ? '(夸克网盘) ' + row.name : '(百度网盘) '+row.name
+              row.name
             }}</span>
         </template>
       </el-table-column>
@@ -74,7 +83,8 @@
 
   </div>
 </template>
-<script setup name="Pan">
+<script setup name="Source">
+import logo from '@/assets/img/deep.jpg';
 import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/wp";
 import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus';
@@ -137,7 +147,7 @@ function goParse(row){
     const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
     const info = extractQuarkInfo(row.url);
     router.push({
-      path: '/parse/quark',
+      path: '/source/q',
       query: {
         shorturl: pwdId,
         pwd: info.password,
@@ -146,7 +156,7 @@ function goParse(row){
   }else if(row.url.includes("baidu")){
     const { url, pwd } = SubmitLink(row.url);
     router.push({
-      path: '/parse/index',
+      path: '/source/b',
       query: {
         shorturl: url,
         pwd: pwd,
@@ -283,7 +293,7 @@ getTag();
 
 /* 修改选择框宽度 */
 .header-search .el-select {
-  width: 600px!important;
+  width: 40%!important;
 }
 
 /* 修改输入框高度 */
@@ -299,28 +309,65 @@ getTag();
   line-height: 50px!important;
 }
 .home {
-  width: 98%;
+  width: 70%;
   height: calc(100vh - 100px);
   margin: auto;
   font-size: 18px;
 
+  .logo{
 
-  .header-search{
-    width: 90%;
-    height: 50px;
-    margin: 50px auto 0;
-    text-align: center;
+   a{
+     width: 100%;
+     height: 80px;
+     display: flex;
+     align-items: center; /* 垂直居中 */
+     justify-content: center; /* 水平居中 */
+     vertical-align: middle;
+     img{
+       width: 120px;
+       height: 80px;
+     }
+     span{
+       width: 100px!important;
+       height: 80px!important;
+       margin-top: 0;
+       font-size: 20px;
+       font-weight: bold;
+       line-height: 80px;
+     }
+   }
+
 
   }
 
 
+  .header-search{
+    width: 100%;
+    height: 50px;
+    margin: 40px auto 0;
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    vertical-align: middle;
+  }
+
+
   .tag{
-    width: 60%;
+    width: 70%;
     height: 100px;
     margin:50px auto 0;
+    .tag-title{
+      display: flex;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      span{
+        font-size: 30px;
+        font-weight: bold;
+      }
+    }
     .tag-inner{
       margin-left: 20px;
-      margin-top: 10px;
+      margin-top: 20px;
       cursor: pointer;
       /* 基础样式 */
       border: 1px solid var(--el-border-color);

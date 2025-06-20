@@ -233,6 +233,33 @@ export const constantRoutes = [
       },
     ],
   },
+
+  {
+    name:'Source',
+    path: '/source',
+    component: () => import('@/views/parse/pan.vue'),
+    hidden: false,
+    meta: {
+      title: '资源',
+      icon: 'chart',
+      link: null,
+      keepAlive: true, // 需要缓存的页面
+      noRefresh: true // 自定义标识
+    }
+  },
+  {
+    path: '/source/b',
+    component: () => import('@/views/parse/index.vue'),
+    hidden: false,
+  },
+  {
+    path: '/source/q',
+    component: () => import('@/views/parse/quark.vue'),
+    hidden: false,
+  },
+
+
+
   {
     name: 'Video',
     path: '/video',

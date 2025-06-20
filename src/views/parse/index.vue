@@ -1,5 +1,11 @@
 <template>
   <div class="app-container home">
+    <div class="logo">
+      <a href="/source">
+        <img :src="logo" alt="">
+        <span>深度搜索</span>
+      </a>
+    </div>
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
@@ -237,6 +243,7 @@ import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import { Client } from "@gopeed/rest";
+import logo from "@/assets/img/deep.jpg";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -752,10 +759,34 @@ async function handleParse() {
 
 <style scoped lang="scss">
 .home {
-  width: 98%;
+  width: 70%;
   height: calc(100vh - 100px);
   margin: auto;
   font-size: 18px;
+  .logo{
+
+    a{
+      width: 100%;
+      height: 80px;
+      display: flex;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      vertical-align: middle;
+      img{
+        width: 120px;
+        height: 80px;
+      }
+      span{
+        width: 100px!important;
+        height: 80px!important;
+        margin-top: 0;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 80px;
+      }
+    }
+
+  }
   header {
     width: 100%;
     height: 40px;
@@ -763,6 +794,7 @@ async function handleParse() {
     cursor: pointer;
     border: 1px solid #ccc;
     display: flex;
+    margin-top:40px;
     .back-icon {
       height: 30px;
       svg {
