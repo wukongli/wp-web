@@ -187,7 +187,7 @@ export const constantRoutes = [
         meta: {
           title: '下载列表',
           icon: 'example',
-          noCache: false,
+          noCache: true,
           link: null,
           refresh:true
         },
@@ -214,6 +214,19 @@ export const constantRoutes = [
           title: '解析列表',
           icon: 'example',
           noCache: true,
+          link: null,
+          refresh:true
+        },
+      },
+      {
+        name: 'Pan',
+        path: 'pan',
+        hidden: false,
+        component: () => import('@/views/parse/pan.vue'),
+        meta: {
+          title: '网盘资源',
+          icon: 'chart',
+          noCache: false,
           link: null,
           refresh:true
         },

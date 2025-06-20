@@ -6,7 +6,7 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">网盘文件加速下载<span style="color: red;">(赞助版)</span></h3>
+      <h3 v-if="getToken()" class="title">网盘文件加速下载</h3>
       <h3 v-else class="title">网盘文件加速下载(支持百度网盘,夸克网盘)</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->

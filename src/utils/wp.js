@@ -1,4 +1,6 @@
 import { ElMessage } from 'element-plus';
+import moment from 'moment';
+
 export  function getFilesize(row, column, size) {
     if (!size || size === '0') return '';
 
@@ -157,6 +159,36 @@ export function timestampToTime(row, column, timestamp) {
     var m = date.getMinutes() + ':';
     var s = date.getSeconds();
      return Y + M + D + h + m + s;
+}
+
+/**
+ * 将各种格式的时间戳/日期字符串转换为 YYYY-MM-DD
+ * @param {number|string} input 时间戳或日期字符串
+ * @param {boolean} isSeconds 是否为秒级时间戳（默认自动检测）
+ */
+export function formatToYMD(input, isSeconds = null) {
+    // 自动检测时间戳长度
+    if (isSeconds === null && typeof input === 'number') {
+        isSeconds = input < 9999999999; // 小于 9999999999 的认为是秒级
+    }
+
+    return isSeconds
+        ? moment.unix(input).format('YYYY-MM-DD')
+        : moment(input).format('YYYY-MM-DD');
+}
+
+export function formatterTime(row, column, timestamp) {
+    const date = new Date(timestamp);
+    const formattedDate = date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    }).replace(/\//g, '-');
+    return formattedDate;
 }
 
 export function generateRandomLetters(count) {

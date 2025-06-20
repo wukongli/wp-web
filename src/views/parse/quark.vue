@@ -59,11 +59,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
-            prop="updated_at"
-            :formatter="timestampToTime"
-            label="修改时间"
-        />
+        <el-table-column prop="updated_at" label="修改时间">
+          <template #default="{row}">
+            {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
+          </template>
+        </el-table-column>
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
@@ -105,12 +105,12 @@
           https://docs.qq.com/doc/DWnlpY2pkclpuUEFX</a
         >
       </div>
-      <div class="down-address">
-        <span>下载地址：</span>
-        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">
-          点击下载</a
-        >
-      </div>
+<!--      <div class="down-address">-->
+<!--        <span>下载地址：</span>-->
+<!--        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">-->
+<!--          点击下载</a-->
+<!--        >-->
+<!--      </div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.dialogVisible = false"
@@ -209,6 +209,7 @@
 </template>
 
 <script setup name="Index">
+import moment from 'moment';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
@@ -265,7 +266,7 @@ const loadData = reactive({
   noLimit: false,
   errorDia: false,
   // codeNum: '',
-  tableLoading: false,
+  tableLoading: true,
   fileSize: getToken() ? 100698669056 : 3221225472,
   routeData: [],
   rootBackTitle: '全部文件',

@@ -94,9 +94,9 @@ const router = useRouter();
 const { proxy } = getCurrentInstance();
 import {createBy} from "@/utils/wp";
 const loginForm = ref({
-  username: '',
-  password: '',
-  rememberMe: false,
+  username: Cookies.get('username') ? Cookies.get('username') : '',
+  password: Cookies.get('password') ? Cookies.get('password') : '',
+  rememberMe: true,
   code: '',
   uuid: '',
 });

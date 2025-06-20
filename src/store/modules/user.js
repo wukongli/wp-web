@@ -10,7 +10,7 @@ import {
     loginNoPwd,
     getCourseByType, delCode, getInfoByUserKey,
     tryDownUrl, parseLinkVisit,
-    getSToken,getQuarkFileList,quarkTransfer
+    getSToken,getQuarkFileList,quarkTransfer,searchPanData,searchTag,searchNames
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -259,6 +259,42 @@ const useUserStore = defineStore('user', {
                   });
           });
       },
+
+      search(data){
+          return new Promise((resolve, reject) => {
+              searchPanData(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      getTag(data){
+          return new Promise((resolve, reject) => {
+              searchTag(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      searchName(data){
+          return new Promise((resolve, reject) => {
+              searchNames(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+
+
   },
 });
 

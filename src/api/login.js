@@ -203,3 +203,31 @@ export function quarkTransfer(data){
   });
 }
 
+export function searchPanData(data){
+  return request({
+    url: '/wp/search',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+export function searchTag(type) {
+  return request({
+    url: '/wp/getTag',
+    method: 'get',
+    timeout: 20000,
+  });
+}
+
+export function searchNames(data){
+  return request({
+    url: '/wp/getName',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+
+
+
