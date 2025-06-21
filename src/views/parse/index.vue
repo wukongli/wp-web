@@ -232,7 +232,7 @@ import {
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from '@/assets/images/前端.png';
+import qrCode from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
