@@ -83,8 +83,9 @@
 
   </div>
 </template>
-<script setup name="Source">
+<script setup name="Source123">
 import { onActivated, onDeactivated } from 'vue';
+import Cookies from 'js-cookie'
 
 import logo from '@/assets/img/deep.jpg';
 import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/wp";
@@ -103,6 +104,7 @@ const tableShow = ref(false);
 const tagShow = ref(true);
 import useUserStore from '@/store/modules/user';
 import MySvg from "@/components/icon/Svg.vue";
+import useTagsViewStore from "@/store/modules/tagsView";
 const userStore = useUserStore();
 const tableData =  ref([])
 const tag =  ref([])
@@ -114,12 +116,21 @@ const data = reactive({
 })
 
 const { queryParams } = toRefs(data)
-onActivated(() => {
-  console.log('组件被激活，缓存生效');
-});
-onDeactivated(() => {
-  console.log('组件被停用，进入缓存');
-});
+// 在pan.vue中添加所有生命周期日志
+onMounted(() => {
+  const cache = JSON.parse(localStorage.getItem("tableData"))
+  if(cache){
+    tagShow.value  = false;
+    tableShow.value = true;
+    tableData.value = cache._value;
+  }else{
+    getTag();
+  }
+})
+onActivated(() => console.log('activated'))
+onDeactivated(() => console.log('deactivated'))
+
+
 function handleSearch(value){
   loading.value = true;
   tableShow.value  = true;
@@ -129,9 +140,11 @@ function handleSearch(value){
   }
   userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     if(res.code === 200){
-      tableData.value = res.data.sort((a,b)=>
-         b.time - a.time
+      const result = res.data.sort((a,b)=>
+          b.time - a.time
       );
+      tableData.value = result;
+      localStorage.setItem('tableData', JSON.stringify(tableData));
     }
     // total.value = res.data.Memory_get_usage;
     loading.value = false
@@ -202,7 +215,6 @@ function onkeydown(e){
   }
 }
 function handleBlur(e){
-  console.log();
   searchValue.value = e.target.value;
 }
 
@@ -255,13 +267,13 @@ function resetQuery(){
   searchValue.value = "";
   tagShow.value  = true;
   tableShow.value = false;
+  getTag();
 }
 // 根据索引返回Element预设类型
 const getTagType = (index) => {
   const types = ['', 'success', 'warning', 'danger', 'info'];
   return types[index % types.length];
 };
-getTag();
 
 
 </script>

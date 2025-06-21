@@ -235,17 +235,30 @@ export const constantRoutes = [
   },
 
   {
-    name:'Source',
-    path: '/source/index',
-    component: () => import('@/views/parse/pan.vue'),
+    name:'Source1',
+    path: '/source',
     hidden: true,
     meta: {
-      title: '资源',
-      icon: 'chart',
+      // title: '资源',
+      // icon: 'chart',
       link: null,
       keepAlive: true, // 需要缓存的页面
       noCache: false,
-    }
+    },
+    children: [
+      {
+        name: 'Source123',
+        path: 'index',
+        hidden: false,
+        component: () => import('@/views/parse/pan.vue'),
+        meta: {
+          // title: '在线观看',
+          // icon: 'redis-list',
+          noCache: false,
+          link: null,
+          refresh:true
+        },
+      }]
   },
   {
     path: '/source/b',

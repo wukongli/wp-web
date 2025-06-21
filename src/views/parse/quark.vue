@@ -546,8 +546,8 @@ function goBack() {
   //   parseCopyLink(route);
   // }
   // parseQuark({pid:false});
-  router.push({ path: '/source/index' });
-  // router.go(-1); // 使用history模式返回
+  // router.push({ path: '/source/index' });
+  router.go(-1); // 使用history模式返回
 
 }
 

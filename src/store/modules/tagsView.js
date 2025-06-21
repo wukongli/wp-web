@@ -3,7 +3,7 @@ const useTagsViewStore = defineStore(
   {
     state: () => ({
       visitedViews: [],
-      cachedViews: ["Source"],
+      cachedViews: [],
       iframeViews: []
     }),
     actions: {
@@ -28,7 +28,6 @@ const useTagsViewStore = defineStore(
         )
       },
       addCachedView(view) {
-        console.log(view);
         if (this.cachedViews.includes(view.name)) return
         if (!view.meta.noCache) {
           this.cachedViews.push(view.name)
