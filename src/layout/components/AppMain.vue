@@ -5,7 +5,7 @@
         <keep-alive :include="tagsViewStore.cachedViews">
           <component v-if="!route.meta.link" :is="Component" :key="route.path"/>
         </keep-alive>
-      </transition>
+<!--      </transition>-->
     </router-view>
     <iframe-toggle />
   </section>
@@ -16,6 +16,8 @@ import iframeToggle from "./IframeToggle/index"
 import useTagsViewStore from '@/store/modules/tagsView'
 
 const tagsViewStore = useTagsViewStore()
+
+console.log(tagsViewStore);
 </script>
 
 <style lang="scss" scoped>

@@ -569,16 +569,20 @@ async function sendToMotrix(item) {
 }
 
 function goBack() {
-  if (loadData.routeData.length === 1) {
-    ElMessage.error('当前已是全部文件');
-    return;
-  }
-  if (loadData.routeData.length > 1) {
-    loadData.tableLoading = true;
-    loadData.routeData.pop();
-    const route = loadData.routeData.pop();
-    parseCopyLink(route);
-  }
+  // if (loadData.routeData.length === 1) {
+  //   ElMessage.error('当前已是全部文件');
+  //   return;
+  // }
+  // if (loadData.routeData.length > 1) {
+  //   loadData.tableLoading = true;
+  //   loadData.routeData.pop();
+  //   const route = loadData.routeData.pop();
+  //   parseCopyLink(route);
+  // }
+  router.push({ path: '/source/index' });
+  // router.go(-1); // 使用history模式返回
+
+
 }
 
 // function goIndex(){

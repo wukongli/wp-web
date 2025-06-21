@@ -214,7 +214,7 @@
   </div>
 </template>
 
-<script setup name="Index">
+<script setup name="Quark">
 import moment from 'moment';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
@@ -546,7 +546,9 @@ function goBack() {
   //   parseCopyLink(route);
   // }
   // parseQuark({pid:false});
-  router.push({ path: '/source' });
+  router.push({ path: '/source/index' });
+  // router.go(-1); // 使用history模式返回
+
 }
 
 // function goIndex(){

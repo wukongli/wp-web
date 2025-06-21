@@ -28,7 +28,7 @@ const whiteList = [
   '/video/vip',
   '/video/out',
   '/parse/pan',
-  '/source',
+  '/source/index',
   '/source/q',
   '/source/b'
 ];

@@ -84,6 +84,8 @@
   </div>
 </template>
 <script setup name="Source">
+import { onActivated, onDeactivated } from 'vue';
+
 import logo from '@/assets/img/deep.jpg';
 import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/wp";
 import { onMounted } from 'vue'
@@ -112,7 +114,12 @@ const data = reactive({
 })
 
 const { queryParams } = toRefs(data)
-
+onActivated(() => {
+  console.log('组件被激活，缓存生效');
+});
+onDeactivated(() => {
+  console.log('组件被停用，进入缓存');
+});
 function handleSearch(value){
   loading.value = true;
   tableShow.value  = true;
@@ -182,7 +189,6 @@ function extractQuarkInfo(text) {
 
 function getTag(){
   userStore.getTag().then(res=>{
-    console.log(res);
     if(res.code === 200){
       tag.value = res.data.data;
     }

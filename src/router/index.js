@@ -236,15 +236,15 @@ export const constantRoutes = [
 
   {
     name:'Source',
-    path: '/source',
+    path: '/source/index',
     component: () => import('@/views/parse/pan.vue'),
-    hidden: false,
+    hidden: true,
     meta: {
       title: '资源',
       icon: 'chart',
       link: null,
       keepAlive: true, // 需要缓存的页面
-      noRefresh: true // 自定义标识
+      noCache: false,
     }
   },
   {
