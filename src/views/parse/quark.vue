@@ -27,14 +27,14 @@
         icon="UploadFilled"
         :disabled="multiple"
         @click="handleParse"
-    >批量解析</el-button
+    >批量下载</el-button
     >
-    <el-button
-        style="margin-left: 20px"
-        type="primary"
-        plain
-        icon="Promotion"
-    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>
+<!--    <el-button-->
+<!--        style="margin-left: 20px"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="Promotion"-->
+<!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
     <div id="content">
@@ -79,12 +79,12 @@
         <!--        >-->
         <el-table-column min-width="100px" label="操作">
           <template #default="scope">
-            <el-button
-                @click="vipDownLoad(scope.row)"
-                v-if="!scope.row.dir && !getToken()"
-                :type="'primary'"
-            >快速下载</el-button
-            >
+<!--            <el-button-->
+<!--                @click="vipDownLoad(scope.row)"-->
+<!--                v-if="!scope.row.dir && !getToken()"-->
+<!--                :type="'primary'"-->
+<!--            >快速下载</el-button-->
+<!--            >-->
             <el-button
                 v-if="!scope.row.dir"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -144,7 +144,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-          >解 析</el-button
+          >下 载</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -158,7 +158,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="noLimit"
-          >解 析</el-button
+          >下 载</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -183,10 +183,10 @@
       </template>
     </el-dialog>
 
-    <!-- 解析出错弹窗 -->
+    <!-- 下载出错弹窗 -->
     <el-dialog title="提示" v-model="loadData.errorDia" width="40%">
       <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">解析出错了，请联系管理员</div>
+      <div class="qr-hint">下载出错了，请联系管理员</div>
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.errorDia = false"
@@ -442,7 +442,7 @@ const onSubmit = () => {
               }  else if (res.data.data == 60) {
                 setTimeout(() => {
                   isSending.value = false;
-                  ElMessage.error('今日解析次数已达上限，请明天再来！');
+                  ElMessage.error('今日下载次数已达上限，请明天再来！');
                 }, 2000);
               } else if (res.data.data == 50) {
                 setTimeout(() => {
@@ -628,7 +628,7 @@ function handleSelectionChange(selection) {
 async function handleParse() {
   const token = getToken();
   if (!token) {
-    ElMessage.error('批量解析请开通快速下载！');
+    ElMessage.error('批量下载请开通快速下载！');
     return false;
   }
   const result = await testDownLoad();

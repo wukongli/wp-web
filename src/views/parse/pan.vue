@@ -119,10 +119,14 @@ const { queryParams } = toRefs(data)
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
   const cache = JSON.parse(localStorage.getItem("tableData"))
+  tableShow.value = true;
+  loading.value = true;
+  tagShow.value  = false;
   if(cache){
-    tagShow.value  = false;
-    tableShow.value = true;
-    tableData.value = cache._value;
+    setTimeout(()=>{
+      loading.value = false;
+      tableData.value = cache._value;
+    },1000)
   }else{
     getTag();
   }
