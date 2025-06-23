@@ -112,9 +112,10 @@ function handleSearch(value){
   }
   userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     if(res.code === 200){
-      tableData.value = res.data.sort((a,b)=>
-         b.time - a.time
+     const list =  res.data.sort((a,b)=>
+         new Date(b.time) - new Date(a.time)
       );
+      tableData.value = list;
     }
     // total.value = res.data.Memory_get_usage;
     loading.value = false
@@ -172,7 +173,6 @@ function extractQuarkInfo(text) {
 
 function getTag(){
   userStore.getTag().then(res=>{
-    console.log(res);
     if(res.code === 200){
       tag.value = res.data.data;
     }
@@ -186,7 +186,6 @@ function onkeydown(e){
   }
 }
 function handleBlur(e){
-  console.log();
   searchValue.value = e.target.value;
 }
 

@@ -163,7 +163,7 @@
 
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
-      <img class="qr-code" :src="loadData.codeUrl" alt="" />
+      <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
@@ -226,11 +226,14 @@ import {
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from '@/assets/images/yaoyao.png';
+import iron from '@/assets/images/钢铁侠.png';
+import front from '@/assets/images/前端.png';
+import duli from '@/assets/images/独立开发者.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import { Client } from "@gopeed/rest";
+import {onMounted} from 'vue';
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -244,6 +247,8 @@ const fsIds = ref([]);
 const fTokenId = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
+const qrCodeList = ref([iron,front,duli]);
+const qrCode = ref('');
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -273,9 +278,14 @@ const loadData = reactive({
   vipDown: false,
   item: null,
   url: '',
-  codeUrl: qrCode,
   ckId: null,
 });
+
+
+onMounted(() => {
+  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = randomItem;
+})
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
   proxy.$tab.closeOpenPage();
@@ -293,7 +303,6 @@ async function parseQuark(params){
       pdir_fid:params.pid,
     }
   }else{
-    console.log(loadData);
     req = {
       pwd_id:route.query.shorturl,
     }
@@ -304,7 +313,6 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
-          console.log(data)
           data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
@@ -330,7 +338,6 @@ function goToIndex() {
 }
 
 function parseList(item) {
-  console.log(item)
   const {fid,dir} = item;
   if(dir){
     parseQuark({
@@ -454,7 +461,6 @@ const onSubmit = () => {
   });
 };
 async function confirm(item) {
-  console.log(item);
   const{fid,share_fid_token} = item;
   item.loading = true;
   item.status = 1;
@@ -468,7 +474,6 @@ async function confirm(item) {
       .quarkTransfer(params)
       .then((res) => {
         if (res.code === 200) {
-          console.log(res);
           isSending.value = false;
           item.loading = false;
           item.disable = false;
@@ -494,7 +499,6 @@ async function confirm(item) {
 
 async function sendToMotrix(data,id) {
   //发送到下载器
-  console.log(data);
   fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
