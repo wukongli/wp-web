@@ -236,6 +236,7 @@ import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import iron from '@/assets/images/钢铁侠.png';
 import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
+import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
@@ -252,7 +253,7 @@ const multiple = ref(true);
 const fsIds = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([iron,front,duli]);
+const qrCodeList = ref([iron,front,duli,yao]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
