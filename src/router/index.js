@@ -235,41 +235,51 @@ export const constantRoutes = [
   },
 
   {
-    name:'Source1',
+    name:'Source',
     path: '/source',
     hidden: true,
+    component: () => import('@/views/parse/pan.vue'),
     meta: {
       // title: '资源',
       // icon: 'chart',
       link: null,
-      keepAlive: true, // 需要缓存的页面
-      noCache: false,
+      keepAlive: false, // 需要缓存的页面
+      noCache: true,
     },
     children: [
       {
-        name: 'Source123',
-        path: 'index',
+        name: 'Index',
+        path: 'parse/index',
         hidden: false,
-        component: () => import('@/views/parse/pan.vue'),
+        component: () => import('@/views/parse/index.vue'),
         meta: {
-          // title: '在线观看',
-          // icon: 'redis-list',
+          noCache: false,
+          link: null,
+          refresh:true
+        }
+        },
+      {
+        name: 'Quark',
+        path: 'parse/quark',
+        hidden: false,
+        component: () => import('@/views/parse/quark.vue'),
+        meta: {
           noCache: false,
           link: null,
           refresh:true
         },
       }]
   },
-  {
-    path: '/source/b',
-    component: () => import('@/views/parse/index.vue'),
-    hidden: false,
-  },
-  {
-    path: '/source/q',
-    component: () => import('@/views/parse/quark.vue'),
-    hidden: false,
-  },
+  // {
+  //   path: '/source/b',
+  //   component: () => import('@/views/parse/index.vue'),
+  //   hidden: false,
+  // },
+  // {
+  //   path: '/source/q',
+  //   component: () => import('@/views/parse/quark.vue'),
+  //   hidden: false,
+  // },
 
 
 

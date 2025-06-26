@@ -13,7 +13,8 @@ export  function getFilesize(row, column, size) {
     if (size < Math.pow(num, 4)){
         let fileSize = (size / Math.pow(num, 3)).toFixed(2);
         if(fileSize > 3){
-            return fileSize + 'G' + ` ( 文件大于3G请使用快速下载 )`; //G
+            // return fileSize + 'G' + ` ( 文件大于3G请使用快速下载 )`; //G
+            return fileSize + 'G'; //G
         }
         return fileSize + 'G'; //G
     }

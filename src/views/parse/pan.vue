@@ -1,9 +1,15 @@
 <template>
   <div class="app-container home">
+<!--    <div class="floewr left">-->
+<!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
+<!--    </div>-->
+<!--    <div class="floewr right">-->
+<!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
+<!--    </div>-->
     <div class="logo">
       <a href="/source">
         <img :src="logo" alt="">
-        <span>深度搜索</span>
+        <span>深度搜索(全网资源教程搜索)</span>
       </a>
     </div>
     <div class="header-search">
@@ -16,7 +22,6 @@
           placeholder="请输入关键词"
           :remote-method="remoteMethod"
           :loading="loading"
-          @keydown="onkeydown"
           @blur="handleBlur"
          >
         <el-option
@@ -37,6 +42,16 @@
     </div>
 
     <div v-if="tagShow" class="tag">
+      <el-tag
+      class="tag-header"
+      size="large"
+      v-for="(item, index) in tagHeader"
+      :key="item"
+      effect="dark"
+      @click="handleSearch(item)"
+      >
+      {{ item }}
+      </el-tag>
       <div class="tag-title">
         <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
       </div>
@@ -54,7 +69,7 @@
       </el-tag>
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column prop="name" label="名字">
+      <el-table-column prop="name" show-overflow-tooltip label="名字">
         <template #default="{row}">
           <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
           <span style="margin-left: 80px;" @click="goParse(row)">{{
@@ -80,21 +95,22 @@
           @current-change="getList"
           class="custom-pagination"
       />
-
+    <!-- 子组件将在此处渲染 -->
+      <router-view></router-view>
   </div>
-</template>
-<script setup name="Source123">
-import { onActivated, onDeactivated } from 'vue';
-import Cookies from 'js-cookie'
 
+</template>
+<script setup name="Source">
+import { onActivated, onDeactivated,watch } from 'vue';
 import logo from '@/assets/img/deep.jpg';
 import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/wp";
 import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
 const router = useRouter();
+
 import { Search } from '@element-plus/icons-vue'
-const list = ref([])
+const tagHeader = ref(["少儿","小学","初中","高中","大学","四六级","考研","考公","教资","英语","电影","动漫","美剧","软件","电子书","编程","剪辑","设计"])
 const options = ref([])
 const searchValue = ref('');
 const selectLoading = ref(false)
@@ -105,6 +121,8 @@ const tagShow = ref(true);
 import useUserStore from '@/store/modules/user';
 import MySvg from "@/components/icon/Svg.vue";
 import useTagsViewStore from "@/store/modules/tagsView";
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const userStore = useUserStore();
 const tableData =  ref([])
 const tag =  ref([])
@@ -115,25 +133,46 @@ const data = reactive({
   }
 })
 
+// 静态资源导入
+import DarkFlowerImg from './img/flower-dark.png'
+import LightFlowerImg from './img/flower-light.png'
+
+// 组合式函数导入
+import { useTheme } from './hooks/useTheme'
+// 使用主题管理
+const { isLightTheme } = useTheme();
 const { queryParams } = toRefs(data)
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
-  const cache = JSON.parse(localStorage.getItem("tableData"))
-  tableShow.value = true;
-  loading.value = true;
-  tagShow.value  = false;
+  const cache = sessionStorage.getItem("tableData")
+  if(route.path === "/source/parse/quark" || route.path === "/source/parse/index"){
+    tableData.value = JSON.parse(cache);
+    return;
+  }
   if(cache){
+    tableShow.value = true;
+    loading.value = true;
+    tagShow.value  = false;
     setTimeout(()=>{
       loading.value = false;
-      tableData.value = cache._value;
+      tableData.value = JSON.parse(cache);
     },1000)
   }else{
+    tagShow.value  = true;
     getTag();
   }
 })
-onActivated(() => console.log('activated'))
-onDeactivated(() => console.log('deactivated'))
-
+watch(() => route.path, (newPath, oldPath) => {
+  if(oldPath === "/source/parse/quark" || oldPath === "/source/parse/index"){
+    tableShow.value = true;
+  }else {
+    tableShow.value = false;
+    tagShow.value  = false;
+  }
+  // if(newPath === "/source/parse/quark" || newPath === "/source/parse/index"){
+  //
+  // }
+}, { immediate: true });
 
 function handleSearch(value){
   loading.value = true;
@@ -145,10 +184,10 @@ function handleSearch(value){
   userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     if(res.code === 200){
       const result = res.data.sort((a,b)=>
-          b.time - a.time
+          new Date(b.time) - new Date(a.time)
       );
       tableData.value = result;
-      localStorage.setItem('tableData', JSON.stringify(tableData));
+      sessionStorage.setItem('tableData', JSON.stringify(result));
     }
     // total.value = res.data.Memory_get_usage;
     loading.value = false
@@ -163,6 +202,7 @@ function getList() {
 }
 
 function goParse(row){
+   tableShow.value = false;
   if(row.url.includes("quark")){
     if(row.url.length <= 23){
       ElMessage.error("文件已失效！");
@@ -171,7 +211,7 @@ function goParse(row){
     const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
     const info = extractQuarkInfo(row.url);
     router.push({
-      path: '/source/q',
+      path: '/source/parse/quark',
       query: {
         shorturl: pwdId,
         pwd: info.password,
@@ -180,7 +220,7 @@ function goParse(row){
   }else if(row.url.includes("baidu")){
     const { url, pwd } = SubmitLink(row.url);
     router.push({
-      path: '/source/b',
+      path: '/source/parse/index',
       query: {
         shorturl: url,
         pwd: pwd,
@@ -212,12 +252,12 @@ function getTag(){
   })
 }
 
-function onkeydown(e){
-  if( e.target.value.length <=1){
-    tagShow.value = true;
-    tableShow.value = false;
-  }
-}
+// function onkeydown(e){
+//   if( e.target.value.length <=1){
+//     tagShow.value = true;
+//     tableShow.value = false;
+//   }
+// }
 function handleBlur(e){
   searchValue.value = e.target.value;
 }
@@ -235,7 +275,7 @@ const remoteMethod = (query) => {
           return item.toLowerCase().includes(query.toLowerCase())
         })
 
-
+        console.log(values);
         options.value =  values.map((item)=>{
           return {
             value:item
@@ -268,10 +308,14 @@ function fixJsonString(str) {
 }
 
 function resetQuery(){
-  searchValue.value = "";
-  tagShow.value  = true;
-  tableShow.value = false;
-  getTag();
+  // searchValue.value = "";
+  // tagShow.value  = true;
+  // tableShow.value = false;
+  // sessionStorage.removeItem("tableData");
+  // getTag();
+  // router.push({ path: '/source' });
+  sessionStorage.removeItem("tableData");
+  window.location.href = "/source";
 }
 // 根据索引返回Element预设类型
 const getTagType = (index) => {
@@ -330,37 +374,63 @@ const getTagType = (index) => {
   height: 50px!important;
   line-height: 50px!important;
 }
+//.app-container{
+//  width: 100%;
+//  height: 100%;
+//  background-color: var(--pad-background-color);
+//  color: var(--pad-text-color);
+//  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+//
+//}
 .home {
-  width: 70%;
+  width: 75%;
   height: calc(100vh - 100px);
+  //height:auto;
   margin: auto;
   font-size: 18px;
 
-  .logo{
 
-   a{
-     width: 100%;
-     height: 80px;
-     display: flex;
-     align-items: center; /* 垂直居中 */
-     justify-content: center; /* 水平居中 */
-     vertical-align: middle;
-     img{
-       width: 120px;
-       height: 80px;
-     }
-     span{
-       width: 100px!important;
-       height: 80px!important;
-       margin-top: 0;
-       font-size: 20px;
-       font-weight: bold;
-       line-height: 80px;
-     }
-   }
-
-
+  //.floewr {
+  //  position: absolute;
+  //  top: 0;
+  //  height: 100%;
+  //  z-index: 0;
+  //  opacity: 0.8;
+  //  img {
+  //    height: 100%;
+  //    filter: blur(200px) brightness(150%);
+  //  }
+  //  &.left {
+  //    left: 0;
+  //    transform: rotate(180deg);
+  //  }
+  //  &.right {
+  //    right: 0;
+  //  }
+  //}
+  a{
+    width: auto;
+    height: 80px;
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    vertical-align: middle;
+    img{
+      width: 120px;
+      height: 80px;
+    }
+    span{
+      width: auto;
+      height: 80px!important;
+      margin-top: 0;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 80px;
+    }
   }
+
+
+}
 
 
   .header-search{
@@ -377,7 +447,27 @@ const getTagType = (index) => {
   .tag{
     width: 70%;
     height: 100px;
-    margin:50px auto 0;
+    margin:30px auto 0;
+    .tag-header{
+      margin-left: 20px;
+      margin-top: 20px;
+      cursor: pointer;
+      width: 100px!important;
+      height: 40px!important;
+      font-size: 15px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      /* 过渡效果 */
+      transition: all 0.3s ease;
+    }
+    .tag-header:hover {
+      transform: scale(1.55);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+
+      /* 晃动动画 */
+      animation: shake 0.5s ease infinite;
+    }
     .tag-title{
       display: flex;
       align-items: center; /* 垂直居中 */
@@ -422,11 +512,10 @@ const getTagType = (index) => {
     font-weight: bold;
     height: 70%;
     width: 100%;
-    margin-top:25px
+    margin-top:25px;
   }
   .el-pagination {
-    margin-top:50px;
-    margin-left: 100px;
+    margin-top:3%;
+    margin-left: 5%;
   }
-}
 </style>

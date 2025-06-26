@@ -1,11 +1,11 @@
 <template>
-  <div class="app-container home">
-    <div class="logo">
-      <a href="/source">
-        <img :src="logo" alt="">
-        <span>深度搜索</span>
-      </a>
-    </div>
+  <div class="app-container app1">
+<!--    <div class="logo">-->
+<!--      <a href="/source/index">-->
+<!--        <img :src="logo" alt="">-->
+<!--        <span>深度搜索</span>-->
+<!--      </a>-->
+<!--    </div>-->
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
@@ -37,19 +37,20 @@
 <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
-    <div id="content">
       <el-table
           v-loading="loadData.tableLoading"
           element-loading-text="数据正在加载中..."
           :data="loadData.tableData"
-          height="calc(100vh - 200px)"
-          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
+          max-height="100%"
+          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600;overflow: auto;"
           class="wp-table"
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column
+            show-overflow-tooltip
             min-width="280px"
+            max-width="500px"
             prop="file_name"
             label="文件名"
         >
@@ -99,7 +100,6 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
@@ -276,7 +276,7 @@ const loadData = reactive({
   tableLoading: true,
   fileSize: getToken() ? 100698669056 : 3221225472,
   routeData: [],
-  rootBackTitle: '全部文件',
+  rootBackTitle: '返回',
   vipDown: false,
   item: null,
   url: '',
@@ -546,8 +546,8 @@ function goBack() {
   //   parseCopyLink(route);
   // }
   // parseQuark({pid:false});
-  // router.push({ path: '/source/index' });
-  router.go(-1); // 使用history模式返回
+  router.push({ path: '/source'});
+  // router.go(-1); // 使用history模式返回
 
 }
 
@@ -666,13 +666,13 @@ async function handleParse() {
 </script>
 
 <style scoped lang="scss">
-.home {
-  width: 70%;
-  height: calc(100vh - 100px);
+.app1 {
+  width: 100%;
+  //height: calc(100vh - 100px);
   margin: auto;
   font-size: 18px;
+  overflow: auto;
   .logo{
-
     a{
       width: 100%;
       height: 80px;
@@ -702,7 +702,7 @@ async function handleParse() {
     font-weight: bold;
     cursor: pointer;
     border: 1px solid #ccc;
-    margin-top:40px;
+    margin-top:25px;
     display: flex;
     .back-icon {
       height: 30px;

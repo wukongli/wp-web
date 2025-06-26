@@ -28,9 +28,11 @@ const whiteList = [
   '/video/vip',
   '/video/out',
   '/parse/pan',
-  '/source/index',
+  '/source',
   '/source/q',
-  '/source/b'
+  '/source/b',
+  '/source/parse/quark',
+  '/source/parse/index',
 ];
 
 router.beforeEach((to, from, next) => {

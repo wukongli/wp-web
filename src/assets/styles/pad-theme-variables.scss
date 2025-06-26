@@ -1,0 +1,33 @@
+// 主题颜色变量
+
+:root {
+	// 默认暗色主题
+	--pad-background-color: #000000;
+	--pad-text-color: #ffffff;
+	--pad-card-background: rgba(26, 26, 26, 0.5);
+	--pad-card-border: 1px solid rgba(255, 255, 255, 0.1);
+	--pad-card-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	--pad-control-btn-bg: rgba(51, 51, 51, 0.8);
+	--pad-control-btn-color: #ffffff;
+	--pad-control-btn-active-bg: rgba(255, 255, 255, 0.75);
+	--pad-control-btn-active-color: #000000;
+	--pad-status-text-color: rgba(255, 255, 255, 0.85);
+	--pad-divider-color: rgba(255, 255, 255, 0.5);
+	--pad-select-hover-bg: rgba(255, 255, 255, 0.15);
+}
+
+// 亮色主题
+[data-theme='light'] {
+	--pad-background-color: #fafafa;
+	--pad-text-color: #333333;
+	--pad-card-background: rgba(255, 255, 255, 0.5);
+	--pad-card-border: 1px solid rgba(230, 230, 230, 0.8);
+	--pad-card-shadow: 0 4px 15px rgba(230, 230, 230, 0.6);
+	--pad-control-btn-bg: rgba(230, 230, 230, 0.5);
+	--pad-control-btn-color: #333333;
+	--pad-control-btn-active-bg: rgba(0, 0, 0, 0.65);
+	--pad-control-btn-active-color: #ffffff;
+	--pad-status-text-color: rgba(0, 0, 0, 0.65);
+	--pad-divider-color: rgba(0, 0, 0, 0.3);
+	--pad-select-hover-bg: rgba(230, 230, 230, 0.5);
+}
