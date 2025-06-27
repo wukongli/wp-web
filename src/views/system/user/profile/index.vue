@@ -30,8 +30,9 @@
 <!--                        <div class="pull-right" v-if="state.user.dept">{{ state.user.dept.deptName }} / {{ state.postGroup }}</div>-->
 <!--                     </li>-->
                      <li class="list-group-item">
-                        <svg-icon icon-class="peoples" />所属角色
-                        <div class="pull-right">{{ state.roleGroup }}</div>
+                        <svg-icon icon-class="peoples" />我的会员
+<!--                        <div class="pull-right">{{ state.roleGroup }}</div>-->
+                        <div class="pull-right">vip</div>
                      </li>
 <!--                     <li class="list-group-item">-->
 <!--                        创建日期-->
@@ -46,13 +47,13 @@
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
 <!--                    </li>-->
                     <li class="list-group-item">
-                      解析到期日期
+                      vip到期日期
                       <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
                     </li>
-                    <li class="list-group-item">
-                      影视vip到期日期
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
-                    </li>
+<!--                    <li class="list-group-item">-->
+<!--                      影视vip到期日期-->
+<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>-->
+<!--                    </li>-->
                   </ul>
                </div>
             </el-card>

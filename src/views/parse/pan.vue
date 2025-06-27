@@ -7,10 +7,33 @@
 <!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
 <!--    </div>-->
     <div class="logo">
-      <a href="/source">
+      <a class="logo-title" href="/source">
         <img :src="logo" alt="">
-        <span>深度搜索(全网资源教程搜索)</span>
+        <span>深度搜索(全网资源搜索)</span>
       </a>
+      <div class="user">
+          <div v-if="loginData.login" class="avatar-container">
+            <el-dropdown
+                class="right-menu-item hover-effect"
+                trigger="click"
+            >
+              <div class="avatar-wrapper">
+                <img :src="userLogo" class="user-avatar" />
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <router-link to="/user">
+                    <el-dropdown-item>个人中心</el-dropdown-item>
+                  </router-link>
+                  <el-dropdown-item @click="logout">
+                    <span>退出登录</span>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        <a v-if="!loginData.login" href="/vip/login">登录</a>
+      </div>
     </div>
     <div class="header-search">
       <el-select
@@ -25,7 +48,7 @@
           @blur="handleBlur"
          >
         <el-option
-            style="font-size: 18px;font-weight: bold;"
+            style="font-size: 15px;font-weight: bold"
             v-for="item in options"
             :key="item.value"
             :label="item.value"
@@ -73,7 +96,7 @@
         <template #default="{row}">
           <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
           <span style="margin-left: 80px;" @click="goParse(row)">{{
-              row.name
+              row.name.replace("夸克","").replace("百度","")
             }}</span>
         </template>
       </el-table-column>
@@ -103,11 +126,14 @@
 <script setup name="Source">
 import { onActivated, onDeactivated,watch } from 'vue';
 import logo from '@/assets/img/deep.jpg';
+import userLogo from '@/assets/logo/img.png';
 import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/wp";
 import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
 const router = useRouter();
+const loginData = reactive({login:false});
+import { ElMessageBox } from 'element-plus';
 
 import { Search } from '@element-plus/icons-vue'
 const tagHeader = ref(["少儿","小学","初中","高中","大学","四六级","考研","考公","教资","英语","电影","动漫","美剧","软件","电子书","编程","剪辑","设计"])
@@ -139,6 +165,7 @@ import LightFlowerImg from './img/flower-light.png'
 
 // 组合式函数导入
 import { useTheme } from './hooks/useTheme'
+import {getToken} from "../../utils/auth";
 // 使用主题管理
 const { isLightTheme } = useTheme();
 const { queryParams } = toRefs(data)
@@ -174,10 +201,32 @@ watch(() => route.path, (newPath, oldPath) => {
   // }
 }, { immediate: true });
 
+function getLogin(){
+  if (getToken()) {
+    loginData.login = true;
+  }else{
+    loginData.login= false;
+  }
+}
+function logout() {
+  ElMessageBox.confirm('确定退出系统吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+      .then(() => {
+        userStore.logOut().then(() => {
+          location.href = '/source';
+        });
+      })
+      .catch(() => {});
+}
+getLogin();
 function handleSearch(value){
   loading.value = true;
   tableShow.value  = true;
   tagShow.value  = false;
+  console.log(searchValue.value);
   if(value){
     searchValue.value = value;
   }
@@ -194,6 +243,10 @@ function handleSearch(value){
   })
 }
 function getList() {
+  if(!searchValue.value){
+    ElMessage.error("请输入关键词搜索！")
+    return;
+  }
   loading.value = true
   userStore.search({"keyword":searchValue.value,...queryParams.value}).then(res => {
     tableData.value = res.data;
@@ -332,12 +385,15 @@ const getTagType = (index) => {
 }
 /* Vue 3 使用 :deep() */
 :deep(.el-select) {
-  font-size: 20px;
+  font-size: 20px!important;
   font-weight: bold;
+  width: 40%!important;
 }
 :deep(.el-input__inner) {
   font-size: 20px;
   font-weight: bold;
+  height: 50px!important;
+  line-height: 50px!important;
 
 }
 :deep(.el-select .el-input__wrapper) {
@@ -345,6 +401,10 @@ const getTagType = (index) => {
   0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
   transition: box-shadow 0.3s ease;
 }
+
+//:deep(.el-select-dropdown__item.selected){
+//  font-size: 18px!important;
+//}
 
 :deep(.el-select:hover .el-input__wrapper) {
   box-shadow: 0 0 0 2px #0773e2,
@@ -357,23 +417,6 @@ const getTagType = (index) => {
 }
 
 
-/* 修改选择框宽度 */
-.header-search .el-select {
-  width: 40%!important;
-}
-
-/* 修改输入框高度 */
-.header-search ::v-deep .el-input__inner {
-  height: 50px!important;
-  line-height: 50px!important;
-}
-
-/* 修改下拉选项样式 */
-.header-search .el-select-dropdown__item {
-  padding: 10px 20px;
-  height: 50px!important;
-  line-height: 50px!important;
-}
 //.app-container{
 //  width: 100%;
 //  height: 100%;
@@ -408,26 +451,64 @@ const getTagType = (index) => {
   //    right: 0;
   //  }
   //}
-  a{
-    width: auto;
-    height: 80px;
-    display: flex;
-    align-items: center; /* 垂直居中 */
-    justify-content: center; /* 水平居中 */
-    vertical-align: middle;
-    img{
-      width: 120px;
+  .logo{
+     position: relative;
+    .logo-title{
+      //width: auto;
       height: 80px;
+      display: flex;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      vertical-align: middle;
+      img{
+        width: 120px;
+        height: 80px;
+      }
+      span{
+        //width: auto;
+        height: 80px!important;
+        margin-top: 0;
+        font-size: 26px;
+        font-weight: bold!important;
+        line-height: 80px;
+        white-space: nowrap;  /* 禁止换行 */
+        overflow: hidden;     /* 隐藏溢出内容 */
+        text-overflow: ellipsis; /* 溢出显示省略号... */
+      }
     }
-    span{
-      width: auto;
-      height: 80px!important;
-      margin-top: 0;
-      font-size: 20px;
+    .user{
+      position: absolute;
+      right: 0;
+      top: 20px;
+      font-size: 18px;
       font-weight: bold;
-      line-height: 80px;
+      color:#337ecc;
+      .avatar-container {
+        //margin-right: 40px;
+
+        .avatar-wrapper {
+          margin-top: 5px;
+          position: relative;
+
+          .user-avatar {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+          }
+
+          i {
+            cursor: pointer;
+            position: absolute;
+            right: -20px;
+            top: 25px;
+            font-size: 12px;
+          }
+        }
+      }
     }
   }
+
 
 
 }
@@ -469,11 +550,12 @@ const getTagType = (index) => {
       animation: shake 0.5s ease infinite;
     }
     .tag-title{
+      margin-top: 15px;
       display: flex;
       align-items: center; /* 垂直居中 */
       justify-content: center; /* 水平居中 */
       span{
-        font-size: 30px;
+        font-size: 25px;
         font-weight: bold;
       }
     }

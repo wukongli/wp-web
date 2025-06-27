@@ -169,7 +169,7 @@
 
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
-      <img class="qr-code" :src="loadData.codeUrl" alt="" />
+      <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
@@ -222,6 +222,7 @@ import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
+import {onMounted} from 'vue';
 const userStore = useUserStore();
 import {
   generateRandomLetters,
@@ -232,12 +233,17 @@ import {
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import qrCode from '@/assets/images/前端.png';
+import iron from '@/assets/images/钢铁侠.png';
+import front from '@/assets/images/前端.png';
+import duli from '@/assets/images/独立开发者.png';
+import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import { Client } from "@gopeed/rest";
 import logo from "@/assets/img/deep.jpg";
+const qrCodeList = ref([iron,front,duli,yao]);
+const qrCode = ref('');
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -291,6 +297,11 @@ onBeforeRouteLeave((to, from) => {
 //   const data = Object.assign({ index: 0 }, route.query);
 //   parseQuark();
 // }
+
+onMounted(() => {
+  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = randomItem;
+})
 async function parseQuark(params){
   loadData.tableLoading = true;
   let req;
@@ -628,7 +639,7 @@ function handleSelectionChange(selection) {
 async function handleParse() {
   const token = getToken();
   if (!token) {
-    ElMessage.error('批量下载请开通快速下载！');
+    ElMessage.error('批量下载请联系管理员开通权限！');
     return false;
   }
   const result = await testDownLoad();

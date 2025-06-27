@@ -270,6 +270,12 @@ export const constantRoutes = [
         },
       }]
   },
+  {
+    name: 'User',
+    path: '/user',
+    hidden: true,
+    component: () => import('@/views/system/user/profile/index.vue'),
+  },
   // {
   //   path: '/source/b',
   //   component: () => import('@/views/parse/index.vue'),

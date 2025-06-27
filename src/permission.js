@@ -20,9 +20,9 @@ const whiteList = [
   '/back/java/interview',
   '/front/front/list',
   '/front/front/interview',
-  '/parse/login',
-  '/parse/index',
-  '/parse/quark',
+  // '/parse/login',
+  // '/parse/index',
+  // '/parse/quark',
   '/401',
   '/video/list',
   '/video/vip',
@@ -33,11 +33,12 @@ const whiteList = [
   '/source/b',
   '/source/parse/quark',
   '/source/parse/index',
+  '/user',
 ];
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  if (getToken()) {
+  if (false) {
     to.meta.title && useSettingsStore().setTitle(to.meta.title);
     NProgress.done();
     if (useUserStore().roles.length === 0) {
@@ -99,11 +100,15 @@ router.beforeEach((to, from, next) => {
       //
       // }
 
+      // router.push({
+      //   path: '/vip/login',
+      //   query: {
+      //     userKey:sessionStorage.getItem("userKey") ? sessionStorage.getItem("userKey") :"main"
+      //   },
+      // })
+
       router.push({
-        path: '/parse/login',
-        query: {
-          userKey:sessionStorage.getItem("userKey") ? sessionStorage.getItem("userKey") :"main"
-        },
+        path: '/source',
       })
 
     }
