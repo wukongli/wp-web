@@ -208,7 +208,7 @@
   </div>
 </template>
 
-<script setup name="Index">
+<script setup name="Quark">
 import moment from 'moment';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
