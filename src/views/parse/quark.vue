@@ -280,7 +280,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 3221225472,
+  fileSize: 100698669056,
   routeData: [],
   rootBackTitle: '返回',
   vipDown: false,

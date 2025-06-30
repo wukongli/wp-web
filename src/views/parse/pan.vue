@@ -95,7 +95,10 @@
       <el-table-column prop="name" show-overflow-tooltip label="名字">
         <template #default="{row}">
           <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-          <span style="margin-left: 80px;" @click="goParse(row)">{{
+          <el-tag v-if="row.url.includes('quark')" style="margin-left: 50px;"  type="success">下载速度快</el-tag>
+          <el-tag v-if="row.url.includes('baidu')" style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
+          <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
+          <span style="margin-left: 10px;" @click="goParse(row)">{{
               row.name.replace("夸克","").replace("百度","")
             }}</span>
         </template>
@@ -226,7 +229,6 @@ function handleSearch(value){
   loading.value = true;
   tableShow.value  = true;
   tagShow.value  = false;
-  console.log(searchValue.value);
   if(value){
     searchValue.value = value;
   }
@@ -280,6 +282,21 @@ function goParse(row){
         dir: '1',
         root: '1'
       },
+    })
+  }else if(row.url.includes("/s/")){
+    userStore.getXdUrl({"link":row.url}).then(res => {
+      if(res.code === 200){
+        const { url, pwd } = SubmitLink(res.data);
+        router.push({
+          path: '/source/parse/index',
+          query: {
+            shorturl: url,
+            pwd: pwd,
+            dir: '1',
+            root: '1'
+          },
+        })
+      }
     })
   }
 }

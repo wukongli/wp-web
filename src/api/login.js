@@ -228,6 +228,15 @@ export function searchNames(data){
   });
 }
 
+export function getXdUrls(data){
+  return request({
+    url: '/wp/getXdUrl',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 
 
 
