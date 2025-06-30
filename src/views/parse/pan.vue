@@ -45,7 +45,7 @@
       </el-tag>
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column prop="name" label="名字">
+      <el-table-column show-overflow-tooltip prop="name" label="名字">
         <template #default="{row}">
           <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
           <span style="margin-left: 80px;" @click="goParse(row)">{{
