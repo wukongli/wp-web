@@ -9,7 +9,7 @@
     <div class="logo">
       <a class="logo-title" href="/source">
         <img :src="logo" alt="">
-        <span>深度搜索(全网资源搜索)</span>
+        <span>深度搜索 - 云端资源搜索专家</span>
       </a>
       <div class="user">
           <div v-if="loginData.login" class="avatar-container">
@@ -32,7 +32,7 @@
               </template>
             </el-dropdown>
           </div>
-        <a v-if="!loginData.login" href="/vip/login">登录</a>
+        <a v-if="!loginData.login" href="/vip/login">卡密登录</a>
       </div>
     </div>
     <div class="header-search">
