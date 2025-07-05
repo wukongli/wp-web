@@ -45,12 +45,18 @@
       </el-tag>
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column show-overflow-tooltip prop="name" label="名字">
+      <el-table-column min-width="280px" prop="name" label="名字">
         <template #default="{row}">
-          <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-          <span style="margin-left: 80px;" @click="goParse(row)">{{
-              row.url.includes("quark") ? '(夸克网盘) ' + row.name : '(百度网盘) '+row.name
-            }}</span>
+          <div
+              @click="goParse(row)"
+              style="display: flex; align-items: center"
+          >
+            <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+            <span style="margin-left: 10px;">{{
+                row.url.includes("quark") ? '(夸克网盘) ' + row.name : '(百度网盘) '+row.name
+              }}</span>
+          </div>
+
         </template>
       </el-table-column>
       <el-table-column prop="time" label="最后更新时间">
@@ -281,8 +287,17 @@ getTag();
 
 
 /* 修改选择框宽度 */
+
+@media only screen and (min-width: 768px) {
+  .header-search .el-select {
+    width: 600px!important;
+  }
+  .tag {
+    width: 60%;
+  }
+}
 .header-search .el-select {
-  width: 600px!important;
+  width: 45%;
 }
 
 /* 修改输入框高度 */
@@ -298,23 +313,19 @@ getTag();
   line-height: 50px!important;
 }
 .home {
-  width: 98%;
   height: calc(100vh - 100px);
   margin: auto;
   font-size: 18px;
 
 
   .header-search{
-    width: 90%;
     height: 50px;
     margin: 50px auto 0;
     text-align: center;
 
   }
 
-
   .tag{
-    width: 60%;
     height: 100px;
     margin:50px auto 0;
     .tag-inner{
@@ -352,11 +363,14 @@ getTag();
     font-weight: bold;
     height: 70%;
     width: 100%;
-    margin-top:25px
+    margin-top:25px;
+    cursor: pointer;
+
   }
   .el-pagination {
-    margin-top:50px;
-    margin-left: 100px;
+    //margin-top:50px;
+    //margin-left: 100px;
+    margin: 45px auto 0;
   }
 }
 </style>

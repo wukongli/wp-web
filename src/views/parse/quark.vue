@@ -31,7 +31,6 @@
     ><a href="https://vip.gssource.com" target="_blank">获取卡密</a></el-button>
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
-    <div id="content">
       <el-table
           v-loading="loadData.tableLoading"
           element-loading-text="数据正在加载中..."
@@ -46,6 +45,7 @@
             min-width="280px"
             prop="file_name"
             label="文件名"
+            show-overflow-tooltip
         >
           <template #default="scope">
             <div
@@ -93,7 +93,6 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
@@ -248,7 +247,7 @@ const fsIds = ref([]);
 const fTokenId = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([iron,front,duli,yao]);
+const qrCodeList = ref([front,duli,yao]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',

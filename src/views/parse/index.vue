@@ -46,6 +46,7 @@
           min-width="280px"
           prop="server_filename"
           label="文件名"
+          show-overflow-tooltip
         >
           <template #default="scope">
             <div
@@ -253,7 +254,7 @@ const multiple = ref(true);
 const fsIds = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([iron,front,duli,yao]);
+const qrCodeList = ref([front,duli,yao]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
