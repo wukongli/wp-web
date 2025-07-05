@@ -242,7 +242,7 @@ import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import { Client } from "@gopeed/rest";
 import logo from "@/assets/img/deep.jpg";
-const qrCodeList = ref([iron,front,duli,yao]);
+const qrCodeList = ref([front,duli,yao]);
 const qrCode = ref('');
 const { proxy } = getCurrentInstance();
 const route = useRoute();

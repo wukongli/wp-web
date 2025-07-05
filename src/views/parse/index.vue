@@ -242,7 +242,7 @@ import iron from '@/assets/images/钢铁侠.png';
 import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import yao from '@/assets/images/yaoyao.png';
-const qrCodeList = ref([iron,front,duli,yao]);
+const qrCodeList = ref([front,duli,yao]);
 const qrCode = ref('');
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
