@@ -90,17 +90,25 @@
       >
         {{ item.value }}
       </el-tag>
+      <div class="foot">
+        声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
+      </div>
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column prop="name" show-overflow-tooltip label="名字">
+      <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
         <template #default="{row}">
-          <MySvg style="position: absolute;top:5px" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-          <el-tag v-if="row.url.includes('quark')" style="margin-left: 50px;"  type="success">下载速度快</el-tag>
-          <el-tag v-if="row.url.includes('baidu')" style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
+          <div
+              @click="goParse(row)"
+              style="display: flex; align-items: center"
+          >
+          <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+          <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
+          <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
           <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
-          <span style="margin-left: 10px;" @click="goParse(row)">{{
+          <span style="margin-left: 2%;">{{
               row.name.replace("夸克","").replace("百度","")
             }}</span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="time" label="最后更新时间">
@@ -122,8 +130,12 @@
           class="custom-pagination"
       />
     <!-- 子组件将在此处渲染 -->
-      <router-view></router-view>
+      <router-view>
+      </router-view>
+
   </div>
+
+
 
 </template>
 <script setup name="Source">
@@ -193,7 +205,7 @@ onMounted(() => {
   }
 })
 watch(() => route.path, (newPath, oldPath) => {
-  if(oldPath === "/source/parse/quark" || oldPath === "/source/parse/index"){
+  if(oldPath === "/source/parse/bt" || oldPath === "/source/parse/index"){
     tableShow.value = true;
   }else {
     tableShow.value = false;
@@ -266,7 +278,7 @@ function goParse(row){
     const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
     const info = extractQuarkInfo(row.url);
     router.push({
-      path: '/source/parse/quark',
+      path: '/source/parse/bt',
       query: {
         shorturl: pwdId,
         pwd: info.password,
@@ -443,13 +455,11 @@ const getTagType = (index) => {
 //
 //}
 .home {
-  width: 75%;
-  height: calc(100vh - 100px);
+  //height: calc(100vh - 100px);
   //height:auto;
   margin: auto;
   font-size: 18px;
-
-
+  //position: relative;
   //.floewr {
   //  position: absolute;
   //  top: 0;
@@ -530,7 +540,27 @@ const getTagType = (index) => {
 
 }
 
+@media only screen and (min-width: 768px) {
+  .home{
+    width: 72%;
+  }
+  .header-search .el-select {
+    width: 600px!important;
+  }
+  .tag {
+    width: 70%;
 
+  }
+  .foot{
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+  }
+ }
+.header-search .el-select {
+  width: 45%;
+}
   .header-search{
     width: 100%;
     height: 50px;
@@ -543,9 +573,8 @@ const getTagType = (index) => {
 
 
   .tag{
-    width: 70%;
-    height: 100px;
     margin:30px auto 0;
+    //position: relative;
     .tag-header{
       margin-left: 20px;
       margin-top: 20px;
@@ -614,7 +643,15 @@ const getTagType = (index) => {
     margin-top:25px;
   }
   .el-pagination {
-    margin-top:3%;
-    margin-left: 5%;
+    margin: 45px auto 0;
+  }
+  .foot{
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    //position: absolute;
+    //bottom: 0;
   }
 </style>

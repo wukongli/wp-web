@@ -260,7 +260,7 @@ export const constantRoutes = [
         },
       {
         name: 'Quark',
-        path: 'parse/quark',
+        path: 'parse/bt',
         hidden: false,
         component: () => import('@/views/parse/quark.vue'),
         meta: {

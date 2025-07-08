@@ -31,7 +31,7 @@ const whiteList = [
   '/source',
   '/source/q',
   '/source/b',
-  '/source/parse/quark',
+  '/source/parse/bt',
   '/source/parse/index',
   '/user',
 ];
