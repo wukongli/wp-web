@@ -213,7 +213,7 @@ const { queryParams } = toRefs(data)
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
   const cache = sessionStorage.getItem("tableData")
-  if(route.path === "/source/parse/quark" || route.path === "/source/parse/index"){
+  if(route.path === "/source/parse/bt" || route.path === "/source/parse/index"){
     tableData.value = JSON.parse(cache);
     return;
   }
@@ -295,6 +295,7 @@ function getList() {
 }
 
 function goParse(row){
+  console.log(row);
    tableShow.value = false;
   if(row.url.includes("quark")){
     if(row.url.length <= 23){
@@ -303,6 +304,7 @@ function goParse(row){
     }
     const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
     const info = extractQuarkInfo(row.url);
+    console.log(12321);
     router.push({
       path: '/source/parse/bt',
       query: {
