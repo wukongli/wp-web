@@ -64,6 +64,41 @@
         >搜索</el-button>
         <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
       </div>
+      <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
+        <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
+          <template #default="{row}">
+            <div
+                @click="goParse(row)"
+                style="display: flex; align-items: center"
+            >
+              <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+              <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
+              <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
+              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
+              <span style="margin-left: 2%;max-width: 200px;">{{
+                  row.name.replace("夸克","").replace("百度","")
+                }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="time" label="最后更新时间">
+          <template #default="{row}">
+            {{ row.time }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+          v-if="tableShow"
+          layout="prev, pager, next"
+          :total="100"
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          background
+          size="large"
+          @size-change="getList"
+          @current-change="getList"
+          class="custom-pagination"
+      />
       <div v-if="tagShow" class="tag">
         <el-tag
         class="tag-header"
@@ -91,48 +126,15 @@
           {{ item.value }}
         </el-tag>
       </div>
+      <!-- 子组件将在此处渲染 -->
+      <router-view>
+      </router-view>
     </div>
     <div v-if="tagShow" class="foot">
       声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
     </div>
-    <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
-        <template #default="{row}">
-          <div
-              @click="goParse(row)"
-              style="display: flex; align-items: center"
-          >
-          <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
-          <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
-          <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
-          <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
-          <span style="margin-left: 2%;max-width: 200px;">{{
-              row.name.replace("夸克","").replace("百度","")
-            }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="time" label="最后更新时间">
-        <template #default="{row}">
-          {{ row.time }}
-        </template>
-      </el-table-column>
-    </el-table>
-      <el-pagination
-          v-if="tableShow"
-          layout="prev, pager, next"
-          :total="100"
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          background
-          size="large"
-          @size-change="getList"
-          @current-change="getList"
-          class="custom-pagination"
-      />
-    <!-- 子组件将在此处渲染 -->
-      <router-view>
-      </router-view>
+
+
 
   </div>
 
