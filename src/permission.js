@@ -34,6 +34,7 @@ const whiteList = [
   '/source/parse/bt',
   '/source/parse/index',
   '/user',
+  '/add/source'
 ];
 
 router.beforeEach((to, from, next) => {

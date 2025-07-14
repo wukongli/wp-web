@@ -138,3 +138,37 @@ export function shareUrl(data) {
     data: data,
   });
 }
+export function addSource(data) {
+  return request({
+    url: '/pan/addSource',
+    method: 'post',
+    data: data,
+  });
+}
+
+export function listSource(query) {
+  return request({
+    url: '/pan/getSource',
+    method: 'get',
+    params: query,
+  });
+}
+
+export function putSource(data) {
+  return request({
+    url: '/pan',
+    method: 'put',
+    data: data,
+  });
+}
+
+
+
+export function deleteSource(data) {
+  return request({
+    url: '/pan',
+    method: 'delete',
+    params: data,
+  });
+}
+

@@ -6,12 +6,11 @@
 <!--    <div class="floewr right">-->
 <!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
 <!--    </div>-->
-    <div class="logo">
-      <a class="logo-title" href="/source">
-        <img :src="logo" alt="">
-        <span>深度搜索 - 云端资源搜索专家</span>
-      </a>
-      <div class="user">
+    <div class="content">
+      <div class="logo">
+
+        <div class="user">
+
           <div v-if="loginData.login" class="avatar-container">
             <el-dropdown
                 class="right-menu-item hover-effect"
@@ -32,67 +31,90 @@
               </template>
             </el-dropdown>
           </div>
-        <a v-if="!loginData.login" href="/vip/login">卡密登录</a>
+          <el-button
+              v-if="!loginData.login"
+              class="share-login"
+              style="margin: 10px 0"
+              type="primary"
+              icon="user"
+          ><a href="/vip/login">登录</a>
+          </el-button>
+          <el-button
+              class="share-source"
+              style="margin: 10px 0"
+              type="primary"
+              icon="share"
+          ><a href="/add/source" target="_blank">资源共享</a></el-button
+          >
+        </div>
+
       </div>
-    </div>
-    <div class="header-search">
-      <el-select
-          v-model="searchValue"
-          filterable
-          remote
-          reserve-keyword
-          allow-create
-          placeholder="请输入关键词"
-          :remote-method="remoteMethod"
-          :loading="loading"
-          @blur="handleBlur"
-         >
-        <el-option
-            style="font-size: 15px;font-weight: bold"
-            v-for="item in options"
+      <div>
+        <a class="logo-title" href="/source">
+          <img :src="logo" alt="">
+          <span>深度搜索 - 网盘资源搜索专家</span>
+        </a>
+      </div>
+      <div class="header-search">
+        <el-select
+            v-model="searchValue"
+            filterable
+            remote
+            reserve-keyword
+            allow-create
+            placeholder="请输入关键词"
+            :remote-method="remoteMethod"
+            :loading="loading"
+            @blur="handleBlur"
+        >
+          <el-option
+              style="font-size: 15px;font-weight: bold"
+              v-for="item in options"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value"
+          />
+        </el-select>
+        <el-button
+            type="primary"
+            icon="Search"
+            style="width: 80px;height: 50px;margin-left: 10px;"
+            @click="handleSearch()"
+        >搜索</el-button>
+        <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
+      </div>
+
+      <div v-if="tagShow" class="tag">
+        <el-tag
+            class="tag-header"
+            size="large"
+            v-for="(item, index) in tagHeader"
+            :key="item"
+            effect="dark"
+            @click="handleSearch(item)"
+        >
+          {{ item }}
+        </el-tag>
+        <div class="tag-title">
+          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
+        </div>
+        <el-tag
+            class="tag-inner"
+            size="large"
+            v-for="(item, index) in tag"
             :key="item.value"
-            :label="item.value"
-            :value="item.value"
-        />
-      </el-select>
-      <el-button
-          type="primary"
-          icon="Search"
-          style="width: 80px;height: 50px;margin-left: 10px;"
-          @click="handleSearch()"
-      >搜索</el-button>
-      <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
+            effect="dark"
+            :type="getTagType(index)"
+            round
+            @click="handleSearch(item.value)"
+        >
+          {{ item.value }}
+        </el-tag>
+      </div>
     </div>
 
-    <div v-if="tagShow" class="tag">
-      <el-tag
-      class="tag-header"
-      size="large"
-      v-for="(item, index) in tagHeader"
-      :key="item"
-      effect="dark"
-      @click="handleSearch(item)"
-      >
-      {{ item }}
-      </el-tag>
-      <div class="tag-title">
-        <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
-      </div>
-      <el-tag
-          class="tag-inner"
-          size="large"
-          v-for="(item, index) in tag"
-          :key="item.value"
-          effect="dark"
-          :type="getTagType(index)"
-          round
-          @click="handleSearch(item.value)"
-      >
-        {{ item.value }}
-      </el-tag>
-      <div class="foot">
-        声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
-      </div>
+    <div v-if="tagShow" class="foot">
+      声明：本站内容由网络爬虫获取、本站不储存任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
       <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
@@ -102,11 +124,10 @@
               style="display: flex; align-items: center"
           >
           <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
-          <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
-          <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
-          <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
-          <span style="margin-left: 2%;">{{
-              row.name.replace("夸克","").replace("百度","")
+            <img v-if="row.url.includes('baidu')" style="margin-left: 2%;width: 80px;height: 18px;" class="baidu" :src="baidu" alt="">
+            <img v-if="row.url.includes('quark')" style="margin-left: 2%;width: 80px;height: 18px;" class="quark" :src="quark" alt="">
+          <span style="margin-left: 2%;max-width: 200px;">{{
+              row.name
             }}</span>
           </div>
         </template>
@@ -162,6 +183,8 @@ const tagShow = ref(true);
 import useUserStore from '@/store/modules/user';
 import MySvg from "@/components/icon/Svg.vue";
 import useTagsViewStore from "@/store/modules/tagsView";
+import baidu from "@/assets/logo/baidu.png"
+import quark from "@/assets/logo/quark.png"
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const userStore = useUserStore();
@@ -329,7 +352,7 @@ function extractQuarkInfo(text) {
 function getTag(){
   userStore.getTag().then(res=>{
     if(res.code === 200){
-      tag.value = res.data.data;
+      tag.value = res.data.data.sort(() => Math.random() - 0.5);
     }
   })
 }
@@ -405,6 +428,12 @@ const getTagType = (index) => {
   return types[index % types.length];
 };
 
+function addSource(){
+  router.push({
+    path: '/add/source',
+  })
+}
+
 
 </script>
 
@@ -459,27 +488,53 @@ const getTagType = (index) => {
   //height:auto;
   margin: auto;
   font-size: 18px;
-  //position: relative;
-  //.floewr {
-  //  position: absolute;
-  //  top: 0;
-  //  height: 100%;
-  //  z-index: 0;
-  //  opacity: 0.8;
-  //  img {
-  //    height: 100%;
-  //    filter: blur(200px) brightness(150%);
-  //  }
-  //  &.left {
-  //    left: 0;
-  //    transform: rotate(180deg);
-  //  }
-  //  &.right {
-  //    right: 0;
-  //  }
-  //}
-  .logo{
-     position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 至少占满整个视口高度 */
+  .content{
+    flex: 1;
+    .logo{
+      position: relative;
+
+      .user{
+        width: 100%;
+        height: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color:#337ecc;
+        .share-source{
+          float: right;
+          margin-right:30px !important;
+        }
+        .avatar-container {
+          float: right;
+
+          margin-top:5px;
+          .avatar-wrapper {
+
+            .user-avatar {
+              cursor: pointer;
+              width: 40px;
+              height: 40px;
+              border-radius: 10px;
+            }
+
+            i {
+              cursor: pointer;
+              position: absolute;
+              right: -20px;
+              top: 25px;
+              font-size: 12px;
+            }
+          }
+        }
+        .share-login{
+          float: right;
+          margin-top:10px;
+          margin-right:30px !important;
+        }
+      }
+    }
     .logo-title{
       //width: auto;
       height: 80px;
@@ -503,38 +558,8 @@ const getTagType = (index) => {
         text-overflow: ellipsis; /* 溢出显示省略号... */
       }
     }
-    .user{
-      position: absolute;
-      right: 0;
-      top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color:#337ecc;
-      .avatar-container {
-        //margin-right: 40px;
-
-        .avatar-wrapper {
-          margin-top: 5px;
-          position: relative;
-
-          .user-avatar {
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-          }
-
-          i {
-            cursor: pointer;
-            position: absolute;
-            right: -20px;
-            top: 25px;
-            font-size: 12px;
-          }
-        }
-      }
-    }
   }
+
 
 
 
@@ -549,12 +574,6 @@ const getTagType = (index) => {
   }
   .tag {
     width: 70%;
-
-  }
-  .foot{
-    position: absolute;
-    left: 0;
-    bottom: 0;
 
   }
  }
@@ -646,12 +665,12 @@ const getTagType = (index) => {
     margin: 45px auto 0;
   }
   .foot{
+    margin-top: 10px;
     width: 100%;
-    height: 40px;
+    height: 20px;
+    line-height: 20px;
     text-align: center;
     font-weight: bold;
     font-size: 12px;
-    //position: absolute;
-    //bottom: 0;
   }
 </style>

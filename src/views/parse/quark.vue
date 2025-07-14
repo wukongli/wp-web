@@ -20,15 +20,15 @@
         {{ loadData.bread }}
       </div>
     </header>
-    <el-button
-        style="margin: 10px 0"
-        type="primary"
-        plain
-        icon="UploadFilled"
-        :disabled="multiple"
-        @click="handleParse"
-    >批量下载</el-button
-    >
+<!--    <el-button-->
+<!--        style="margin: 10px 0"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="UploadFilled"-->
+<!--        :disabled="multiple"-->
+<!--        @click="handleParse"-->
+<!--    >批量下载</el-button-->
+<!--    >-->
 <!--    <el-button-->
 <!--        style="margin-left: 20px"-->
 <!--        type="primary"-->
@@ -36,7 +36,7 @@
 <!--        icon="Promotion"-->
 <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
+<!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
       <el-table
           v-loading="loadData.tableLoading"
           element-loading-text="数据正在加载中..."
@@ -66,12 +66,12 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="updated_at" label="修改时间">
+        <el-table-column prop="updated_at" label="更新时间">
           <template #default="{row}">
             {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
         </el-table-column>
-        <el-table-column prop="size" :formatter="getFilesize" label="大小" />
+<!--        <el-table-column prop="size" :formatter="getFilesize" label="大小" />-->
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
         <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
@@ -87,13 +87,12 @@
 <!--            >快速下载</el-button-->
 <!--            >-->
             <el-button
-                v-if="!scope.row.dir"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
                 :loading="scope.row.loading"
             >
-              <span v-if="scope.row.status === 0">下 载</span>
+              <span v-if="scope.row.status === 0">复制链接</span>
               <span v-if="scope.row.status === 1">下载中</span>
               <span v-if="scope.row.status === 2">已下载</span>
             </el-button>
@@ -216,6 +215,7 @@
 
 <script setup name="Quark">
 import moment from 'moment';
+import Swal from 'sweetalert2';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
@@ -400,15 +400,22 @@ function parseCopyLink(params) {
 }
 
 function downLoad(item) {
-  loadData.item = item;
-  isSending.value = false;
-  // showParse.value = true;
-  if (getToken()) {
-    loadData.noLimit = true;
-  } else {
-    loadData.WeCharVisible = true;
-    form.code = '';
-  }
+  const url = "https://pan.quark.cn/s/" + route.query.shorturl+"?pwd="+route.query.pwd;
+  navigator.clipboard.writeText(url);
+  Swal.fire({
+    title: "复制成功",
+    text: `${item.file_name}`,
+    icon: "success"
+  });
+  // loadData.item = item;
+  // isSending.value = false;
+  // // showParse.value = true;
+  // if (getToken()) {
+  //   loadData.noLimit = true;
+  // } else {
+  //   loadData.WeCharVisible = true;
+  //   form.code = '';
+  // }
 }
 
 async function noLimit() {

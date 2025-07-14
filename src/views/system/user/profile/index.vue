@@ -9,9 +9,9 @@
                  </div>
                </template>
                <div>
-                  <div class="text-center">
-                     <userAvatar :user="state.user" />
-                  </div>
+<!--                  <div class="text-center">-->
+<!--                     <userAvatar :user="state.user" />-->
+<!--                  </div>-->
                   <ul class="list-group list-group-striped">
                      <li class="list-group-item">
                         <svg-icon icon-class="user" />用户名称
@@ -46,10 +46,10 @@
 <!--                      验证码剩余时间-->
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
 <!--                    </li>-->
-                    <li class="list-group-item">
-                      vip到期日期
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
-                    </li>
+<!--                    <li class="list-group-item">-->
+<!--                      vip到期日期-->
+<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>-->
+<!--                    </li>-->
 <!--                    <li class="list-group-item">-->
 <!--                      影视vip到期日期-->
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>-->

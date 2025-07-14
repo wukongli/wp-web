@@ -276,6 +276,19 @@ export const constantRoutes = [
     hidden: true,
     component: () => import('@/views/system/user/profile/index.vue'),
   },
+  {
+    name: 'Monitor',
+    path: '/monitor/job',
+    hidden: true,
+    component: () => import('@/views/monitor/job/index'),
+  },
+  {
+    name: 'AddSource',
+    path: '/add/source',
+    hidden: true,
+    component: () => import('@/views/parse/add.vue'),
+  },
+
   // {
   //   path: '/source/b',
   //   component: () => import('@/views/parse/index.vue'),
