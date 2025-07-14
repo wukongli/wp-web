@@ -6,12 +6,13 @@
 <!--    <div class="floewr right">-->
 <!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
 <!--    </div>-->
-    <div class="logo">
-      <a class="logo-title" href="/source">
-        <img :src="logo" alt="">
-        <span>深度搜索 - 云端资源搜索专家</span>
-      </a>
-      <div class="user">
+    <div class="content">
+      <div class="logo">
+        <a class="logo-title" href="/source">
+          <img :src="logo" alt="">
+          <span>深度搜索 - 云端资源搜索专家</span>
+        </a>
+        <div class="user">
           <div v-if="loginData.login" class="avatar-container">
             <el-dropdown
                 class="right-menu-item hover-effect"
@@ -32,67 +33,67 @@
               </template>
             </el-dropdown>
           </div>
-        <a v-if="!loginData.login" href="/vip/login">卡密登录</a>
+          <a v-if="!loginData.login" href="/vip/login">卡密登录</a>
+        </div>
       </div>
-    </div>
-    <div class="header-search">
-      <el-select
-          v-model="searchValue"
-          filterable
-          remote
-          reserve-keyword
-          allow-create
-          placeholder="请输入关键词"
-          :remote-method="remoteMethod"
-          :loading="loading"
-          @blur="handleBlur"
-         >
-        <el-option
-            style="font-size: 15px;font-weight: bold"
-            v-for="item in options"
+      <div class="header-search">
+        <el-select
+            v-model="searchValue"
+            filterable
+            remote
+            reserve-keyword
+            allow-create
+            placeholder="请输入关键词"
+            :remote-method="remoteMethod"
+            :loading="loading"
+            @blur="handleBlur"
+        >
+          <el-option
+              style="font-size: 15px;font-weight: bold"
+              v-for="item in options"
+              :key="item.value"
+              :label="item.value"
+              :value="item.value"
+          />
+        </el-select>
+        <el-button
+            type="primary"
+            icon="Search"
+            style="width: 80px;height: 50px;margin-left: 10px;"
+            @click="handleSearch()"
+        >搜索</el-button>
+        <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
+      </div>
+      <div v-if="tagShow" class="tag">
+        <el-tag
+        class="tag-header"
+        size="large"
+        v-for="(item, index) in tagHeader"
+        :key="item"
+        effect="dark"
+        @click="handleSearch(item)"
+        >
+        {{ item }}
+        </el-tag>
+        <div class="tag-title">
+          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
+        </div>
+        <el-tag
+            class="tag-inner"
+            size="large"
+            v-for="(item, index) in tag"
             :key="item.value"
-            :label="item.value"
-            :value="item.value"
-        />
-      </el-select>
-      <el-button
-          type="primary"
-          icon="Search"
-          style="width: 80px;height: 50px;margin-left: 10px;"
-          @click="handleSearch()"
-      >搜索</el-button>
-      <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
+            effect="dark"
+            :type="getTagType(index)"
+            round
+            @click="handleSearch(item.value)"
+        >
+          {{ item.value }}
+        </el-tag>
+      </div>
     </div>
-
-    <div v-if="tagShow" class="tag">
-      <el-tag
-      class="tag-header"
-      size="large"
-      v-for="(item, index) in tagHeader"
-      :key="item"
-      effect="dark"
-      @click="handleSearch(item)"
-      >
-      {{ item }}
-      </el-tag>
-      <div class="tag-title">
-        <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
-      </div>
-      <el-tag
-          class="tag-inner"
-          size="large"
-          v-for="(item, index) in tag"
-          :key="item.value"
-          effect="dark"
-          :type="getTagType(index)"
-          round
-          @click="handleSearch(item.value)"
-      >
-        {{ item.value }}
-      </el-tag>
-      <div class="foot">
-        声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
-      </div>
+    <div v-if="tagShow" class="foot">
+      声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
     </div>
     <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
       <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
@@ -105,7 +106,7 @@
           <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
           <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
           <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
-          <span style="margin-left: 2%;">{{
+          <span style="margin-left: 2%;max-width: 200px;">{{
               row.name.replace("夸克","").replace("百度","")
             }}</span>
           </div>
@@ -459,82 +460,70 @@ const getTagType = (index) => {
   //height:auto;
   margin: auto;
   font-size: 18px;
-  //position: relative;
-  //.floewr {
-  //  position: absolute;
-  //  top: 0;
-  //  height: 100%;
-  //  z-index: 0;
-  //  opacity: 0.8;
-  //  img {
-  //    height: 100%;
-  //    filter: blur(200px) brightness(150%);
-  //  }
-  //  &.left {
-  //    left: 0;
-  //    transform: rotate(180deg);
-  //  }
-  //  &.right {
-  //    right: 0;
-  //  }
-  //}
-  .logo{
-     position: relative;
-    .logo-title{
-      //width: auto;
-      height: 80px;
-      display: flex;
-      align-items: center; /* 垂直居中 */
-      justify-content: center; /* 水平居中 */
-      vertical-align: middle;
-      img{
-        width: 120px;
-        height: 80px;
-      }
-      span{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 至少占满整个视口高度 */
+  .content{
+    flex: 1;
+    .logo{
+      position: relative;
+      .logo-title{
         //width: auto;
-        height: 80px!important;
-        margin-top: 0;
-        font-size: 26px;
-        font-weight: bold!important;
-        line-height: 80px;
-        white-space: nowrap;  /* 禁止换行 */
-        overflow: hidden;     /* 隐藏溢出内容 */
-        text-overflow: ellipsis; /* 溢出显示省略号... */
+        height: 80px;
+        display: flex;
+        align-items: center; /* 垂直居中 */
+        justify-content: center; /* 水平居中 */
+        vertical-align: middle;
+        img{
+          width: 120px;
+          height: 80px;
+        }
+        span{
+          //width: auto;
+          height: 80px!important;
+          margin-top: 0;
+          font-size: 26px;
+          font-weight: bold!important;
+          line-height: 80px;
+          white-space: nowrap;  /* 禁止换行 */
+          overflow: hidden;     /* 隐藏溢出内容 */
+          text-overflow: ellipsis; /* 溢出显示省略号... */
+        }
       }
-    }
-    .user{
-      position: absolute;
-      right: 0;
-      top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color:#337ecc;
-      .avatar-container {
-        //margin-right: 40px;
+      .user{
+        position: absolute;
+        right: 0;
+        top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color:#337ecc;
+        .avatar-container {
+          //margin-right: 40px;
 
-        .avatar-wrapper {
-          margin-top: 5px;
-          position: relative;
+          .avatar-wrapper {
+            margin-top: 5px;
+            position: relative;
 
-          .user-avatar {
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-          }
+            .user-avatar {
+              cursor: pointer;
+              width: 40px;
+              height: 40px;
+              border-radius: 10px;
+            }
 
-          i {
-            cursor: pointer;
-            position: absolute;
-            right: -20px;
-            top: 25px;
-            font-size: 12px;
+            i {
+              cursor: pointer;
+              position: absolute;
+              right: -20px;
+              top: 25px;
+              font-size: 12px;
+            }
           }
         }
       }
     }
   }
+
 
 
 
@@ -549,12 +538,6 @@ const getTagType = (index) => {
   }
   .tag {
     width: 70%;
-
-  }
-  .foot{
-    position: absolute;
-    left: 0;
-    bottom: 0;
 
   }
  }
@@ -646,12 +629,12 @@ const getTagType = (index) => {
     margin: 45px auto 0;
   }
   .foot{
+    margin-top: 10px;
     width: 100%;
-    height: 40px;
+    height: 20px;
+    line-height: 20px;
     text-align: center;
     font-weight: bold;
     font-size: 12px;
-    //position: absolute;
-    //bottom: 0;
   }
 </style>
