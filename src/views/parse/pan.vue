@@ -84,6 +84,41 @@
         <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
       </div>
 
+      <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
+        <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
+          <template #default="{row}">
+            <div
+                @click="goParse(row)"
+                style="display: flex; align-items: center"
+            >
+              <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+              <img v-if="row.url.includes('baidu')" style="margin-left: 2%;width: 80px;height: 18px;" class="baidu" :src="baidu" alt="">
+              <img v-if="row.url.includes('quark')" style="margin-left: 2%;width: 80px;height: 18px;" class="quark" :src="quark" alt="">
+              <span style="margin-left: 2%;max-width: 200px;">{{
+                  row.name
+                }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="time" label="最后更新时间">
+          <template #default="{row}">
+            {{ row.time }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+          v-if="tableShow"
+          layout="prev, pager, next"
+          :total="100"
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          background
+          size="large"
+          @size-change="getList"
+          @current-change="getList"
+          class="custom-pagination"
+      />
+
       <div v-if="tagShow" class="tag">
         <el-tag
             class="tag-header"
@@ -111,48 +146,16 @@
           {{ item.value }}
         </el-tag>
       </div>
+      <!-- 子组件将在此处渲染 -->
+      <router-view>
+      </router-view>
     </div>
 
     <div v-if="tagShow" class="foot">
       声明：本站内容由网络爬虫获取、本站不储存任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
     </div>
-    <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-      <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
-        <template #default="{row}">
-          <div
-              @click="goParse(row)"
-              style="display: flex; align-items: center"
-          >
-          <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
-            <img v-if="row.url.includes('baidu')" style="margin-left: 2%;width: 80px;height: 18px;" class="baidu" :src="baidu" alt="">
-            <img v-if="row.url.includes('quark')" style="margin-left: 2%;width: 80px;height: 18px;" class="quark" :src="quark" alt="">
-          <span style="margin-left: 2%;max-width: 200px;">{{
-              row.name
-            }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="time" label="最后更新时间">
-        <template #default="{row}">
-          {{ row.time }}
-        </template>
-      </el-table-column>
-    </el-table>
-      <el-pagination
-          v-if="tableShow"
-          layout="prev, pager, next"
-          :total="100"
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          background
-          size="large"
-          @size-change="getList"
-          @current-change="getList"
-          class="custom-pagination"
-      />
-    <!-- 子组件将在此处渲染 -->
-      <router-view>
-      </router-view>
+
+
 
   </div>
 
@@ -261,8 +264,8 @@ function logout() {
 }
 getLogin();
 function handleSearch(value){
-  loading.value = true;
   tableShow.value  = true;
+  loading.value = true;
   tagShow.value  = false;
   if(value){
     searchValue.value = value;

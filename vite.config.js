@@ -30,6 +30,11 @@ export default defineConfig(({ mode, command }) => {
       open: true,
       cors: true, // 允许跨域
       hmr: true, // 开启热更新
+      fs: {
+        // 明确禁止访问.git目录
+        strict: true,
+        deny: ['.env', '.env.*', '.git', '.git/**']
+      },
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
@@ -39,7 +44,22 @@ export default defineConfig(({ mode, command }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
         },
+        '/.git': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/\.git/, ''),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              if (req.url.startsWith('/.git')) {
+                res.writeHead(403, {'Content-Type': 'text/plain'});
+                res.end('Access to .git is forbidden');
+              }
+            });
+          }
+        }
       },
+
+
     },
     //fix:error:stdin>:7356:1: warning: "@charset" must be the first rule in the file
     css: {

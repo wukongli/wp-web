@@ -240,7 +240,6 @@ import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
-import { Client } from "@gopeed/rest";
 import logo from "@/assets/img/deep.jpg";
 const qrCodeList = ref([front,duli,yao]);
 const qrCode = ref('');
@@ -687,7 +686,7 @@ async function handleParse() {
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);
-  margin: auto;
+  //margin: auto;
   font-size: 18px;
   overflow: auto;
   .logo{
