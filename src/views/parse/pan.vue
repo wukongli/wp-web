@@ -190,7 +190,7 @@ const { queryParams } = toRefs(data)
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
   const cache = sessionStorage.getItem("tableData")
-  if(route.path === "/source/parse/quark" || route.path === "/source/parse/index"){
+  if(route.path === "/source/parse/bt" || route.path === "/source/parse/index"){
     tableData.value = JSON.parse(cache);
     return;
   }
