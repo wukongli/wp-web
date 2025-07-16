@@ -70,12 +70,17 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination
-        v-show="total > 0"
+    <el-pagination
+        v-if="total > 0"
+        layout="prev, pager, next"
         :total="total"
-        v-model:page="queryParams.pageNum"
-        v-model:limit="queryParams.pageSize"
-        @pagination="getList"
+        v-model:current-page="queryParams.pageNum"
+        v-model:page-size="queryParams.pageSize"
+        background
+        size="large"
+        @size-change="getList"
+        @current-change="getList"
+        class="custom-pagination"
     />
 
   </div>
@@ -219,7 +224,7 @@ function handleDelete(item) {
 
 function getList() {
   loading.value = true;
-  listSource(queryParams).then((response) => {
+  listSource(queryParams.value).then((response) => {
     tableList.value = response.rows;
     total.value = response.total;
     loading.value = false;
@@ -259,6 +264,9 @@ function extractQuarkInfo(text) {
 <style scoped lang="scss">
  .app{
    width: 80%;
-   margin:auto;
+   margin:5% auto 0;
+   .el-pagination {
+     margin: 45px auto 0;
+   }
  }
 </style>
