@@ -52,7 +52,7 @@
       <div>
         <a class="logo-title" href="/source">
           <img :src="logo" alt="">
-          <span>深度搜索 - 网盘资源搜索专家</span>
+          <span>深度盘搜 - 网盘资源搜索专家</span>
         </a>
       </div>
       <div class="header-search">
@@ -147,7 +147,7 @@
         </el-tag>
       </div>
       <!-- 子组件将在此处渲染 -->
-      <router-view>
+      <router-view v-if="showComponent">
       </router-view>
     </div>
 
@@ -183,6 +183,7 @@ const total = ref(0);
 const loading = ref(false);
 const tableShow = ref(false);
 const tagShow = ref(true);
+const showComponent = ref(true);
 import useUserStore from '@/store/modules/user';
 import MySvg from "@/components/icon/Svg.vue";
 import useTagsViewStore from "@/store/modules/tagsView";
@@ -267,6 +268,7 @@ function handleSearch(value){
   tableShow.value  = true;
   loading.value = true;
   tagShow.value  = false;
+  showComponent.value = false;
   if(value){
     searchValue.value = value;
   }
@@ -295,8 +297,8 @@ function getList() {
 }
 
 function goParse(row){
-  console.log(row);
-   tableShow.value = false;
+  tableShow.value = false;
+  showComponent.value = true;
   if(row.url.includes("quark")){
     if(row.url.length <= 23){
       ElMessage.error("文件已失效！");

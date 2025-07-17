@@ -105,11 +105,11 @@ service.interceptors.response.use(
       if (!isRelogin.show) {
         isRelogin.show = true;
         ElMessageBox.confirm(
-          '状态已过期，您可以继续留在该页面，或者返回首页',
+          '状态已过期，请登录后操作',
           '系统提示',
           {
             confirmButtonText: '确定',
-            cancelButtonText: '取消',
+            // cancelButtonText: '取消',
             type: 'warning',
           }
         )

@@ -88,6 +88,15 @@
 <!--            >-->
             <el-button
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
+                @click="openLink(scope.row)"
+                :disabled="scope.row.disable"
+                :loading="scope.row.loading"
+            >
+              打开此分享
+            </el-button>
+            <el-button
+                style="margin-left: 10px;"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
                 :loading="scope.row.loading"
@@ -416,7 +425,10 @@ function downLoad(item) {
   //   form.code = '';
   // }
 }
-
+function openLink(item){
+  const url = "https://pan.quark.cn/s/" + route.query.shorturl+"?pwd="+route.query.pwd;
+  window.open(url);
+}
 async function noLimit() {
   //直接下载文件
   isSending.value = true;

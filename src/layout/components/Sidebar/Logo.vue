@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('深度搜索');
+const title = ref('深度盘搜');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>

@@ -54,7 +54,7 @@
           label="文件名"
         >
           <template #default="scope">
-            <div
+            <div @click="parseList(scope.row)"
               style="display: flex; align-items: center"
             >
               <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
@@ -90,6 +90,15 @@
 <!--              >快速下载</el-button-->
 <!--            >-->
             <el-button
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
+                @click="openLink(scope.row)"
+                :disabled="scope.row.disable"
+                :loading="scope.row.loading"
+            >
+              打开此分享
+            </el-button>
+            <el-button
+                style="margin-left: 10px;"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
               @click="downLoad(scope.row)"
               :disabled="scope.row.disable"
@@ -389,6 +398,10 @@ function downLoad(item) {
   //   loadData.WeCharVisible = true;
   //   form.code = '';
   // }
+}
+function openLink(item){
+  const url = "https://pan.baidu.com/s/" + route.query.shorturl+"?pwd="+route.query.pwd;
+  window.open(url);
 }
 
 async function noLimit() {
