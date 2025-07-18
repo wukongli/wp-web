@@ -14,7 +14,7 @@
             height="30px"
             size="30"
         ></MySvg>
-        <span style="margin-left: 15px">{{ loadData.rootBackTitle }}</span>
+        <span style="margin-left: 10px">{{ loadData.rootBackTitle }}</span>
       </div>
       <div :title="loadData.bread" class="back-title">
         {{ loadData.bread }}
@@ -738,6 +738,9 @@ async function handleParse() {
       overflow: hidden; /* 隐藏超出容器的部分 */
       text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
     }
+  }
+  .wp-table{
+    min-height: 200px;
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {
     //background-color: #c0ffe7 !important;
