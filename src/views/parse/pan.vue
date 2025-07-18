@@ -274,13 +274,9 @@ function handleSearch(value){
   }
   userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     if(res.code === 200){
-      const result = res.data.sort((a,b)=>
-          new Date(b.time) - new Date(a.time)
-      );
-      tableData.value = result;
-      sessionStorage.setItem('tableData', JSON.stringify(result));
+      tableData.value =  res.data;
+      sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
     }
-    // total.value = res.data.Memory_get_usage;
     loading.value = false
   })
 }
@@ -306,7 +302,6 @@ function goParse(row){
     }
     const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
     const info = extractQuarkInfo(row.url);
-    console.log(12321);
     router.push({
       path: '/source/parse/bt',
       query: {
@@ -497,7 +492,7 @@ function addSource(){
   font-size: 18px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* 至少占满整个视口高度 */
+  min-height: 110vh; /* 至少占满整个视口高度 */
   .content{
     flex: 1;
     .logo{
@@ -669,7 +664,7 @@ function addSource(){
     margin-top:25px;
   }
   .el-pagination {
-    margin: 45px auto 0;
+    margin: 35px auto 30px;
   }
   .foot{
     margin-top: 10px;

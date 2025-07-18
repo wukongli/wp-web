@@ -1,11 +1,5 @@
 <template>
   <div class="app-container app1">
-<!--    <div class="logo">-->
-<!--      <a href="/source/index">-->
-<!--        <img :src="logo" alt="">-->
-<!--        <span>深度搜索</span>-->
-<!--      </a>-->
-<!--    </div>-->
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
@@ -795,30 +789,6 @@ async function handleParse() {
   //margin: auto;
   font-size: 18px;
   overflow: auto;
-  .logo{
-
-    a{
-      width: 100%;
-      height: 80px;
-      display: flex;
-      align-items: center; /* 垂直居中 */
-      justify-content: center; /* 水平居中 */
-      vertical-align: middle;
-      img{
-        width: 120px;
-        height: 80px;
-      }
-      span{
-        width: 100px!important;
-        height: 80px!important;
-        margin-top: 0;
-        font-size: 20px;
-        font-weight: bold;
-        line-height: 80px;
-      }
-    }
-
-  }
   header {
     width: 100%;
     height: 40px;
@@ -851,6 +821,9 @@ async function handleParse() {
       overflow: hidden; /* 隐藏超出容器的部分 */
       text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
     }
+  }
+  .wp-table{
+    min-height: 200px;
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {
     //background-color: #c0ffe7 !important;
