@@ -101,9 +101,9 @@
                 :disabled="scope.row.disable"
                 :loading="scope.row.loading"
             >
-              <span v-if="scope.row.status === 0">复制链接</span>
-              <span v-if="scope.row.status === 1">下载中</span>
-              <span v-if="scope.row.status === 2">已下载</span>
+              <span>复制链接</span>
+<!--              <span v-if="scope.row.status === 1">下载中</span>-->
+<!--              <span v-if="scope.row.status === 2">已下载</span>-->
             </el-button>
           </template>
         </el-table-column>
@@ -299,6 +299,7 @@ const loadData = reactive({
   url: '',
   codeUrl: qrCode,
   ckId: null,
+  sToken: null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -320,11 +321,12 @@ async function parseQuark(params){
       req = {
       pwd_id:route.query.shorturl,
       pdir_fid:params.pid,
+        stoken:loadData.sToken
     }
   }else{
-    console.log(loadData);
     req = {
       pwd_id:route.query.shorturl,
+      stoken:loadData.sToken
     }
   }
 
@@ -333,12 +335,11 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
-          console.log(data)
-          data.data.list.forEach((item) => {
+          data.data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
           });
-          loadData.tableData = data.data.list;
+          loadData.tableData = data.data.data.list;
         }
       })
       .catch(() => {
@@ -366,48 +367,6 @@ function parseList(item) {
       pid:fid
     });
   }
-}
-function parseCopyLink(params) {
-  loadData.routeData.push(params);
-  if (loadData.routeData.length === 1) {
-    loadData.rootBackTitle = '全部文件';
-    loadData.parseLinkParams.dir = '/';
-  } else {
-    loadData.parseLinkParams.dir = params.dir;
-    loadData.rootBackTitle = '返回上一级';
-  }
-  // 获取文件列表
-  userStore
-      .parseCopyLink(params)
-      .then((data) => {
-        loadData.tableLoading = false;
-        if (data.code === 200) {
-          if (parseInt(data.data.errno) === 0) {
-            const list = data.data.data.list;
-            const title = data.data.data.title;
-            loadData.bread = title;
-            // const code = Cookies.get('code');
-            list.forEach((item) => {
-              // 0 下载，1，下载中
-              item.status = 0;
-              // if (parseInt(item.size) > loadData.fileSize) {
-              //   item.disable = true;
-              // }
-            });
-            loadData.tableData = list;
-            loadData.parseLinkParams.seckey = data.data.data.seckey;
-            loadData.parseLinkParams.shareid = data.data.data.shareid;
-            loadData.parseLinkParams.uk = data.data.data.uk;
-          } else {
-            loadData.limitSpeedVisible = true;
-            return;
-          }
-        }
-      })
-      .catch(() => {
-        loadData.tableLoading = false;
-        // loadData.errorDia = true;
-      });
 }
 
 function downLoad(item) {
@@ -493,7 +452,6 @@ const onSubmit = () => {
   });
 };
 async function confirm(item) {
-  console.log(item);
   const{fid,share_fid_token} = item;
   item.loading = true;
   item.status = 1;
@@ -507,7 +465,6 @@ async function confirm(item) {
       .quarkTransfer(params)
       .then((res) => {
         if (res.code === 200) {
-          console.log(res);
           isSending.value = false;
           item.loading = false;
           item.disable = false;
@@ -533,7 +490,6 @@ async function confirm(item) {
 
 async function sendToMotrix(data,id) {
   //发送到下载器
-  console.log(data);
   fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
@@ -593,8 +549,17 @@ async function init() {
     router.push({ path: '/parse/login' });
     return;
   }
-  await initToken();
-  parseQuark({pid:false});
+  const cache = JSON.parse(sessionStorage.getItem("tableData"))
+  cache.forEach(item=>{
+    if(item.url.includes(route.query.shorturl)){
+      loadData.tableData = item.transfer.data.list;
+      loadData.tableLoading = false;
+      loadData.sToken = item.transfer.sToken;
+    }
+  })
+
+  // await initToken();
+  // parseQuark({pid:false});
 }
 init();
 

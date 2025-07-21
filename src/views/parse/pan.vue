@@ -65,6 +65,9 @@
             placeholder="请输入关键词"
             :remote-method="remoteMethod"
             :loading="loading"
+            remote-show-suffix
+            @focus="searchFocus"
+            @keydown="searchDown"
             @blur="handleBlur"
         >
           <el-option
@@ -92,8 +95,17 @@
                 style="display: flex; align-items: center"
             >
               <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+<!--              <el-progress-->
+<!--                            width="40" type="circle" :percentage="row.percentage">-->
+<!--                <template #default="{ percentage }">-->
+<!--                  <span style="font-size: 10px;" class="percentage-label">{{row.message}}</span>-->
+<!--                </template>-->
+<!--              </el-progress>-->
               <img v-if="row.url.includes('baidu')" style="margin-left: 2%;width: 80px;height: 18px;" class="baidu" :src="baidu" alt="">
               <img v-if="row.url.includes('quark')" style="margin-left: 2%;width: 80px;height: 18px;" class="quark" :src="quark" alt="">
+              <el-tag v-if="row.check === 1" style="margin-left: 2%;" type="success">有效</el-tag>
+              <el-tag v-if="row.check === 2" style="margin-left: 2%;" type="danger">无效</el-tag>
+              <el-tag v-if="row.check === 0" style="margin-left: 2%;" type="warning">检测中...</el-tag>
               <span style="margin-left: 2%;max-width: 200px;">{{
                   row.name
                 }}</span>
@@ -174,7 +186,7 @@ const router = useRouter();
 const loginData = reactive({login:false});
 import { ElMessageBox } from 'element-plus';
 
-import { Search } from '@element-plus/icons-vue'
+import { Search,Check } from '@element-plus/icons-vue'
 const tagHeader = ref(["少儿","小学","初中","高中","大学","四六级","考研","考公","教资","英语","电影","动漫","美剧","软件","电子书","编程","剪辑","设计"])
 const options = ref([])
 const searchValue = ref('');
@@ -211,8 +223,14 @@ import {getToken} from "../../utils/auth";
 // 使用主题管理
 const { isLightTheme } = useTheme();
 const { queryParams } = toRefs(data)
+const percentage = ref(0)
+
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
+
+  // setInterval(() => {
+  //   percentage2.value = (percentage2.value % 100) + 10
+  // }, 500)
   const cache = sessionStorage.getItem("tableData")
   if(route.path === "/source/parse/bt" || route.path === "/source/parse/index"){
     tableData.value = JSON.parse(cache);
@@ -264,7 +282,7 @@ function logout() {
       .catch(() => {});
 }
 getLogin();
-function handleSearch(value){
+ async function handleSearch(value){
   tableShow.value  = true;
   loading.value = true;
   tagShow.value  = false;
@@ -272,13 +290,65 @@ function handleSearch(value){
   if(value){
     searchValue.value = value;
   }
-  userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
-    if(res.code === 200){
-      tableData.value =  res.data;
-      sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
-    }
+  await userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     loading.value = false
+    if(res.code === 200){
+      res.data.forEach((item)=>{
+        item.check = 0;
+      })
+      tableData.value =  res.data;
+    }
   })
+   let index = 0;
+  const setInterId =  setInterval(()=> {
+    if(index < tableData.value.length){
+      checkUrl({url: tableData.value[index].url}).then(res => {
+        tableData.value[index].check = 1;
+        tableData.value[index].transfer = res;
+        if (res === "文件链接已失效") {
+          tableData.value[index].check = 2;
+        }
+        index++;
+        sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+      })
+    }else{
+      clearInterval(setInterId);
+    }
+   },2000);
+
+}
+
+async function checkUrl(row){
+  if(row.url.includes("quark")){
+    const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
+    const info = extractQuarkInfo(row.url);
+    const req = {
+      pwd_id:pwdId,
+      passcode:info.password,
+    }
+    return await userStore
+        .getToken(req)
+        .then((data) => {
+          if(data.code === 200){
+            return data.data;
+          }
+        })
+  }else if(row.url.includes("baidu")){
+    const { url, pwd } = SubmitLink(row.url);
+    const req = {
+      dir: "1",
+      root: '1',
+      shorturl: url,
+      pwd: pwd,
+    };
+    return await userStore
+        .parseCopyLink(req).then(res=>{
+          if(res.code === 200){
+            return res.data;
+          }
+        })
+
+  }
 }
 function getList() {
   if(!searchValue.value){
@@ -287,12 +357,36 @@ function getList() {
   }
   loading.value = true
   userStore.search({"keyword":searchValue.value,...queryParams.value}).then(res => {
+    res.data.forEach((item)=>{
+      item.check = 0;
+    })
     tableData.value = res.data;
-    loading.value = false
+    loading.value = false;
+    let index = 0;
+    const setInterId =  setInterval(()=> {
+      if(index < tableData.value.length){
+        checkUrl({url: tableData.value[index].url}).then(res => {
+          tableData.value[index].check = 1;
+          tableData.value[index].transfer = res;
+          if (res === "文件链接已失效") {
+            tableData.value[index].check = 2;
+          }
+          index++;
+          sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+        })
+      }else{
+        clearInterval(setInterId);
+      }
+    },2000);
   })
 }
 
+
 function goParse(row){
+  if(row.transfer === "文件链接已失效"){
+    ElMessage.error("文件已失效！");
+    return false;
+  }
   tableShow.value = false;
   showComponent.value = true;
   if(row.url.includes("quark")){
@@ -366,7 +460,15 @@ function getTag(){
 //   }
 // }
 function handleBlur(e){
-  searchValue.value = e.target.value;
+
+  // searchValue.value = e.target.value;
+}
+
+function searchDown(e){
+}
+
+function searchFocus(e){
+  console.log(e.target.value);
 }
 
 
@@ -381,8 +483,6 @@ const remoteMethod = (query) => {
        const values = jsonData.s.filter((item) => {
           return item.toLowerCase().includes(query.toLowerCase())
         })
-
-        console.log(values);
         options.value =  values.map((item)=>{
           return {
             value:item
@@ -452,8 +552,8 @@ function addSource(){
 :deep(.el-input__inner) {
   font-size: 20px;
   font-weight: bold;
-  height: 50px!important;
-  line-height: 50px!important;
+  height: 45px!important;
+  line-height: 45px!important;
 
 }
 :deep(.el-select .el-input__wrapper) {

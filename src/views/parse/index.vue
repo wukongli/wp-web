@@ -98,9 +98,9 @@
               :disabled="scope.row.disable"
               :loading="scope.row.loading"
             >
-              <span v-if="scope.row.status === 0">复制链接</span>
-              <span v-if="scope.row.status === 1">下载中</span>
-              <span v-if="scope.row.status === 2">已下载</span>
+              <span>复制链接</span>
+<!--              <span v-if="scope.row.status === 1">下载中</span>
+              <span v-if="scope.row.status === 2">已下载</span>-->
             </el-button>
           </template>
         </el-table-column>
@@ -304,8 +304,15 @@ onMounted(() => {
 })
 function getList() {
   // const userCode = Cookies.get('code');
-  const data = Object.assign({ index: 0 }, route.query);
-  parseCopyLink(data);
+  // const data = Object.assign({ index: 0 }, route.query);
+  // parseCopyLink(data);
+  const cache = JSON.parse(sessionStorage.getItem("tableData"))
+  cache.forEach(item=>{
+    if(item.url.includes(route.query.shorturl)){
+      loadData.tableData = item.transfer.data.list;
+      loadData.tableLoading = false;
+    }
+  })
 }
 const codeRules = {
   code: [{ required: true, trigger: 'blur', message: '请输入验证码' }],
