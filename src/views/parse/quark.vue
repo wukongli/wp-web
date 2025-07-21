@@ -270,6 +270,7 @@ const loadData = reactive({
     code: '',
     link: '',
     index: 0,
+    stoken:""
   },
   dialogVisible: false,
   // fileName: '',
@@ -308,11 +309,12 @@ async function parseQuark(params){
       req = {
       pwd_id:route.query.shorturl,
       pdir_fid:params.pid,
+        stoken:loadData.stoken,
     }
   }else{
-    console.log(loadData);
     req = {
       pwd_id:route.query.shorturl,
+      stoken:loadData.stoken,
     }
   }
 
@@ -321,7 +323,6 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
-          console.log(data)
           data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
@@ -347,11 +348,10 @@ function goToIndex() {
 }
 
 function parseList(item) {
-  console.log(item)
   const {fid,dir} = item;
   if(dir){
     parseQuark({
-      pid:fid
+      pid:fid,
     });
   }
 }
@@ -471,7 +471,6 @@ const onSubmit = () => {
   });
 };
 async function confirm(item) {
-  console.log(item);
   const{fid,share_fid_token} = item;
   item.loading = true;
   item.status = 1;
@@ -479,6 +478,7 @@ async function confirm(item) {
   const params = {
     pwd_id: route.query.shorturl,
     fid_list:[fid],
+    stoken:loadData.stoken
     // fid_token_list:[share_fid_token]
   };
   userStore
@@ -572,7 +572,7 @@ async function init() {
     return;
   }
   await initToken();
-  parseQuark({pid:false});
+  // parseQuark({pid:false});
 }
 init();
 
@@ -584,8 +584,11 @@ async function initToken(){
    await userStore
       .getToken(req)
       .then((data) => {
-        // if(data.code === 200){
-        // }
+        if(data.code === 200){
+          loadData.tableData = data.data.data.list;
+          loadData.stoken = data.data.sToken;
+          loadData.tableLoading = false;
+        }
       })
       .catch(() => {
         loadData.tableLoading = false;
@@ -654,7 +657,8 @@ async function handleParse() {
   const params = {
     pwd_id: route.query.shorturl,
     fid_list:fsIds.value,
-    fid_token_list:fTokenId.value
+    fid_token_list:fTokenId.value,
+    stoken:loadData.stoken
   };
   userStore
       .quarkTransfer(params)
