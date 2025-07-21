@@ -649,7 +649,10 @@ function init() {
   }
   loadData.tableLoading = true;
   // getUserByUserKey();
-  getList();
+  setTimeout(()=>{
+    getList();
+  },500)
+
   // getDownNum();
 }
 init();

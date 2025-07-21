@@ -387,6 +387,10 @@ function goParse(row){
     ElMessage.error("文件已失效！");
     return false;
   }
+  if(!row.transfer){
+    ElMessage.error("文件检测中,请稍后");
+    return;
+  }
   tableShow.value = false;
   showComponent.value = true;
   if(row.url.includes("quark")){

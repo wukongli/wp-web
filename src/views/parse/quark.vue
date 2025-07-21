@@ -335,11 +335,12 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
+          console.log(data.data.list);
           data.data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
           });
-          loadData.tableData = data.data.data.list;
+          loadData.tableData = data.data.list;
         }
       })
       .catch(() => {
@@ -360,7 +361,6 @@ function goToIndex() {
 }
 
 function parseList(item) {
-  console.log(item)
   const {fid,dir} = item;
   if(dir){
     parseQuark({
@@ -549,14 +549,17 @@ async function init() {
     router.push({ path: '/parse/login' });
     return;
   }
-  const cache = JSON.parse(sessionStorage.getItem("tableData"))
-  cache.forEach(item=>{
-    if(item.url.includes(route.query.shorturl)){
-      loadData.tableData = item.transfer.data.list;
-      loadData.tableLoading = false;
-      loadData.sToken = item.transfer.sToken;
-    }
-  })
+  setTimeout(()=>{
+    const cache = JSON.parse(sessionStorage.getItem("tableData"))
+    cache.forEach(item=>{
+      if(item.url.includes(route.query.shorturl)){
+        loadData.tableData = item.transfer.data.list;
+        loadData.tableLoading = false;
+        loadData.sToken = item.transfer.sToken;
+      }
+    })
+  },500)
+
 
   // await initToken();
   // parseQuark({pid:false});
