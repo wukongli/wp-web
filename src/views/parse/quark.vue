@@ -232,7 +232,6 @@ import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
-import { Client } from "@gopeed/rest";
 import {onMounted} from 'vue';
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -263,6 +262,7 @@ const loadData = reactive({
     code: '',
     link: '',
     index: 0,
+    stoken:'',
   },
   dialogVisible: false,
   // fileName: '',
@@ -301,10 +301,12 @@ async function parseQuark(params){
       req = {
       pwd_id:route.query.shorturl,
       pdir_fid:params.pid,
+        stoken:loadData.stoken,
     }
   }else{
     req = {
       pwd_id:route.query.shorturl,
+      stoken:loadData.stoken,
     }
   }
 
@@ -468,6 +470,7 @@ async function confirm(item) {
   const params = {
     pwd_id: route.query.shorturl,
     fid_list:[fid],
+    stoken:loadData.stoken,
     // fid_token_list:[share_fid_token]
   };
   userStore
@@ -556,7 +559,7 @@ async function init() {
     return;
   }
   await initToken();
-  parseQuark({pid:false});
+  // parseQuark({pid:false});
 }
 init();
 
@@ -568,8 +571,11 @@ async function initToken(){
    await userStore
       .getToken(req)
       .then((data) => {
-        // if(data.code === 200){
-        // }
+        if(data.code === 200){
+          loadData.tableData = data.data.data.list;
+          loadData.stoken = data.data.sToken;
+          loadData.tableLoading = false;
+        }
       })
       .catch(() => {
         loadData.tableLoading = false;

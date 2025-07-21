@@ -241,7 +241,6 @@ import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
-import { Client } from "@gopeed/rest";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -254,7 +253,7 @@ const multiple = ref(true);
 const fsIds = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([front,duli,yao]);
+const qrCodeList = ref([front,duli,yao,iron]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
