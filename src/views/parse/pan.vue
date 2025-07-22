@@ -377,7 +377,7 @@ function getList() {
       }else{
         clearInterval(setInterId);
       }
-    },2000);
+    },1000);
   })
 }
 

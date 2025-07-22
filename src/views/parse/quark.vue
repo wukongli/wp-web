@@ -335,8 +335,7 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
-          console.log(data.data.list);
-          data.data.data.list.forEach((item) => {
+          data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
           });
