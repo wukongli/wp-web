@@ -38,7 +38,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth';
 import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
-const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+const selectValue = ref('https://jx.789jiexi.net:4433/?url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -51,12 +51,24 @@ const loadData = reactive({
 })
 const options = [
   {
-    value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
+    value: 'https://jx.789jiexi.net:4433/?url=',
     label: '默认线路',
   },
   {
-    value: 'https://player.aifenxiang.net.cn/?url=',
-    label: '备用线路',
+    value: 'https://jx.789jiexi.icu:4433/?url=',
+    label: '备用线路一',
+  },
+  {
+    value: 'https://jiexi.789jiexi.net:4433/?url=',
+    label: '备用线路二',
+  },
+  {
+    value: 'https://jiexi.789jiexi.icu:4433/?url=',
+    label: '备用线路三',
+  },
+  {
+    value: 'https://jx.xmflv.com/?url=',
+    label: '备用线路四',
   },
 ]
 watch(() => selectValue.value, (newValue, oldValue) => {
@@ -67,14 +79,14 @@ watch(() => selectValue.value, (newValue, oldValue) => {
 function playVideo(){
   // ElMessage.success("加载成功，视频开始播放！");
   // window.location.reload();
-  if(input.value){
-    ElMessage.success("加载成功，视频开始播放！");
-    videoUrl.value = `${selectValue.value}${playUrl}`;
-    // videoUrl.value = `https://jx.xmflv.com/?url=${input.value}`;
-  }else{
-    ElMessage.error("请输入视频播放地址！")
-  }
-
+  // if(input.value){
+  //   ElMessage.success("加载成功，视频开始播放！");
+  //   videoUrl.value = `${selectValue.value}${playUrl}`;
+  //   // videoUrl.value = `https://jx.xmflv.com/?url=${input.value}`;
+  // }else{
+  //   ElMessage.error("请输入视频播放地址！")
+  // }
+  window.location.reload();
 }
 
 onMounted(() => {
