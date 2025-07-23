@@ -52,6 +52,9 @@
               style="display: flex; align-items: center"
           >
             <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
+            <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
+            <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
+            <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
             <span style="margin-left: 10px;">{{
                 row.url.includes("quark") ? '(夸克网盘) ' + row.name : '(百度网盘) '+row.name
               }}</span>
@@ -330,7 +333,7 @@ getTag();
     margin:50px auto 0;
     .tag-inner{
       margin-left: 20px;
-      margin-top: 10px;
+      margin-top: 20px;
       cursor: pointer;
       /* 基础样式 */
       border: 1px solid var(--el-border-color);

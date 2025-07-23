@@ -166,8 +166,12 @@ function handleBlur() {
       loginForm.value.pwd = info.password;
     }
   }else{
+    let cleanUrl;
+    if (loginForm.value.username.includes("http://") || loginForm.value.username.includes("https://")) {
+      cleanUrl = loginForm.value.username.replace(/^.*?(https?:\/\/)/i, "$1");
+    }
     loginForm.value.panType = 0;
-    const { url, pwd } = SubmitLink(loginForm.value.username);
+    const { url, pwd } = SubmitLink(cleanUrl);
     loginForm.value.shorturl = url;
     if(pwd){
       loginForm.value.pwd = pwd;

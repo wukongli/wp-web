@@ -38,6 +38,19 @@ export default defineConfig(({ mode, command }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
         },
+        '/.git': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/\.git/, ''),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              if (req.url.startsWith('/.git')) {
+                res.writeHead(403, {'Content-Type': 'text/plain'});
+                res.end('Access to .git is forbidden');
+              }
+            });
+          }
+        }
       },
     },
     //fix:error:stdin>:7356:1: warning: "@charset" must be the first rule in the file
