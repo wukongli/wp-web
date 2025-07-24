@@ -23,12 +23,12 @@
         @click="handleParse"
     >批量解析</el-button
     >
-    <el-button
-        style="margin-left: 20px"
-        type="primary"
-        plain
-        icon="Promotion"
-    ><a href="https://vip.gssource.com" target="_blank">获取卡密</a></el-button>
+<!--    <el-button-->
+<!--        style="margin-left: 20px"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="Promotion"-->
+<!--    ><a href="https://vip.gssource.com" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
       <el-table
@@ -165,12 +165,12 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
-        快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
+        快速下载无需验证码,不限次数,自由下载！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://vip.gssource.com/" target="_blank">点击开通快速下载</a></el-button>
+<!--          <el-button type="primary"><a href="https://vip.gssource.com/" target="_blank">点击开通快速下载</a></el-button>-->
           <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
