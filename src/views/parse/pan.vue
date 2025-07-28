@@ -43,7 +43,7 @@
             remote
             reserve-keyword
             allow-create
-            placeholder="请输入关键词"
+            placeholder="请输入关键词或者磁力链接"
             :remote-method="remoteMethod"
             :loading="loading"
             @blur="handleBlur"
@@ -336,7 +336,6 @@ function getTag(){
     }
   })
 }
-
 // function onkeydown(e){
 //   if( e.target.value.length <=1){
 //     tagShow.value = true;
@@ -359,8 +358,6 @@ const remoteMethod = (query) => {
        const values = jsonData.s.filter((item) => {
           return item.toLowerCase().includes(query.toLowerCase())
         })
-
-        console.log(values);
         options.value =  values.map((item)=>{
           return {
             value:item

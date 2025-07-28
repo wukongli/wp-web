@@ -84,12 +84,12 @@
         <!--        >-->
         <el-table-column min-width="100px" label="操作">
           <template #default="scope">
-<!--            <el-button-->
-<!--              @click="vipDownLoad(scope.row)"-->
-<!--              v-if="!parseInt(scope.row.isdir) && !getToken()"-->
-<!--              :type="'primary'"-->
-<!--              >快速下载</el-button-->
-<!--            >-->
+            <el-button
+              @click="vipDownLoad(scope.row)"
+              v-if="!parseInt(scope.row.isdir) && !getToken()"
+              :type="'primary'"
+              >快速下载</el-button
+            >
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -176,9 +176,9 @@
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        快速下载无需验证码，不限文件大小，不限下载次数，支持批量下载！
+        快速下载无需验证码，不限下载次数，支持批量下载！
       </div>
-      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>
+<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通快速下载</a></el-button>
