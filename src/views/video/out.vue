@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <a href="https://mac.aifenxiang.net.cn/">点击跳往站外观看...</a>
+    <a href="https://gssource.com">点击获取4k臻彩影视资源...</a>
   </div>
 </template>
 <script>

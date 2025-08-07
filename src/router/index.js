@@ -221,18 +221,31 @@ export const constantRoutes = [
       {
         name: 'Pan',
         path: 'pan',
-        hidden: false,
-        component: () => import('@/views/parse/pan.vue'),
+        hidden: true,
+        // component: () => import('@/views/parse/pan.vue'),
         meta: {
-          title: '网盘资源',
+          title: '资源地址',
           icon: 'chart',
           noCache: false,
-          link: null,
+          link: 'https://gssource.com/',
           refresh:true
         },
       },
     ],
   },
+  // {
+  //   name: 'Source',
+  //   path: '/source',
+  //   hidden: false,
+  //   // component: () => import('@/views/parse/pan.vue'),
+  //   meta: {
+  //     title: '影视观看',
+  //     icon: 'chart',
+  //     noCache: false,
+  //     link: 'https://gssource.com',
+  //     // refresh:true
+  //   },
+  // },
   {
     name: 'Video',
     path: '/video',
@@ -248,32 +261,32 @@ export const constantRoutes = [
       refresh:true
     },
     children: [
+      // {
+      //   name: 'List',
+      //   path: 'list',
+      //   hidden: false,
+      //   // component: () => import('@/views/video/list.vue'),
+      //   meta: {
+      //     title: '在线观看',
+      //     icon: 'redis-list',
+      //     noCache: false,
+      //     link: 'https://gssource.com',
+      //     refresh:true
+      //   },
+      // },
       {
-        name: 'List',
-        path: 'list',
+        name: 'Out',
+        path: 'out',
         hidden: false,
-        component: () => import('@/views/video/list.vue'),
+        component: () => import('@/views/video/out.vue'),
         meta: {
-          title: '在线观看',
+          title: '影视资源',
           icon: 'redis-list',
           noCache: false,
           link: null,
           refresh:true
         },
       },
-      // {
-      //   name: 'Out',
-      //   path: 'out',
-      //   hidden: false,
-      //   component: () => import('@/views/video/out.vue'),
-      //   meta: {
-      //     title: '站外观看',
-      //     icon: 'redis-list',
-      //     noCache: false,
-      //     link: null,
-      //     refresh:true
-      //   },
-      // },
     ],
   },
   {
