@@ -8,6 +8,13 @@
 <!--    </div>-->
     <div class="content">
       <div class="logo">
+        <a class="share-login" href="/vip/login">
+          <el-button
+              v-if="!loginData.login"
+              style="margin: 10px 0"
+              type="primary"
+              icon="user"
+          >登录</el-button></a>
         <a class="logo-title" href="/source">
           <img :src="logo" alt="">
           <span>深度搜索 - 云端资源搜索专家</span>
@@ -33,9 +40,10 @@
               </template>
             </el-dropdown>
           </div>
-          <a v-if="!loginData.login" href="/vip/login">卡密登录</a>
         </div>
+
       </div>
+
       <div class="header-search">
         <el-select
             v-model="searchValue"
@@ -416,7 +424,7 @@ const getTagType = (index) => {
 :deep(.el-select) {
   font-size: 20px!important;
   font-weight: bold;
-  width: 40%!important;
+  //width: 40%!important;
 }
 :deep(.el-input__inner) {
   font-size: 20px;
@@ -517,8 +525,15 @@ const getTagType = (index) => {
               top: 25px;
               font-size: 12px;
             }
+
           }
         }
+
+      }
+      .share-login{
+        float: right;
+        margin-top:10px;
+        margin-right:30px !important;
       }
     }
   }
@@ -540,9 +555,6 @@ const getTagType = (index) => {
 
   }
  }
-.header-search .el-select {
-  width: 45%;
-}
   .header-search{
     width: 100%;
     height: 50px;
