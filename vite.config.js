@@ -33,9 +33,10 @@ export default defineConfig(({ mode, command }) => {
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
-          target: 'http://127.0.0.1:8081',
+          // target: 'http://127.0.0.1:8081',
           // target: 'https://aifenxiang.net.cn:8081',
           // target: 'https://api.gssource.com/',
+          target: 'https://api.aifenxiang.net.cn/',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
         },
