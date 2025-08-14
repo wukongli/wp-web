@@ -45,25 +45,26 @@
       </div>
 
       <div class="header-search">
-        <el-select
-            v-model="searchValue"
-            filterable
-            remote
-            reserve-keyword
-            allow-create
-            placeholder="请输入关键词或者磁力链接"
-            :remote-method="remoteMethod"
-            :loading="loading"
-            @blur="handleBlur"
-        >
-          <el-option
-              style="font-size: 15px;font-weight: bold"
-              v-for="item in options"
-              :key="item.value"
-              :label="item.value"
-              :value="item.value"
-          />
-        </el-select>
+        <el-input class="header-input" v-model="searchValue" placeholder="请输入关键词或者磁力链接" />
+<!--        <el-select-->
+<!--            v-model="searchValue"-->
+<!--            filterable-->
+<!--            remote-->
+<!--            remote-show-suffix-->
+<!--            placeholder="请输入关键词或者磁力链接"-->
+<!--            :remote-method="remoteMethod"-->
+<!--            :loading="selectLoading"-->
+<!--            @focus="handleFocus"-->
+<!--            ref="selectRef"-->
+<!--        >-->
+<!--          <el-option-->
+<!--              style="font-size: 15px;font-weight: bold"-->
+<!--              v-for="item in options"-->
+<!--              :key="item.value"-->
+<!--              :label="item.label"-->
+<!--              :value="item.value"-->
+<!--          />-->
+<!--        </el-select>-->
         <el-button
             type="primary"
             icon="Search"
@@ -142,8 +143,6 @@
       声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
     </div>
 
-
-
   </div>
 
 
@@ -157,13 +156,14 @@ import {formatterTime, getIconClass, SubmitLink, timestampToTime} from "@/utils/
 import { onMounted } from 'vue'
 import { ElMessage } from 'element-plus';
 import moment from 'moment';
+import { nextTick } from 'vue'
 const router = useRouter();
 const loginData = reactive({login:false});
 import { ElMessageBox } from 'element-plus';
 
 import { Search } from '@element-plus/icons-vue'
 const tagHeader = ref(["少儿","小学","初中","高中","大学","四六级","考研","考公","教资","英语","电影","动漫","美剧","软件","电子书","编程","剪辑","设计"])
-const options = ref([])
+const options = ref([{label:123,value:123}])
 const searchValue = ref('');
 const selectLoading = ref(false)
 const total = ref(0);
@@ -174,6 +174,7 @@ const showComponent = ref(true);
 import useUserStore from '@/store/modules/user';
 import MySvg from "@/components/icon/Svg.vue";
 import useTagsViewStore from "@/store/modules/tagsView";
+const selectRef = ref(null)
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const userStore = useUserStore();
@@ -350,9 +351,29 @@ function getTag(){
 //     tableShow.value = false;
 //   }
 // }
-function handleBlur(e){
-  searchValue.value = e.target.value;
+// function handleBlur(e){
+//   searchValue.value = e.target.value;
+// }
+
+async function handleFocus() {
+  // 确保输入框保持可输入状态
+  await nextTick()
+  const input = document.querySelector('.el-select .el-input__inner')
+  console.log(input);
+  if (input) {
+    input.focus();
+  }
 }
+
+// const handleVisibleChange = async (visible) => {
+//   if (!visible) {
+//     await nextTick()
+//     const input = selectRef.value?.$el?.querySelector('.el-input__inner')
+//     input?.focus();
+//     input.removeAttribute('readonly');
+//   }
+// }
+
 
 
 const remoteMethod = (query) => {
@@ -366,9 +387,10 @@ const remoteMethod = (query) => {
        const values = jsonData.s.filter((item) => {
           return item.toLowerCase().includes(query.toLowerCase())
         })
-        options.value =  values.map((item)=>{
+        options.value =  values.map((item,index)=>{
           return {
-            value:item
+            value:item,
+            label:item,
           }
         })
       })
@@ -421,19 +443,19 @@ const getTagType = (index) => {
   background-color: var(--el-fill-color-blank);
 }
 /* Vue 3 使用 :deep() */
-:deep(.el-select) {
+:deep(.header-input) {
   font-size: 20px!important;
   font-weight: bold;
   //width: 40%!important;
 }
-:deep(.el-input__inner) {
+:deep(.header-input) {
   font-size: 20px;
   font-weight: bold;
   height: 50px!important;
   line-height: 50px!important;
 
 }
-:deep(.el-select .el-input__wrapper) {
+:deep(.header-input) {
   box-shadow: 0 0 0 1px #409EFF,
   0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
   transition: box-shadow 0.3s ease;
@@ -443,14 +465,9 @@ const getTagType = (index) => {
 //  font-size: 18px!important;
 //}
 
-:deep(.el-select:hover .el-input__wrapper) {
+:deep(.header-input .el-select:hover) {
   box-shadow: 0 0 0 2px #0773e2,
   0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
-}
-
-:deep(.el-select.is-focus .el-input__wrapper) {
-  box-shadow: 0 0 0 2px #0773e2,
-  0 2px 8px 0 rgba(64, 158, 255, 0.2) !important;
 }
 
 
@@ -547,7 +564,7 @@ const getTagType = (index) => {
   .home{
     width: 72%;
   }
-  .header-search .el-select {
+  .header-search .header-input {
     width: 600px!important;
   }
   .tag {
