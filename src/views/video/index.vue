@@ -6,7 +6,7 @@
         </div>
         <div class="content">
           <div class="top">
-            <el-link style="font-size: 20px;margin-top:10px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">4K、1080P、更多资源、点击前往观看</el-link>
+            <el-link style="font-size: 20px;margin-top:10px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">4K臻彩、1080P、高码率资源、流畅不卡顿、点击前往观看</el-link>
             <el-link style="font-size: 20px; margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" target="_blank" type="primary">夸克网盘不限速下载教程</el-link>
             <el-link style="font-size: 20px;margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" type="success">百度网盘不限速下载教程</el-link>
             <div class="right">
