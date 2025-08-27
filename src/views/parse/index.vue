@@ -130,7 +130,7 @@
       </template>
     </el-dialog>
     <!-- 扫描获取验证码弹窗 -->
-    <el-dialog width="40%" height="300px" title="提示" v-model="loadData.WeCharVisible">
+    <el-dialog class = "dia-code" height="300px" title="提示" v-model="loadData.WeCharVisible">
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <el-form
@@ -770,6 +770,11 @@ async function handleParse() {
 </script>
 
 <style scoped lang="scss">
+@media only screen and (max-width: 767px) {
+  :deep(.dia-code) {
+    width: 80%;
+  }
+}
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);
