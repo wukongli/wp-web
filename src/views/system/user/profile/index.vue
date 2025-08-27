@@ -46,13 +46,13 @@
 <!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).diff(moment(),'day'):'' }}</div>-->
 <!--                    </li>-->
                     <li class="list-group-item">
-                      解析到期日期
+                      到期日期
                       <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.vipEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
                     </li>
-                    <li class="list-group-item">
-                      影视vip到期日期
-                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>
-                    </li>
+<!--                    <li class="list-group-item">-->
+<!--                      影视vip到期日期-->
+<!--                      <div class="pull-right">{{state.user.vipEndTime ? moment(state.user.videoEndTime).format("YYYY-MM-DD HH:mm:ss"):'' }}</div>-->
+<!--                    </li>-->
                   </ul>
                </div>
             </el-card>
