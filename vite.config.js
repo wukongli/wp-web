@@ -34,23 +34,12 @@ export default defineConfig(({ mode, command }) => {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
           // target: 'http://127.0.0.1:8081',
-          target: 'https://api.gssource.com',
+          // target: 'https://aifenxiang.net.cn:8081',
+          target: 'https://api.gssource.com/',
+          // target: 'http://154.201.66.44:8081/',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
         },
-        '/.git': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/\.git/, ''),
-          configure: (proxy, options) => {
-            proxy.on('proxyReq', (proxyReq, req, res) => {
-              if (req.url.startsWith('/.git')) {
-                res.writeHead(403, {'Content-Type': 'text/plain'});
-                res.end('Access to .git is forbidden');
-              }
-            });
-          }
-        }
       },
     },
     //fix:error:stdin>:7356:1: warning: "@charset" must be the first rule in the file

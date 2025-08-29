@@ -14,15 +14,15 @@
         {{ loadData.bread }}
       </div>
     </header>
-    <el-button
-        style="margin: 10px 0"
-        type="primary"
-        plain
-        icon="UploadFilled"
-        :disabled="multiple"
-        @click="handleParse"
-    >批量解析</el-button
-    >
+<!--    <el-button-->
+<!--        style="margin: 10px 0"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="UploadFilled"-->
+<!--        :disabled="multiple"-->
+<!--        @click="handleParse"-->
+<!--    >批量解析</el-button-->
+<!--    >-->
     <el-button
         style="margin-left: 20px"
         type="primary"
