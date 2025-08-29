@@ -74,7 +74,7 @@
         <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
       </div>
       <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-        <el-table-column min-width="280px" prop="name" show-overflow-tooltip label="名字">
+        <el-table-column min-width="400px" prop="name" show-overflow-tooltip label="名字">
           <template #default="{row}">
             <div
                 @click="goParse(row)"

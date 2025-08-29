@@ -36,7 +36,7 @@
 <!--        icon="Promotion"-->
 <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
+<!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
       <el-table
         v-loading="loadData.tableLoading"
         element-loading-text="数据正在加载中..."
@@ -48,7 +48,7 @@
       >
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column
-          min-width="280px"
+          min-width="400px"
           show-overflow-tooltip
           prop="server_filename"
           label="文件名"
@@ -58,8 +58,18 @@
               @click="parseList(scope.row)"
               style="display: flex; align-items: center"
             >
-              <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
-              <span style="margin-left: 10px">{{
+              <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <el-image
+                  style="width:120px;height: 50px"
+                  v-if="scope.row.thumbs"
+                  :src="scope.row.thumbs.url3"
+                  fit="cover"
+                  :preview-src-list="[scope.row.thumbs.url3]"
+                  hide-on-click-modal
+                  preview-teleported
+              >
+              </el-image>
+              <span style="margin-left: 10px;max-width: 60%;">{{
                 scope.row.server_filename
               }}</span>
             </div>

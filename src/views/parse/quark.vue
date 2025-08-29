@@ -20,15 +20,15 @@
         {{ loadData.bread }}
       </div>
     </header>
-    <el-button
-        style="margin: 10px 0"
-        type="primary"
-        plain
-        icon="UploadFilled"
-        :disabled="multiple"
-        @click="handleParse"
-    >批量下载</el-button
-    >
+<!--    <el-button-->
+<!--        style="margin: 10px 0"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="UploadFilled"-->
+<!--        :disabled="multiple"-->
+<!--        @click="handleParse"-->
+<!--    >批量下载</el-button-->
+<!--    >-->
 <!--    <el-button-->
 <!--        style="margin-left: 20px"-->
 <!--        type="primary"-->
@@ -36,7 +36,7 @@
 <!--        icon="Promotion"-->
 <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
+<!--    <el-tag style="float: right;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
       <el-table
           v-loading="loadData.tableLoading"
           element-loading-text="数据正在加载中..."
@@ -60,7 +60,7 @@
                 style="display: flex; align-items: center"
             >
               <MySvg :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
-              <span style="margin-left: 10px">{{
+              <span style="margin-left: 10px;max-width: 60%;">{{
                   scope.row.file_name
                 }}</span>
             </div>
