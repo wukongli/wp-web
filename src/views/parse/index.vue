@@ -53,7 +53,17 @@
               @click="parseList(scope.row)"
               style="display: flex; align-items: center"
             >
-              <MySvg :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <el-image
+                  style="width:120px;height: 50px"
+                  v-if="scope.row.thumbs"
+                  :src="scope.row.thumbs.url3"
+                  fit="cover"
+                  :preview-src-list="[scope.row.thumbs.url3]"
+                  hide-on-click-modal
+                  preview-teleported
+              >
+              </el-image>
               <span style="margin-left: 10px">{{
                 scope.row.server_filename
               }}</span>
