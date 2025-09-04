@@ -6,8 +6,11 @@
         </div>
         <div class="content">
           <div class="top">
-            <el-link style="font-size: 20px;margin-top:10px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">4K臻彩、1080P、高码率资源、流畅不卡顿、点击前往观看</el-link>
-<!--            <el-link style="font-size: 20px; margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" target="_blank" type="primary">夸克网盘不限速下载教程</el-link>-->
+            <el-link style="font-size: 20px;margin-top:10px;" type="primary">4K臻彩、1080P、流畅不卡顿</el-link>
+            <el-link :icon="Link" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">线上观看</el-link>
+            <el-link :icon="Download" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://v.gssource.com" target="_blank" type="danger">下载观看</el-link>
+
+            <!--            <el-link style="font-size: 20px; margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" target="_blank" type="primary">夸克网盘不限速下载教程</el-link>-->
 <!--            <el-link style="font-size: 20px;margin-left:10px;margin-top:10px;" href="https://aifenxiang.net.cn" type="success">百度网盘不限速下载教程</el-link>-->
             <div class="right">
               <el-select v-model="selectValue" class="m-2" placeholder="切换线路" size="large">
@@ -29,6 +32,7 @@
 
 <script setup name="List">
 import { ref,watch } from 'vue'
+import { Edit,Link, Download,View as IconView } from '@element-plus/icons-vue'
 import moment from 'moment';
 // import video from "@/assets/images/video.png";
 import { ElMessage } from 'element-plus';

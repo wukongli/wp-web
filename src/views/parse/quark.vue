@@ -246,7 +246,7 @@ const fsIds = ref([]);
 const fTokenId = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([yao,iron]);
+const qrCodeList = ref([iron,front,duli]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
