@@ -48,7 +48,7 @@
       >
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column
-          min-width="400px"
+          min-width="300px"
           show-overflow-tooltip
           prop="server_filename"
           label="文件名"
