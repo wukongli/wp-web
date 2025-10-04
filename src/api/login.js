@@ -105,7 +105,14 @@ export function parseLinkReq(data) {
     data: data,
   });
 }
-
+export function videoAddReq(data) {
+  return request({
+    url: '/wp/addVideo',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
 export function parseLinkVisit(data) {
   return request({
     url: '/wp/pc/dlink',
@@ -197,6 +204,15 @@ export function getQuarkFileList(data){
 export function quarkTransfer(data){
   return request({
     url: '/quark/transfer',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+export function addVideo(data){
+  return request({
+    url: '/quark/addVideo',
     method: 'post',
     timeout: 20000,
     data: data,

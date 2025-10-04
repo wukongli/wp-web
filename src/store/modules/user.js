@@ -10,7 +10,7 @@ import {
     loginNoPwd,
     getCourseByType, delCode, getInfoByUserKey,
     tryDownUrl, parseLinkVisit,
-    getSToken,getQuarkFileList,quarkTransfer,searchPanData,searchTag,searchNames,getXdUrls
+    getSToken, getQuarkFileList, quarkTransfer, searchPanData, searchTag, searchNames, getXdUrls, videoAddReq, addVideo
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -77,6 +77,18 @@ const useUserStore = defineStore('user', {
           });
       });
    },
+
+      videoAdd(parseLink) {
+          return new Promise((resolve, reject) => {
+              videoAddReq(parseLink)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
   parseLinkVisit(parseLink) {
       return new Promise((resolve, reject) => {
           parseLinkVisit(parseLink)
@@ -251,6 +263,18 @@ const useUserStore = defineStore('user', {
       quarkTransfer(data){
           return new Promise((resolve, reject) => {
               quarkTransfer(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+
+      addVideo(data){
+          return new Promise((resolve, reject) => {
+              addVideo(data)
                   .then((res) => {
                       resolve(res);
                   })

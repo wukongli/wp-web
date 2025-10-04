@@ -78,19 +78,19 @@
           <template #default="{row}">
             <div
                 @click="goParse(row)"
-                style="display: flex; align-items: center"
             >
-              <MySvg :iconName="'icon-wenjianjia'" size="40"></MySvg>
-              <el-tag v-if="row.url.includes('quark')" style="margin-left: 2%;"  type="success">下载速度快</el-tag>
-              <el-tag v-if="row.url.includes('baidu')" style="margin-left: 2%;"  type="danger">下载速度一般</el-tag>
-              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;"  type="danger">下载速度一般</el-tag>
-              <span style="margin-left: 2%;max-width: 200px;">{{
+              <MySvg style="float:left;margin-left: 2%;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
+              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="success">下载速度快</el-tag>
+              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="primary">在线播放</el-tag>
+              <el-tag v-if="row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="danger">下载速度一般</el-tag>
+              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 7px;"  type="danger">下载速度一般</el-tag>
+              <span style="float:left;margin-left: 2%;margin-top:7px;">{{
                   row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="time" label="最后更新时间">
+        <el-table-column style="width: 100px;" prop="time" label="最后更新时间">
           <template #default="{row}">
             {{ row.time }}
           </template>
@@ -258,9 +258,13 @@ function handleSearch(value){
   if(value){
     searchValue.value = value;
   }
+  localStorage.setItem("searchName",searchValue.value);
   userStore.search({"keyword":value ? value : searchValue.value,...queryParams.value}).then((res)=>{
     if(res.code === 200){
-      tableData.value = res.data;
+      const uniqueArray = Array.from(
+          new Set(res.data.map(item => JSON.stringify(item)))
+      ).map(item => JSON.parse(item));
+      tableData.value = uniqueArray;
       sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
     }
     // total.value = res.data.Memory_get_usage;
@@ -426,6 +430,7 @@ function resetQuery(){
   // sessionStorage.removeItem("tableData");
   // getTag();
   // router.push({ path: '/source' });
+  localStorage.removeItem("searchName");
   sessionStorage.removeItem("tableData");
   window.location.href = "/source";
 }

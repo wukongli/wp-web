@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container app1">
+  <div class="app1">
 <!--    <div class="logo">-->
 <!--      <a href="/source/index">-->
 <!--        <img :src="logo" alt="">-->
@@ -46,11 +46,10 @@
           class="wp-table"
           @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="50" align="center" />
+<!--        <el-table-column type="selection" width="50" align="center" />-->
         <el-table-column
             show-overflow-tooltip
-            min-width="280px"
-            max-width="500px"
+            min-width="200px"
             prop="file_name"
             label="文件名"
         >
@@ -66,7 +65,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="updated_at" label="修改时间">
+        <el-table-column style="min-width: 100px;" prop="updated_at" label="修改时间">
           <template #default="{row}">
             {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
@@ -78,13 +77,19 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="100px" label="操作">
+        <el-table-column min-width="200px" label="操作">
           <template #default="scope">
             <el-button
                 @click="vipDownLoad(scope.row)"
                 v-if="!scope.row.dir && !getToken()"
                 :type="'primary'"
-            >快速下载</el-button
+            >VIP</el-button
+            >
+            <el-button
+                @click="playVideo(scope.row)"
+                v-if="!scope.row.dir && showPlay(scope.row)"
+                :type="'primary'"
+            >播放</el-button
             >
             <el-button
                 v-if="!scope.row.dir"
@@ -144,7 +149,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-          >下 载</el-button
+          >{{downOrPlay ? "播 放": "下 载"}}</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -172,7 +177,7 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
-        快速下载无需验证码，不限下载次数，支持批量下载！
+        深度搜索VIP无需验证码,不限下载次数，支持在线播放！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -196,25 +201,35 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
-      <!--      <img class="qr-code" :src="wechar" alt="" />-->
-      <div class="qr-hint">今天下载次数已达20次，请休息一下明天再来下载吧!</div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.maxNum = false"
-          >确 定</el-button
-          >
-        </span>
-      </template>
+    <el-dialog draggable width="70%" :style="{
+    height: '70vh',
+    maxHeight: '90vh',
+  }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
+      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中..." style="width:100%;height:55vh;background: black;">
+        <iframe style="background-color: black;" width="100%" height="100%"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen
+                frameborder="0"
+                :src="loadData.videoUrl">
+        </iframe>
+      </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
     <!--      <img :src="wechar" alt="" />-->
     <!--      <p class="con">有问题联系管理员</p>-->
     <!--    </div>-->
   </div>
+
 </template>
 
 <script setup name="Quark">
+import Player from 'xgplayer';
+import 'xgplayer/dist/index.min.css';
+import ArtPlayer from 'artplayer';
+const artPlayerContainer = ref(null);
+import Hls from "hls.js";
+
 import moment from 'moment';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
@@ -227,7 +242,7 @@ const userStore = useUserStore();
 import {
   generateRandomLetters,
   getFilesize,
-  getIconClass,
+  getIconClass, showPlay,
   timestampToTime, transQuarkIcon,
   userKey,
 } from '@/utils/wp';
@@ -238,10 +253,12 @@ import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import yao from '@/assets/images/yaoyao.png';
 import duli2 from '@/assets/images/独立2.png';
+import loading from '@/assets/img/loading.gif';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
+import videojs from "video.js";
 const qrCodeList = ref([front,duli,yao,iron,duli2]);
 const qrCode = ref('');
 const { proxy } = getCurrentInstance();
@@ -252,6 +269,7 @@ const form = reactive({
   code: '',
 });
 const isSending = ref(false);
+const downOrPlay = ref(true);//true 播放，false 下载
 const multiple = ref(true);
 const fsIds = ref([]);
 const fTokenId = ref([]);
@@ -279,6 +297,7 @@ const loadData = reactive({
   WeCharVisible: false,
   noLimit: false,
   errorDia: false,
+  maxNum:false,
   // codeNum: '',
   tableLoading: true,
   fileSize: 100698669056,
@@ -289,6 +308,9 @@ const loadData = reactive({
   url: '',
   codeUrl: qrCode,
   ckId: null,
+  videoUrl:'',
+  loading:true,
+  title:'',
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -298,10 +320,14 @@ onBeforeRouteLeave((to, from) => {
 //   const data = Object.assign({ index: 0 }, route.query);
 //   parseQuark();
 // }
+import 'video.js/dist/video-js.css';
+const videoRef = ref(null);
+
+
 
 onMounted(() => {
-  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = randomItem;
+  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = xiaochengxu
 })
 async function parseQuark(params){
   loadData.tableLoading = true;
@@ -399,9 +425,15 @@ function parseCopyLink(params) {
       });
 }
 
+/**
+ *
+ *下载
+ * @param item
+ */
 function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
+  downOrPlay.value = false;
   // showParse.value = true;
   if (getToken()) {
     loadData.noLimit = true;
@@ -410,6 +442,29 @@ function downLoad(item) {
     form.code = '';
   }
 }
+
+/**
+ * 播放视频
+ * @returns {Promise<void>}
+ */
+
+function playVideo(item){
+  loadData.item = item;
+  form.code = '';
+  downOrPlay.value = true;
+  if (getToken()) {
+    confirmVideo(loadData.item);
+  } else {
+    loadData.WeCharVisible = true;
+  }
+}
+
+function handleBeforeClose(){
+    loadData.videoUrl = "";
+    loadData.maxNum = false;
+    loadData.loading = true;
+}
+
 
 async function noLimit() {
   //直接下载文件
@@ -426,13 +481,40 @@ async function noLimit() {
 const onSubmit = () => {
   proxy.$refs.codeRef.validate(async (valid) => {
     if (valid) {
-      isSending.value = true;
       const params = {
         code: form.code,
         userKey: userKey,
         fsId: loadData.item.fid,
         version: '1.0.9',
       };
+
+      if(downOrPlay.value){
+        userStore
+            .getCodeNum(params)
+            .then((res) => {
+              if (res.code === 200) {
+                if (res.data.data == 100) {
+                  confirmVideo(loadData.item);
+                }  else if (res.data.data == 60) {
+                  setTimeout(() => {
+                    ElMessage.error('今日播放次数已达上限，请明天再来！');
+                  }, 2000);
+                } else if (res.data.data == 50) {
+                  setTimeout(() => {
+                    ElMessage.error(
+                        '验证码错误,一个验证码只能播放一个文件,请重新获取!'
+                    );
+                  }, 2000);
+                }
+              }
+            })
+            .catch(() => {
+              isSending.value = false;
+            });
+        return;
+      }
+      isSending.value = true;
+
       const result = await testDownLoad();
       if (!result) {
         loadData.dialogVisible = true;
@@ -471,6 +553,41 @@ const onSubmit = () => {
     }
   });
 };
+
+async function confirmVideo(item) {
+  const{fid,file_name,duration,size} = item;
+  loadData.title = file_name;
+  loadData.WeCharVisible = false;
+  loadData.maxNum = true;
+  const params = {
+    pwd_id: route.query.shorturl,
+    fid_list:[fid],
+    stoken:loadData.stoken,
+    fileName:file_name,
+    duration:duration,
+    size:size,
+  };
+  userStore
+      .addVideo(params)
+      .then((res) => {
+        if (res.code === 200) {
+          if(res.data.url.includes("&mt=")){
+            ElMessage.error("视屏播放失败,请更换资源或者下载后观看");
+            loadData.maxNum = false;
+            return;
+          }
+          let path = "夸克网盘/来自：分享/"+res.data.fileName;
+          // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
+          loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          setTimeout(()=>{
+            loadData.loading = false;
+          },1000)
+        }
+      })
+      .catch(() => {
+      });
+}
+
 async function confirm(item) {
   const{fid,share_fid_token} = item;
   item.loading = true;
@@ -479,7 +596,7 @@ async function confirm(item) {
   const params = {
     pwd_id: route.query.shorturl,
     fid_list:[fid],
-    stoken:loadData.stoken
+    stoken:loadData.stoken,
     // fid_token_list:[share_fid_token]
   };
   userStore
@@ -686,6 +803,10 @@ async function handleParse() {
     width: 80%;
   }
 }
+/* 使用深度选择器修改局部 loading 样式 */
+.loading-content :deep(.el-loading-mask) {
+  background-color: black !important;
+}
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);
@@ -770,7 +891,6 @@ async function handleParse() {
     font-weight: bold;
   }
   .qr-code {
-    width: 200px;
     height: 180px;
     margin: auto;
     display: block;

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container app1">
+  <div class="app1">
 <!--    <div class="logo">-->
 <!--      <a href="/source/index">-->
 <!--        <img :src="logo" alt="">-->
@@ -20,15 +20,15 @@
         {{ loadData.bread }}
       </div>
     </header>
-    <el-button
-      style="margin: 10px 0"
-      type="primary"
-      plain
-      icon="UploadFilled"
-      :disabled="multiple"
-      @click="handleParse"
-      >批量下载</el-button
-    >
+<!--    <el-button-->
+<!--      style="margin: 10px 0"-->
+<!--      type="primary"-->
+<!--      plain-->
+<!--      icon="UploadFilled"-->
+<!--      :disabled="multiple"-->
+<!--      @click="handleParse"-->
+<!--      >批量下载</el-button-->
+<!--    >-->
 <!--    <el-button-->
 <!--        style="margin-left: 20px"-->
 <!--        type="primary"-->
@@ -46,9 +46,9 @@
         class="wp-table"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="50" align="center" />
+<!--        <el-table-column type="selection" width="50" align="center" />-->
         <el-table-column
-          min-width="300px"
+          min-width="200px"
           show-overflow-tooltip
           prop="server_filename"
           label="文件名"
@@ -75,7 +75,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
+        <el-table-column style="width: 100px;"
           prop="server_mtime"
           :formatter="timestampToTime"
           label="修改时间"
@@ -92,14 +92,20 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="100px" label="操作">
+        <el-table-column min-width="110px" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
               v-if="!parseInt(scope.row.isdir) && !getToken()"
               :type="'primary'"
-              >快速下载</el-button
+              >VIP</el-button
             >
+<!--            <el-button-->
+<!--                @click="playVideo(scope.row)"-->
+<!--                v-if="!parseInt(scope.row.isdir)"-->
+<!--                :type="'primary'"-->
+<!--            >在线播放</el-button-->
+<!--            >-->
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -166,6 +172,26 @@
         </span>
       </template>
     </el-dialog>
+
+   <!-- 视频播放弹窗 -->
+    <el-dialog class = "dia-code" height="300px" title="提示" v-model="loadData.playVideo">
+      <div class="file-name">原文件名：{{ loadData.item.server_filename }}</div>
+      <el-form
+          ref="codeRef"
+          :model="form"
+      >
+        <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="播放文件名">
+          <el-input v-model="form.playName" auto-complete="off" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="videoAdd"
+          >添加播放</el-button
+          >
+        </span>
+      </template>
+    </el-dialog>
     <!-- 无限制下载 -->
     <el-dialog title="提示" v-model="loadData.noLimit" width="40%">
       <div class="qr-title">{{ loadData.item.server_filename }}</div>
@@ -186,12 +212,12 @@
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        快速下载无需验证码，不限下载次数，支持批量下载！
+        深度搜索VIP无需验证码,不限下载次数，支持在线播放！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通快速下载</a></el-button>
+          <el-button type="primary"><a href="https://vip.gssource.com" target="_blank">点击开通VIP</a></el-button>
 <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
@@ -265,6 +291,7 @@ const router = useRouter();
 const codeRef = ref();
 const form = reactive({
   code: '',
+  playName:'',
 });
 const isSending = ref(false);
 const multiple = ref(true);
@@ -290,6 +317,7 @@ const loadData = reactive({
   // fileName: '',
   realLink: '',
   WeCharVisible: false,
+  playVideo: false,
   noLimit: false,
   errorDia: false,
   // codeNum: '',
@@ -308,8 +336,8 @@ onBeforeRouteLeave((to, from) => {
   proxy.$tab.closeOpenPage();
 });
 onMounted(() => {
-  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = randomItem;
+  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = xiaochengxu;
 })
 function getList() {
   // const userCode = Cookies.get('code');
@@ -456,6 +484,38 @@ const onSubmit = () => {
     }
   });
 };
+const videoAdd = () => {
+  const params = {
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
+    sekey: loadData.parseLinkParams.seckey,
+    fsId: loadData.item.fs_id,
+    fs_ids: [loadData.item.fs_id],
+    path: loadData.item.server_filename,
+    userKey: userKey,
+    size: loadData.item.size,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    dir: loadData.parseLinkParams.dir,
+    fileNewName: form.playName,
+    fileName: loadData.item.server_filename,
+  };
+  // const token = getToken();
+  userStore
+      .videoAdd(params)
+      .then((res) => {
+        if (res.code === 200) {
+          ElMessage.success('添加成功,请打开播放器刷观看');
+          loadData.playVideo = false;
+        }
+      })
+      .catch(() => {
+      });
+};
+
+
 async function confirm(item) {
   item.loading = true;
   item.status = 1;
@@ -672,6 +732,13 @@ function vipDownLoad(item) {
   loadData.vipDown = true;
 }
 
+function playVideo(item){
+  console.log(item);
+  loadData.item = item;
+  form.playName = localStorage.getItem("searchName") + item.server_filename;
+  loadData.playVideo = true;
+}
+
 function vipDownClick() {
   ElMessage.error('请扫码联系管理员开通权限！');
 }
@@ -870,7 +937,7 @@ async function handleParse() {
     font-weight: bold;
   }
   .qr-code {
-    width: 200px;
+    width: 180px;
     height: 180px;
     margin: auto;
     display: block;
