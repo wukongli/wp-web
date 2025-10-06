@@ -173,7 +173,7 @@
     </el-dialog>
 
     <!--    赞助下载弹窗-->
-    <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
+    <el-dialog title="提示" v-model="loadData.vipDown" min-width="40%">
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
@@ -202,17 +202,40 @@
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
     <el-dialog draggable width="70%" :style="{
-    height: '70vh',
+    miHeight: '600px',
     maxHeight: '90vh',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
-      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中..." style="width:100%;height:55vh;background: black;">
-        <iframe style="background-color: black;" width="100%" height="100%"
+      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中..." style="width:100%;height:500px;background: black;">
+        <iframe style="background-color: black;" width="100%" height="500px"
                 allowfullscreen
                 webkitallowfullscreen
                 mozallowfullscreen
                 frameborder="0"
                 :src="loadData.videoUrl">
         </iframe>
+      </div>
+      <div class="mobile_player" >
+        <a :href="loadData.infuseUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="infuse播放器"
+              placement="top-start"
+          >
+            <img :src="infuse" alt="">
+          </el-tooltip>
+        </a>
+        <a :href="loadData.maxUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="mx播放器"
+              placement="top-start"
+          >
+            <img :src="mobilePlayer" alt="">
+          </el-tooltip>
+        </a>
+        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放速度更流畅</el-link></span>
       </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
@@ -224,16 +247,13 @@
 </template>
 
 <script setup name="Quark">
-import Player from 'xgplayer';
-import 'xgplayer/dist/index.min.css';
-import ArtPlayer from 'artplayer';
-const artPlayerContainer = ref(null);
-import Hls from "hls.js";
-
+import deviceDetector from '@/utils/platform';
 import moment from 'moment';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
+import mobilePlayer from '@/assets/logo/mxplayer.png';
+import infuse from '@/assets/logo/infuse.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
@@ -309,6 +329,9 @@ const loadData = reactive({
   codeUrl: qrCode,
   ckId: null,
   videoUrl:'',
+  infuseUrl:'',
+  maxUrl:'',
+  vlcUrl:'',
   loading:true,
   title:'',
 });
@@ -326,7 +349,6 @@ const videoRef = ref(null);
 
 
 onMounted(() => {
-  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
   qrCode.value = xiaochengxu
 })
 async function parseQuark(params){
@@ -579,6 +601,9 @@ async function confirmVideo(item) {
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
           setTimeout(()=>{
             loadData.loading = false;
           },1000)
@@ -805,7 +830,25 @@ async function handleParse() {
 }
 /* 使用深度选择器修改局部 loading 样式 */
 .loading-content :deep(.el-loading-mask) {
+  height: 500px;
   background-color: black !important;
+}
+.mobile_player{
+  cursor: pointer;
+  width: 530px;
+  height: 50px;
+  margin:auto;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  img{
+    margin-left:5px;
+    width: 40px;
+    height: 40px;
+  }
+  span{
+    margin-left:5px;
+  }
 }
 .app1 {
   width: 100%;
