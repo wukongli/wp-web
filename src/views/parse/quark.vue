@@ -1,11 +1,5 @@
 <template>
   <div class="app1">
-<!--    <div class="logo">-->
-<!--      <a href="/source/index">-->
-<!--        <img :src="logo" alt="">-->
-<!--        <span>深度搜索</span>-->
-<!--      </a>-->
-<!--    </div>-->
     <header>
       <div @click="goBack()" class="back-icon">
         <MySvg
@@ -201,12 +195,12 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog draggable width="70%" :style="{
+    <el-dialog class="play_dia" draggable :style="{
     miHeight: '600px',
-    maxHeight: '90vh',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
-      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中..." style="width:100%;height:500px;background: black;">
-        <iframe style="background-color: black;" width="100%" height="500px"
+      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
+        <iframe
+                ref="iframeRef"
                 allowfullscreen
                 webkitallowfullscreen
                 mozallowfullscreen
@@ -214,6 +208,7 @@
                 :src="loadData.videoUrl">
         </iframe>
       </div>
+        <el-button @click="refreshVideo" style="position: relative;left:3px;bottom: 40px;" :icon="Refresh">重新播放</el-button>
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -247,6 +242,9 @@
 </template>
 
 <script setup name="Quark">
+import {
+  Refresh
+} from '@element-plus/icons-vue'
 import deviceDetector from '@/utils/platform';
 import moment from 'moment';
 import { useRoute } from 'vue-router';
@@ -329,8 +327,8 @@ const loadData = reactive({
   codeUrl: qrCode,
   ckId: null,
   videoUrl:'',
-  infuseUrl:'',
-  maxUrl:'',
+  infuseUrl:"javascript:void(0)",
+  maxUrl:"javascript:void(0)",
   vlcUrl:'',
   loading:true,
   title:'',
@@ -344,7 +342,7 @@ onBeforeRouteLeave((to, from) => {
 //   parseQuark();
 // }
 import 'video.js/dist/video-js.css';
-const videoRef = ref(null);
+const iframeRef = ref(null);
 
 
 
@@ -482,9 +480,12 @@ function playVideo(item){
 }
 
 function handleBeforeClose(){
+   isSending.value = false;
     loadData.videoUrl = "";
     loadData.maxNum = false;
     loadData.loading = true;
+    loadData.infuseUrl = "javascript:void(0)";
+    loadData.maxUrl = "javascript:void(0)";
 }
 
 
@@ -509,6 +510,13 @@ const onSubmit = () => {
         fsId: loadData.item.fid,
         version: '1.0.9',
       };
+      isSending.value = true;
+      const result = await testDownLoad();
+      if (!result) {
+        loadData.dialogVisible = true;
+        isSending.value = false;
+        return;
+      }
 
       if(downOrPlay.value){
         userStore
@@ -533,14 +541,6 @@ const onSubmit = () => {
             .catch(() => {
               isSending.value = false;
             });
-        return;
-      }
-      isSending.value = true;
-
-      const result = await testDownLoad();
-      if (!result) {
-        loadData.dialogVisible = true;
-        isSending.value = false;
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
@@ -589,18 +589,19 @@ async function confirmVideo(item) {
     duration:duration,
     size:size,
   };
+  loadData.loading = true;
   userStore
       .addVideo(params)
       .then((res) => {
         if (res.code === 200) {
           if(res.data.url.includes("&mt=")){
-            ElMessage.error("视屏播放失败,请更换资源或者下载后观看");
+            ElMessage.error("视频播放失败,请更换资源或者下载后观看");
             loadData.maxNum = false;
             return;
           }
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
           loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+loadData.videoUrl;
@@ -611,6 +612,14 @@ async function confirmVideo(item) {
       })
       .catch(() => {
       });
+}
+
+function refreshVideo(){
+  loadData.loading = true;
+  iframeRef.value.src  = loadData.videoUrl;
+  setTimeout(()=>{
+    loadData.loading = false;
+  },3000)
 }
 
 async function confirm(item) {
@@ -654,7 +663,6 @@ async function confirm(item) {
 
 async function sendToMotrix(data,id) {
   //发送到下载器
-  console.log(data);
   fetch('http://127.0.0.1:9999/api/v1/tasks', {
     method: 'POST',
     headers: {
@@ -827,11 +835,24 @@ async function handleParse() {
   :deep(.dia-code) {
     width: 80%;
   }
+  :deep(.el-dialog){
+    width: 100%!important;
+  }
 }
 /* 使用深度选择器修改局部 loading 样式 */
 .loading-content :deep(.el-loading-mask) {
   height: 500px;
   background-color: black !important;
+}
+.loading-content{
+  width: 100%;
+  height: 500px;
+  background-color: black !important;
+  iframe{
+    width: 100%;
+    height: 500px;
+    background-color: black !important;
+  }
 }
 .mobile_player{
   cursor: pointer;
