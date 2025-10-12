@@ -52,7 +52,17 @@
                 @click="parseList(scope.row)"
                 style="display: flex; align-items: center"
             >
-              <MySvg :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
+              <MySvg v-if="!scope.row.base64Image" :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
+              <el-image
+                  style="width:120px;height: 50px"
+                  v-if="scope.row.base64Image"
+                  :src="scope.row.base64Image"
+                  fit="cover"
+                  :preview-src-list="[scope.row.base64Image]"
+                  hide-on-click-modal
+                  preview-teleported
+              >
+              </el-image>
               <span style="margin-left: 10px;max-width: 60%;">{{
                   scope.row.file_name
                 }}</span>
@@ -214,7 +224,7 @@
           <el-tooltip
               class="box-item"
               effect="dark"
-              content="infuse播放器"
+              content="苹果infuse播放器"
               placement="top-start"
           >
             <img :src="infuse" alt="">
@@ -224,13 +234,13 @@
           <el-tooltip
               class="box-item"
               effect="dark"
-              content="mx播放器"
+              content="安卓mx播放器"
               placement="top-start"
           >
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
         </a>
-        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放速度更流畅</el-link></span>
+        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放说明</el-link></span>
       </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
@@ -238,7 +248,6 @@
     <!--      <p class="con">有问题联系管理员</p>-->
     <!--    </div>-->
   </div>
-
 </template>
 
 <script setup name="Quark">
@@ -347,7 +356,7 @@ const iframeRef = ref(null);
 
 
 onMounted(() => {
-  qrCode.value = xiaochengxu
+  qrCode.value = xiaochengxu;
 })
 async function parseQuark(params){
   loadData.tableLoading = true;
@@ -590,28 +599,28 @@ async function confirmVideo(item) {
     size:size,
   };
   loadData.loading = true;
-  userStore
-      .addVideo(params)
-      .then((res) => {
-        if (res.code === 200) {
-          if(res.data.url.includes("&mt=")){
-            ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-            loadData.maxNum = false;
-            return;
-          }
-          let path = "夸克网盘/来自：分享/"+res.data.fileName;
-          // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
-          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-          setTimeout(()=>{
-            loadData.loading = false;
-          },1000)
-        }
-      })
-      .catch(() => {
-      });
+  // userStore
+  //     .addVideo(params)
+  //     .then((res) => {
+  //       if (res.code === 200) {
+  //         if(res.data.url.includes("&mt=")){
+  //           ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+  //           loadData.maxNum = false;
+  //           return;
+  //         }
+  //         let path = "夸克网盘/来自：分享/"+res.data.fileName;
+  //         // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
+  //         loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+  //         loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+  //         loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+  //         loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+  //         setTimeout(()=>{
+  //           loadData.loading = false;
+  //         },1000)
+  //       }
+  //     })
+  //     .catch(() => {
+  //     });
 }
 
 function refreshVideo(){
@@ -836,41 +845,81 @@ async function handleParse() {
     width: 80%;
   }
   :deep(.el-dialog){
-    width: 100%!important;
+    width: 96%!important;
+  }
+  :deep(.el-dialog__body){
+    padding:0;
+    padding-bottom: 20px;
+  }
+
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 350px;
+    background-color: black !important;
+  }
+  .loading-content{
+    width: 100%;
+    height: 350px;
+    background-color: black !important;
+    iframe{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:5px;
+      width: 40px;
+      height: 40px;
+    }
+    span{
+      margin-left:5px;
+    }
   }
 }
-/* 使用深度选择器修改局部 loading 样式 */
-.loading-content :deep(.el-loading-mask) {
-  height: 500px;
-  background-color: black !important;
-}
-.loading-content{
-  width: 100%;
-  height: 500px;
-  background-color: black !important;
-  iframe{
-    width: 100%;
+@media only screen and (min-width: 767px) {
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
     height: 500px;
     background-color: black !important;
   }
-}
-.mobile_player{
-  cursor: pointer;
-  width: 530px;
-  height: 50px;
-  margin:auto;
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  img{
-    margin-left:5px;
-    width: 40px;
-    height: 40px;
+  .loading-content{
+    width: 100%;
+    height: 500px;
+    background-color: black !important;
+    iframe{
+      width: 100%;
+      height: 500px;
+      background-color: black !important;
+    }
   }
-  span{
-    margin-left:5px;
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:5px;
+      width: 50px;
+      height: 50px;
+    }
+    span{
+      margin-left:5px;
+    }
   }
 }
+
+
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);
