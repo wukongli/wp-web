@@ -350,7 +350,6 @@ onBeforeRouteLeave((to, from) => {
 //   const data = Object.assign({ index: 0 }, route.query);
 //   parseQuark();
 // }
-import 'video.js/dist/video-js.css';
 const iframeRef = ref(null);
 
 
@@ -384,11 +383,26 @@ async function parseQuark(params){
             item.status = 0;
           });
           loadData.tableData = data.data.list;
+          loadImagesSequentially(loadData.tableData);
         }
       })
       .catch(() => {
         loadData.tableLoading = false;
       });
+}
+
+async function loadImagesSequentially(tableData) {
+  for (const item of tableData) {
+    if (item.big_thumbnail) {
+      try {
+        const res = await userStore.getImg({"imgUrl": item.big_thumbnail});
+        item.base64Image = res.data;
+      } catch (error) {
+        console.error('图片加载失败:', error);
+        item.base64Image = ''; // 设置默认值
+      }
+    }
+  }
 }
 
 
@@ -599,28 +613,28 @@ async function confirmVideo(item) {
     size:size,
   };
   loadData.loading = true;
-  // userStore
-  //     .addVideo(params)
-  //     .then((res) => {
-  //       if (res.code === 200) {
-  //         if(res.data.url.includes("&mt=")){
-  //           ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-  //           loadData.maxNum = false;
-  //           return;
-  //         }
-  //         let path = "夸克网盘/来自：分享/"+res.data.fileName;
-  //         // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-  //         loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
-  //         loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-  //         loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-  //         loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-  //         setTimeout(()=>{
-  //           loadData.loading = false;
-  //         },1000)
-  //       }
-  //     })
-  //     .catch(() => {
-  //     });
+  userStore
+      .addVideo(params)
+      .then((res) => {
+        if (res.code === 200) {
+          if(res.data.url.includes("&mt=")){
+            ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+            loadData.maxNum = false;
+            return;
+          }
+          let path = "夸克网盘/来自：分享/"+res.data.fileName;
+          // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
+          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+          setTimeout(()=>{
+            loadData.loading = false;
+          },1000)
+        }
+      })
+      .catch(() => {
+      });
 }
 
 function refreshVideo(){

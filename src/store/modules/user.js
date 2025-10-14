@@ -8,9 +8,21 @@ import {
     getVip,
     getCode,
     loginNoPwd,
-    getCourseByType, delCode, getInfoByUserKey,
-    tryDownUrl, parseLinkVisit,
-    getSToken, getQuarkFileList, quarkTransfer, searchPanData, searchTag, searchNames, getXdUrls, videoAddReq, addVideo
+    getCourseByType,
+    delCode,
+    getInfoByUserKey,
+    tryDownUrl,
+    parseLinkVisit,
+    getSToken,
+    getQuarkFileList,
+    quarkTransfer,
+    searchPanData,
+    searchTag,
+    searchNames,
+    getXdUrls,
+    videoAddReq,
+    addVideo,
+    getImgUrl
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -66,6 +78,18 @@ const useUserStore = defineStore('user', {
           });
       });
     },
+      getImg(params) {
+          return new Promise((resolve, reject) => {
+              getImgUrl(params)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+
     parseLink(parseLink) {
       return new Promise((resolve, reject) => {
         parseLinkReq(parseLink)

@@ -95,6 +95,16 @@ export function parseCopyLink(data) {
   });
 }
 
+export function getImgUrl(data) {
+  return request({
+    url: '/quark/getImg',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
+
 export function parseLinkReq(data) {
   return request({
     // url: '/wp/dlink',
