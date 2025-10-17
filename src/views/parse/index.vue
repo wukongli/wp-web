@@ -30,7 +30,7 @@
         icon="Promotion"
     ><a href="https://vip.gssource.com" target="_blank">快速下载</a></el-button>
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
-    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>
+<!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -113,7 +113,7 @@
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
-        您还没有安装下载器，请安装下载器并配置好端口！！
+        下载器已更新，请安装下载器并配置好端口！！
       </div>
       <div class="down-address">
         <span>配置说明：</span>
@@ -515,7 +515,7 @@ async function sendToMotrix(item) {
 
   // 调用API创建任务
 
-  fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -599,7 +599,7 @@ function goBack() {
 // }
 function init() {
   setInterval(()=>{
-    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+    fetch("http://127.0.0.1:6066/api/v1/tasks?status=running")
         .then((resp) => resp.json()).then((res)=>{
       if(res.code === 0){
         const result = res.data.filter(e=>
@@ -609,9 +609,9 @@ function init() {
           return `id=${e}`
         }).join('&')
         if(ids && ids.length){
-          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+          fetch( `http://127.0.0.1:6066/api/v1/tasks/pause?${ids}`,{method:"put"})
               .then((resp) => resp.json()).then((res)=>{
-            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+            fetch( `http://127.0.0.1:6066/api/v1/tasks/continue?${ids}`,{method:"put"})
                 .then((resp) => resp.json()).then((res)=>{
             })
           })
@@ -644,7 +644,7 @@ init();
 // }
 
 async function testDownLoad() {
-  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  return fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -729,7 +729,7 @@ async function handleParse() {
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
             }
-            fetch('http://127.0.0.1:9999/api/v1/tasks', {
+            fetch('http://127.0.0.1:6066/api/v1/tasks', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
