@@ -581,7 +581,7 @@ async function sendToMotrix(item) {
 
   // 调用API创建任务
 
-  fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -669,7 +669,7 @@ function goBack() {
 // }
 function init() {
   setInterval(()=>{
-    fetch("http://127.0.0.1:9999/api/v1/tasks?status=running")
+    fetch("http://127.0.0.1:6066/api/v1/tasks?status=running")
         .then((resp) => resp.json()).then((res)=>{
       if(res.code === 0){
         const result = res.data.filter(e=>
@@ -679,9 +679,9 @@ function init() {
           return `id=${e}`
         }).join('&')
         if(ids && ids.length){
-          fetch( `http://127.0.0.1:9999/api/v1/tasks/pause?${ids}`,{method:"put"})
+          fetch( `http://127.0.0.1:6066/api/v1/tasks/pause?${ids}`,{method:"put"})
               .then((resp) => resp.json()).then((res)=>{
-            fetch( `http://127.0.0.1:9999/api/v1/tasks/continue?${ids}`,{method:"put"})
+            fetch( `http://127.0.0.1:6066/api/v1/tasks/continue?${ids}`,{method:"put"})
                 .then((resp) => resp.json()).then((res)=>{
             })
           })
@@ -714,7 +714,7 @@ init();
 // }
 
 async function testDownLoad() {
-  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  return fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -806,7 +806,7 @@ async function handleParse() {
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
             }
-            fetch('http://127.0.0.1:9999/api/v1/tasks', {
+            fetch('http://127.0.0.1:6066/api/v1/tasks', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'

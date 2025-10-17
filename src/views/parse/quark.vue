@@ -686,7 +686,7 @@ async function confirm(item) {
 
 async function sendToMotrix(data,id) {
   //发送到下载器
-  fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -778,7 +778,7 @@ async function initToken(){
 // }
 
 async function testDownLoad() {
-  return fetch('http://127.0.0.1:9999/api/v1/tasks', {
+  return fetch('http://127.0.0.1:6066/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
