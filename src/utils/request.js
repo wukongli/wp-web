@@ -22,7 +22,7 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: import.meta.env.VITE_APP_BASE_API,
   // 超时
-  timeout: 10000,
+  timeout: 30000,
 });
 
 // request拦截器
@@ -127,8 +127,10 @@ service.interceptors.response.use(
       }
       return;
     } else if (code === 500) {
-       ElMessage({ message: msg, type: 'error' });
-      return Promise.reject(new Error(msg));
+        if(msg !== "SocketTimeoutException: connect timed out"){
+            ElMessage({ message: msg, type: 'error' });
+            return Promise.reject(new Error(msg));
+        }
     } else if (code === 601) {
       ElMessage({ message: msg, type: 'warning' });
       return Promise.reject(new Error(msg));

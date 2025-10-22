@@ -102,9 +102,9 @@
             >
 <!--            <el-button-->
 <!--                @click="playVideo(scope.row)"-->
-<!--                v-if="!parseInt(scope.row.isdir)"-->
+<!--                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"-->
 <!--                :type="'primary'"-->
-<!--            >在线播放</el-button-->
+<!--            >播放</el-button-->
 <!--            >-->
             <el-button
               v-if="!parseInt(scope.row.isdir)"
@@ -150,21 +150,21 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <el-form
-        ref="codeRef"
-        :model="form"
-        :rules="codeRules"
+          ref="codeRef"
+          :model="form"
+          :rules="codeRules"
       >
         <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="请输入验证码">
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
       <div class="qr-hint">扫一扫上方二维码获取验证码</div>
-<!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
-<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
+      <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
+      <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-            >下 载</el-button
+          >{{downOrPlay ? "播 放": "下 载"}}</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -236,16 +236,43 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
-      <!--      <img class="qr-code" :src="wechar" alt="" />-->
-      <div class="qr-hint">今天下载次数已达20次，请休息一下明天再来下载吧!</div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.maxNum = false"
-            >确 定</el-button
+    <el-dialog class="play_dia" draggable :style="{
+    miHeight: '600px',
+  }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
+      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
+        <iframe
+            ref="iframeRef"
+            allowfullscreen
+            webkitallowfullscreen
+            mozallowfullscreen
+            frameborder="0"
+            :src="loadData.videoUrl">
+        </iframe>
+      </div>
+      <el-button style="position: relative;left:3px;bottom: 40px;">此资源只能播放器播放</el-button>
+      <div class="mobile_player" >
+        <a :href="loadData.infuseUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="苹果infuse播放器"
+              placement="top-start"
           >
-        </span>
-      </template>
+            <img :src="infuse" alt="">
+          </el-tooltip>
+        </a>
+        <a :href="loadData.maxUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="安卓mx播放器"
+              placement="top-start"
+          >
+            <img :src="mobilePlayer" alt="">
+          </el-tooltip>
+        </a>
+        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放说明</el-link></span>
+      </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
     <!--      <img :src="wechar" alt="" />-->
@@ -269,7 +296,7 @@ import {
   getIconClass,
   timestampToTime,
   userKey,
-  formatToYMD
+  formatToYMD, showPlay, baiduShowPlay
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
@@ -285,6 +312,8 @@ import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
+import infuse from "@/assets/logo/infuse.png";
+import mobilePlayer from "@/assets/logo/mxplayer.png";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -298,6 +327,7 @@ const multiple = ref(true);
 const fsIds = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
+const downOrPlay = ref(true);//true 播放，false 下载
 const loadData = reactive({
   bread: '',
   tableData: [],
@@ -415,6 +445,7 @@ function parseCopyLink(params) {
 function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
+  downOrPlay.value = false;
   // showParse.value = true;
   if (getToken()) {
     loadData.noLimit = true;
@@ -452,6 +483,31 @@ const onSubmit = () => {
         isSending.value = false;
         return;
       }
+      if(downOrPlay.value){
+        userStore
+            .getCodeNum(params)
+            .then((res) => {
+              if (res.code === 200) {
+                if (res.data.data == 100) {
+                  confirmVideo(loadData.item);
+                }  else if (res.data.data == 60) {
+                  setTimeout(() => {
+                    ElMessage.error('今日播放次数已达上限，请明天再来！');
+                  }, 2000);
+                } else if (res.data.data == 50) {
+                  setTimeout(() => {
+                    ElMessage.error(
+                        '验证码错误,一个验证码只能播放一个文件,请重新获取!'
+                    );
+                  }, 2000);
+                }
+              }
+            })
+            .catch(() => {
+              isSending.value = false;
+            });
+        return;
+      }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
         ElMessage.error('文件大于3G,普通下载暂不支持，请使用快速下载！');
         isSending.value = false;
@@ -484,36 +540,6 @@ const onSubmit = () => {
     }
   });
 };
-const videoAdd = () => {
-  const params = {
-    shareid: loadData.parseLinkParams.shareid,
-    uk: loadData.parseLinkParams.uk,
-    randsk: loadData.parseLinkParams.seckey,
-    sekey: loadData.parseLinkParams.seckey,
-    fsId: loadData.item.fs_id,
-    fs_ids: [loadData.item.fs_id],
-    path: loadData.item.server_filename,
-    userKey: userKey,
-    size: loadData.item.size,
-    pwd: loadData.query.pwd,
-    surl: loadData.query.shorturl,
-    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
-    dir: loadData.parseLinkParams.dir,
-    fileNewName: form.playName,
-    fileName: loadData.item.server_filename,
-  };
-  // const token = getToken();
-  userStore
-      .videoAdd(params)
-      .then((res) => {
-        if (res.code === 200) {
-          ElMessage.success('添加成功,请打开播放器刷观看');
-          loadData.playVideo = false;
-        }
-      })
-      .catch(() => {
-      });
-};
 
 
 async function confirm(item) {
@@ -534,6 +560,7 @@ async function confirm(item) {
     surl: loadData.query.shorturl,
     url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
     dir: loadData.parseLinkParams.dir,
+    fileName: loadData.item.server_filename,
   };
   // const token = getToken();
     userStore
@@ -668,27 +695,27 @@ function goBack() {
 //   router.push({ path: '/login' });
 // }
 function init() {
-  setInterval(()=>{
-    fetch("http://127.0.0.1:6066/api/v1/tasks?status=running")
-        .then((resp) => resp.json()).then((res)=>{
-      if(res.code === 0){
-        const result = res.data.filter(e=>
-            e.status === "running"
-        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
-        const ids = result.map((e)=>{
-          return `id=${e}`
-        }).join('&')
-        if(ids && ids.length){
-          fetch( `http://127.0.0.1:6066/api/v1/tasks/pause?${ids}`,{method:"put"})
-              .then((resp) => resp.json()).then((res)=>{
-            fetch( `http://127.0.0.1:6066/api/v1/tasks/continue?${ids}`,{method:"put"})
-                .then((resp) => resp.json()).then((res)=>{
-            })
-          })
-        }
-      }
-    })
-  },15000)
+  // setInterval(()=>{
+  //   fetch("http://127.0.0.1:6066/api/v1/tasks?status=running")
+  //       .then((resp) => resp.json()).then((res)=>{
+  //     if(res.code === 0){
+  //       const result = res.data.filter(e=>
+  //           e.status === "running"
+  //       ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
+  //       const ids = result.map((e)=>{
+  //         return `id=${e}`
+  //       }).join('&')
+  //       if(ids && ids.length){
+  //         fetch( `http://127.0.0.1:6066/api/v1/tasks/pause?${ids}`,{method:"put"})
+  //             .then((resp) => resp.json()).then((res)=>{
+  //           fetch( `http://127.0.0.1:6066/api/v1/tasks/continue?${ids}`,{method:"put"})
+  //               .then((resp) => resp.json()).then((res)=>{
+  //           })
+  //         })
+  //       }
+  //     }
+  //   })
+  // },15000)
   if (
     !route.query.shorturl ||
     !route.query.pwd ||
@@ -733,11 +760,76 @@ function vipDownLoad(item) {
 }
 
 function playVideo(item){
-  console.log(item);
+  // console.log(item);
+  // loadData.item = item;
+  // form.playName = localStorage.getItem("searchName") + item.server_filename;
+  // loadData.playVideo = true;
+
   loadData.item = item;
-  form.playName = localStorage.getItem("searchName") + item.server_filename;
-  loadData.playVideo = true;
+  form.code = '';
+  downOrPlay.value = true;
+  if (getToken()) {
+    confirmVideo(loadData.item);
+  } else {
+    loadData.WeCharVisible = true;
+  }
 }
+function handleBeforeClose(){
+  isSending.value = false;
+  loadData.videoUrl = "";
+  loadData.maxNum = false;
+  loadData.loading = true;
+  loadData.infuseUrl = "javascript:void(0)";
+  loadData.maxUrl = "javascript:void(0)";
+}
+
+async function confirmVideo(item) {
+  const{fid,server_filename,duration,size} = item;
+  loadData.title = server_filename;
+  loadData.WeCharVisible = false;
+  loadData.maxNum = true;
+  loadData.loading = true;
+    const params = {
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
+    sekey: loadData.parseLinkParams.seckey,
+    fsId: loadData.item.fs_id,
+    fs_ids: [loadData.item.fs_id],
+    path: loadData.item.server_filename,
+    userKey: userKey,
+    size: loadData.item.size,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    dir: loadData.parseLinkParams.dir,
+    fileNewName: form.playName,
+    fileName: loadData.item.server_filename,
+  };
+  userStore
+      .videoAdd(params)
+      .then((res) => {
+        if (res.code === 200) {
+            if(res.data.url.includes("&mt=")){
+              ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+              loadData.maxNum = false;
+              return;
+            }
+            let path = "baidu/我的资源/"+res.data.fileName;
+            // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
+            loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+            loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+            loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+            loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+            setTimeout(()=>{
+              loadData.loading = false;
+            },1000)
+        }
+      })
+      .catch(() => {
+      });
+}
+
 
 function vipDownClick() {
   ElMessage.error('请扫码联系管理员开通权限！');
@@ -851,6 +943,79 @@ async function handleParse() {
 @media only screen and (max-width: 767px) {
   :deep(.dia-code) {
     width: 80%;
+  }
+  :deep(.el-dialog){
+    width: 96%!important;
+  }
+  :deep(.el-dialog__body){
+    padding:0;
+    padding-bottom: 20px;
+  }
+
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 350px;
+    background-color: black !important;
+  }
+  .loading-content{
+    width: 100%;
+    height: 350px;
+    background-color: black !important;
+    iframe{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:5px;
+      width: 40px;
+      height: 40px;
+    }
+    span{
+      margin-left:5px;
+    }
+  }
+}
+@media only screen and (min-width: 767px) {
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 500px;
+    background-color: black !important;
+  }
+  .loading-content{
+    width: 100%;
+    height: 500px;
+    background-color: black !important;
+    iframe{
+      width: 100%;
+      height: 500px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:5px;
+      width: 50px;
+      height: 50px;
+    }
+    span{
+      margin-left:5px;
+    }
   }
 }
 .app1 {
