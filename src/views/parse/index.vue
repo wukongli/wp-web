@@ -469,6 +469,7 @@ async function confirm(item) {
     surl: loadData.query.shorturl,
     url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
     dir: loadData.parseLinkParams.dir,
+    fileName: item.server_filename,
   };
   // const token = getToken();
     userStore
