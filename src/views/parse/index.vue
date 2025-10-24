@@ -56,11 +56,11 @@
           <template #default="scope">
             <div
               @click="parseList(scope.row)"
-              style="display: flex; align-items: center"
+              style="height:75px!important;"
             >
-              <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)"></MySvg>
               <el-image
-                  style="width:120px;height: 50px"
+                  style="width:110px;height: 50px;"
                   v-if="scope.row.thumbs"
                   :src="scope.row.thumbs.url3"
                   fit="cover"
@@ -69,9 +69,9 @@
                   preview-teleported
               >
               </el-image>
-              <span style="margin-left: 10px;max-width: 60%;">{{
+              <div style="font-size: 16px;font-weight: bold;overflow:hidden;text-overflow: ellipsis;">{{
                 scope.row.server_filename
-              }}</span>
+              }}</div>
             </div>
           </template>
         </el-table-column>
@@ -92,7 +92,7 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="110px" label="操作">
+        <el-table-column min-width="230px" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
@@ -100,12 +100,12 @@
               :type="'primary'"
               >VIP</el-button
             >
-<!--            <el-button-->
-<!--                @click="playVideo(scope.row)"-->
-<!--                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"-->
-<!--                :type="'primary'"-->
-<!--            >播放</el-button-->
-<!--            >-->
+            <el-button
+                @click="playVideo(scope.row)"
+                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
+                :type="'primary'"
+            >播放</el-button
+            >
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -240,16 +240,16 @@
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
-        <iframe
-            ref="iframeRef"
-            allowfullscreen
-            webkitallowfullscreen
-            mozallowfullscreen
-            frameborder="0"
-            :src="loadData.videoUrl">
-        </iframe>
+<!--        <iframe-->
+<!--            ref="iframeRef"-->
+<!--            allowfullscreen-->
+<!--            webkitallowfullscreen-->
+<!--            mozallowfullscreen-->
+<!--            frameborder="0"-->
+<!--            :src="loadData.videoUrl">-->
+<!--        </iframe>-->
       </div>
-      <el-button style="position: relative;left:3px;bottom: 40px;">此资源只能播放器播放</el-button>
+      <el-button style="position: relative;left:3px;bottom: 40px;">此资源只能播放器播放,请点击下方按钮播放器内播放</el-button>
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -477,11 +477,13 @@ const onSubmit = () => {
         fsId: loadData.item.fs_id,
         version: '1.0.9',
       };
-      const result = await testDownLoad();
-      if (!result) {
-        loadData.dialogVisible = true;
-        isSending.value = false;
-        return;
+      if(!downOrPlay){
+        const result = await testDownLoad();
+        if (!result) {
+          loadData.dialogVisible = true;
+          isSending.value = false;
+          return;
+        }
       }
       if(downOrPlay.value){
         userStore
@@ -778,7 +780,7 @@ function handleBeforeClose(){
   isSending.value = false;
   loadData.videoUrl = "";
   loadData.maxNum = false;
-  loadData.loading = true;
+  loadData.loading = false;
   loadData.infuseUrl = "javascript:void(0)";
   loadData.maxUrl = "javascript:void(0)";
 }
@@ -810,11 +812,6 @@ async function confirmVideo(item) {
       .videoAdd(params)
       .then((res) => {
         if (res.code === 200) {
-            if(res.data.url.includes("&mt=")){
-              ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-              loadData.maxNum = false;
-              return;
-            }
             let path = "baidu/我的资源/"+res.data.fileName;
             // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
             loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;

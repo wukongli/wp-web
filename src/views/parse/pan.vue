@@ -77,20 +77,21 @@
         <el-table-column min-width="400px" prop="name" show-overflow-tooltip label="名字">
           <template #default="{row}">
             <div
+                style="height: 67px;"
                 @click="goParse(row)"
             >
               <MySvg style="float:left;margin-left: 2%;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="success">下载速度快</el-tag>
-              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="primary">在线播放</el-tag>
-              <el-tag v-if="row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 7px;"  type="danger">下载速度一般</el-tag>
-              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 7px;"  type="danger">下载速度一般</el-tag>
-              <span style="float:left;margin-left: 2%;margin-top:7px;">{{
+              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>
+              <el-tag v-if="row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
+              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>
+              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>
+              <span style="float:left;margin-left: 2%;margin-top:10px;">{{
                   row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column style="width: 100px;" prop="time" label="最后更新时间">
+        <el-table-column style="min-width: 100px;" prop="time" label="修改时间">
           <template #default="{row}">
             {{ row.time }}
           </template>
@@ -522,7 +523,7 @@ const getTagType = (index) => {
       .user{
         position: absolute;
         right: 0;
-        top: 20px;
+        top: -10px;
         font-size: 18px;
         font-weight: bold;
         color:#337ecc;
@@ -530,9 +531,7 @@ const getTagType = (index) => {
           //margin-right: 40px;
 
           .avatar-wrapper {
-            margin-top: 5px;
             position: relative;
-
             .user-avatar {
               cursor: pointer;
               width: 40px;
@@ -553,9 +552,10 @@ const getTagType = (index) => {
 
       }
       .share-login{
-        float: right;
-        margin-top:10px;
-        margin-right:30px !important;
+        position: absolute;
+        right: 0;
+        top: -20px;
+        font-size: 18px;
       }
     }
   }
@@ -580,7 +580,7 @@ const getTagType = (index) => {
   .header-search{
     width: 100%;
     height: 50px;
-    margin: 40px auto 0;
+    margin: 15px auto 0;
     display: flex;
     align-items: center; /* 垂直居中 */
     justify-content: center; /* 水平居中 */

@@ -70,8 +70,8 @@ export function getIconClass(row) {
 }
 
 export function transQuarkIcon(row) {
-    const {file_name ,isdir} = row;
-    if(isdir){
+    const {file_name,file} = row;
+    if(!file){
         return "icon-wenjianjia";
     }
     const filetype = {

@@ -36,7 +36,7 @@
           element-loading-text="数据正在加载中..."
           :data="loadData.tableData"
           max-height="100%"
-          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600;overflow: auto;"
+          style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600;"
           class="wp-table"
           @selection-change="handleSelectionChange"
       >
@@ -49,12 +49,12 @@
         >
           <template #default="scope">
             <div
+                style="height:75px!important;"
                 @click="parseList(scope.row)"
-                style="display: flex; align-items: center"
             >
-              <MySvg v-if="!scope.row.base64Image" :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
+              <MySvg v-if="!scope.row.base64Image" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
               <el-image
-                  style="width:120px;height: 50px"
+                  style="width:110px;height: 50px;"
                   v-if="scope.row.base64Image"
                   :src="scope.row.base64Image"
                   fit="cover"
@@ -63,13 +63,13 @@
                   preview-teleported
               >
               </el-image>
-              <span style="margin-left: 10px;max-width: 60%;">{{
+              <div style="font-size: 16px;font-weight: bold;overflow:hidden;text-overflow: ellipsis;">{{
                   scope.row.file_name
-                }}</span>
+                }}</div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column style="min-width: 100px;" prop="updated_at" label="修改时间">
+        <el-table-column style="min-width: 200px;" prop="updated_at" label="修改时间">
           <template #default="{row}">
             {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
@@ -81,7 +81,7 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="200px" label="操作">
+        <el-table-column min-width="230px" label="操作">
           <template #default="scope">
             <el-button
                 @click="vipDownLoad(scope.row)"
@@ -534,11 +534,13 @@ const onSubmit = () => {
         version: '1.0.9',
       };
       isSending.value = true;
-      const result = await testDownLoad();
-      if (!result) {
-        loadData.dialogVisible = true;
-        isSending.value = false;
-        return;
+      if(!downOrPlay){
+        const result = await testDownLoad();
+        if (!result) {
+          loadData.dialogVisible = true;
+          isSending.value = false;
+          return;
+        }
       }
 
       if(downOrPlay.value){
@@ -617,26 +619,76 @@ async function confirmVideo(item) {
       .addVideo(params)
       .then((res) => {
         if (res.code === 200) {
-          if(res.data.url.includes("&mt=")){
-            ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-            loadData.maxNum = false;
-            return;
-          }
+          // if(res.data.url.includes("&mt=")){
+          //   ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+          //   loadData.maxNum = false;
+          //   return;
+          // }
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
-          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-          setTimeout(()=>{
-            loadData.loading = false;
-          },1000)
+         const testUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+         fetch(testUrl, {
+            method: "HEAD",
+            redirect: "manual", // 手动处理重定向
+            headers: {
+              Range: "bytes=0-0", // 只请求少量数据，节省带宽
+            },
+          }).then(response=>{
+           if (response.status >= 300 && response.status < 400) {
+              loadData.loading = false;
+              ElMessage.error("此资源无法播放,请更换资源播放！");
+              return;
+           }else{
+             loadData.videoUrl = testUrl;
+             loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+             loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+             loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+             setTimeout(()=>{
+               loadData.loading = false;
+             },1000)
+           }
+         })
+
+
         }
       })
       .catch(() => {
       });
 }
-
+async function checkRedirect(url) {
+  try {
+    const response = await fetch(url, {
+      method: "HEAD",
+      redirect: "manual", // 手动处理重定向
+      headers: {
+        Range: "bytes=0-0", // 只请求少量数据，节省带宽
+      },
+    })
+    console.log(response)
+    if (response.status >= 300 && response.status < 400) {
+      console.log("会发生重定向")
+      console.log("重定向状态码:", response.status)
+      console.log("重定向地址:", response.headers.get("location"))
+      return {
+        willRedirect: true,
+        status: response.status,
+        redirectUrl: response.headers.get("location"),
+      }
+    } else {
+      console.log("不会重定向")
+      return {
+        willRedirect: false,
+        status: response.status,
+      }
+    }
+  } catch (error) {
+    console.error("检查重定向时出错:", error)
+    return {
+      willRedirect: false,
+      error: error.message,
+    }
+  }
+}
 function refreshVideo(){
   loadData.loading = true;
   iframeRef.value.src  = loadData.videoUrl;

@@ -22,11 +22,11 @@ const props = defineProps({
   },
   width: {
     type: String,
-    default: '40px'
+    default: '60px'
   },
   height: {
     type: String,
-    default: '40px'
+    default: '50px'
   }
 })
 // 图标在 iconfont 中的名字
