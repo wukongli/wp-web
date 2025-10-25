@@ -48,10 +48,10 @@
       >
 <!--        <el-table-column type="selection" width="50" align="center" />-->
         <el-table-column
-          min-width="200px"
           show-overflow-tooltip
           prop="server_filename"
           label="文件名"
+          min-width="40%"
         >
           <template #default="scope">
             <div
@@ -75,9 +75,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column style="width: 100px;"
+        <el-table-column
           prop="server_mtime"
           :formatter="timestampToTime"
+          min-width="20%"
           label="修改时间"
         />
 <!--        <el-table-column prop="updated_at" label="修改时间">-->
@@ -85,25 +86,31 @@
 <!--            {{ timestampToTime(row.server_mtime) }}-->
 <!--          </template>-->
 <!--        </el-table-column>-->
-        <el-table-column prop="size" :formatter="getFilesize" label="大小" />
+        <el-table-column min-width="15%" prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
         <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="230px" label="操作">
+        <el-table-column min-width="25%" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
-              v-if="!parseInt(scope.row.isdir) && !getToken()"
-              :type="'primary'"
-              >VIP</el-button
+              v-if="!parseInt(scope.row.isdir)"
+              :type="'warning'"
+              style="margin-left:12px;margin-top: 5px;"
+              icon="menu"
+              size="small"
+              >&nbsp;VIP</el-button
             >
             <el-button
                 @click="playVideo(scope.row)"
                 v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
-                :type="'primary'"
+                :type="'success'"
+                icon="videoPlay"
+                size="small"
+                style="margin-top:5px;"
             >播放</el-button
             >
             <el-button
@@ -112,8 +119,11 @@
               @click="downLoad(scope.row)"
               :disabled="scope.row.disable"
               :loading="scope.row.loading"
+              icon="download"
+              size="small"
+              style="margin-top:5px;"
             >
-              <span v-if="scope.row.status === 0">下 载</span>
+              <span v-if="scope.row.status === 0">下载</span>
               <span v-if="scope.row.status === 1">下载中</span>
               <span v-if="scope.row.status === 2">已下载</span>
             </el-button>
@@ -249,7 +259,7 @@
 <!--            :src="loadData.videoUrl">-->
 <!--        </iframe>-->
       </div>
-      <el-button style="position: relative;left:3px;bottom: 40px;">此资源只能播放器播放,请点击下方按钮播放器内播放</el-button>
+      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -569,7 +579,6 @@ async function confirm(item) {
         .parseLink(params)
         .then((res) => {
           if (res.code === 200) {
-            console.log(res);
             isSending.value = false;
             item.status = 0;
             item.loading = false;

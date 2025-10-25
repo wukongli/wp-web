@@ -74,7 +74,7 @@
         <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
       </div>
       <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
-        <el-table-column min-width="400px" prop="name" show-overflow-tooltip label="名字">
+        <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="{row}">
             <div
                 style="height: 67px;"
@@ -91,7 +91,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column style="min-width: 100px;" prop="time" label="修改时间">
+        <el-table-column prop="time" label="修改时间">
           <template #default="{row}">
             {{ row.time }}
           </template>
@@ -493,6 +493,7 @@ const getTagType = (index) => {
   display: flex;
   flex-direction: column;
   min-height: 110vh; /* 至少占满整个视口高度 */
+  overflow-x: hidden;
   .content{
     flex: 1;
     .logo{

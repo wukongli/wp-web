@@ -43,9 +43,9 @@
 <!--        <el-table-column type="selection" width="50" align="center" />-->
         <el-table-column
             show-overflow-tooltip
-            min-width="200px"
             prop="file_name"
             label="文件名"
+            min-width="40%"
         >
           <template #default="scope">
             <div
@@ -69,40 +69,49 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column style="min-width: 200px;" prop="updated_at" label="修改时间">
+        <el-table-column min-width="20%" prop="updated_at" label="修改时间">
           <template #default="{row}">
             {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
         </el-table-column>
-        <el-table-column prop="size" :formatter="getFilesize" label="大小" />
+        <el-table-column min-width="15%" prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
         <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="230px" label="操作">
+        <el-table-column min-width="25%" label="操作">
           <template #default="scope">
             <el-button
+                icon="menu"
+                style="margin-left:12px;margin-top: 5px;"
+                size="small"
                 @click="vipDownLoad(scope.row)"
-                v-if="!scope.row.dir && !getToken()"
-                :type="'primary'"
-            >VIP</el-button
+                v-if="!scope.row.dir"
+                :type="'warning'"
+            >&nbsp;VIP</el-button
             >
             <el-button
+                size="small"
                 @click="playVideo(scope.row)"
                 v-if="!scope.row.dir && showPlay(scope.row)"
-                :type="'primary'"
+                :type="'success'"
+                icon="videoPlay"
+                style="margin-top:5px;"
             >播放</el-button
             >
             <el-button
+                icon="download"
+                size="small"
                 v-if="!scope.row.dir"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
                 :loading="scope.row.loading"
+                style="margin-top:5px;"
             >
-              <span v-if="scope.row.status === 0">下 载</span>
+              <span v-if="scope.row.status === 0">下载</span>
               <span v-if="scope.row.status === 1">下载中</span>
               <span v-if="scope.row.status === 2">已下载</span>
             </el-button>
@@ -218,7 +227,7 @@
                 :src="loadData.videoUrl">
         </iframe>
       </div>
-        <el-button @click="refreshVideo" style="position: relative;left:3px;bottom: 40px;" :icon="Refresh">重新播放</el-button>
+        <el-button size="small" @click="refreshVideo" style="position: relative;left:3px;bottom: 30px;" :icon="Refresh">重新播放</el-button>
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -344,7 +353,7 @@ const loadData = reactive({
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
-  proxy.$tab.closeOpenPage();
+  proxy.$tab.closeOpenPage()
 });
 // function getList() {
 //   const data = Object.assign({ index: 0 }, route.query);
@@ -626,28 +635,30 @@ async function confirmVideo(item) {
           // }
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-         const testUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
-         fetch(testUrl, {
-            method: "HEAD",
-            redirect: "manual", // 手动处理重定向
-            headers: {
-              Range: "bytes=0-0", // 只请求少量数据，节省带宽
-            },
-          }).then(response=>{
-           if (response.status >= 300 && response.status < 400) {
-              loadData.loading = false;
-              ElMessage.error("此资源无法播放,请更换资源播放！");
-              return;
-           }else{
-             loadData.videoUrl = testUrl;
-             loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-             loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-             loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-             setTimeout(()=>{
-               loadData.loading = false;
-             },1000)
-           }
-         })
+          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+         //  loadData.videoUrl = testUrl;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
+          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+          setTimeout(()=>{
+            loadData.loading = false;
+          },1000)
+         // fetch(testUrl, {
+         //    method: "HEAD",
+         //    redirect: "manual", // 手动处理重定向
+         //    headers: {
+         //      Range: "bytes=0-0", // 只请求少量数据，节省带宽
+         //    },
+         //  }).then(response=>{
+         //    console.log(response);
+         //   if (response.status >= 300 && response.status < 400) {
+         //      loadData.loading = false;
+         //      ElMessage.error("此资源无法播放,请更换资源播放！");
+         //      return;
+         //   }else{
+         //
+         //   }
+         // })
 
 
         }
