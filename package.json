@@ -25,6 +25,8 @@
     "electron-reload": "^2.0.0-alpha.1",
     "element-plus": "2.2.27",
     "file-saver": "2.0.5",
+    "flv.js": "^1.6.2",
+    "mpegts.js": "^1.8.0",
     "fuse.js": "6.6.2",
     "hls.js": "^1.6.13",
     "js-cookie": "3.0.1",

@@ -26,9 +26,9 @@ export default defineConfig(({ mode, command }) => {
     // vite 相关配置
     server: {
       port: 8899,
-      host: true,
+      host: "0.0.0.0",
       open: true,
-      cors: true, // 允许跨域
+      // cors: true, // 允许跨域
       hmr: true, // 开启热更新
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy

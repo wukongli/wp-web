@@ -271,6 +271,16 @@
             <img :src="infuse" alt="">
           </el-tooltip>
         </a>
+        <a :href="loadData.vlcUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="vlc播放器"
+              placement="top-start"
+          >
+            <img :src="vlc" alt="">
+          </el-tooltip>
+        </a>
         <a :href="loadData.maxUrl">
           <el-tooltip
               class="box-item"
@@ -324,6 +334,7 @@ import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
 import infuse from "@/assets/logo/infuse.png";
 import mobilePlayer from "@/assets/logo/mxplayer.png";
+import vlc from "@/assets/logo/vlc.png";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -1015,7 +1026,7 @@ async function handleParse() {
     display: flex;
     align-items: center;
     img{
-      margin-left:5px;
+      margin-left:8px;
       width: 50px;
       height: 50px;
     }

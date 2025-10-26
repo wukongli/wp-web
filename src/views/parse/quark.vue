@@ -214,10 +214,11 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog class="play_dia" draggable :style="{
+    <el-dialog class="play_dia" :style="{
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
+<!--        <div class="video_player" id="video-player"></div>-->
         <iframe
                 ref="iframeRef"
                 allowfullscreen
@@ -237,6 +238,16 @@
               placement="top-start"
           >
             <img :src="infuse" alt="">
+          </el-tooltip>
+        </a>
+        <a :href="loadData.vlcUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="vlc播放器"
+              placement="top-start"
+          >
+            <img :src="vlc" alt="">
           </el-tooltip>
         </a>
         <a :href="loadData.maxUrl">
@@ -270,11 +281,16 @@ import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import mobilePlayer from '@/assets/logo/mxplayer.png';
 import infuse from '@/assets/logo/infuse.png';
+import vlc from '@/assets/logo/vlc.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
 import {onMounted} from 'vue';
 const userStore = useUserStore();
+import flvjs from 'flv.js'
+import Hls from 'hls.js'
+import Artplayer from "artplayer"
+import mpegts from "mpegts.js"
 import {
   generateRandomLetters,
   getFilesize,
@@ -347,9 +363,11 @@ const loadData = reactive({
   videoUrl:'',
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
-  vlcUrl:'',
+  vlcUrl:'javascript:void(0)',
   loading:true,
   title:'',
+  player:null,
+  hlsPlayer:null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -512,12 +530,15 @@ function playVideo(item){
 }
 
 function handleBeforeClose(){
-   isSending.value = false;
+    isSending.value = false;
     loadData.videoUrl = "";
     loadData.maxNum = false;
-    loadData.loading = true;
+    loadData.loading = false;
     loadData.infuseUrl = "javascript:void(0)";
     loadData.maxUrl = "javascript:void(0)";
+    // if (loadData.player && loadData.player.video) loadData.player.video.src = "";
+    // loadData.player?.destroy();
+    // loadData.hlsPlayer?.destroy();
 }
 
 
@@ -643,6 +664,103 @@ async function confirmVideo(item) {
           setTimeout(()=>{
             loadData.loading = false;
           },1000)
+          // const option = {
+          //   id: "/夸克网盘/来自：分享/"+res.data.fileName,
+          //   container: "#video-player",
+          //   url: loadData.videoUrl,
+          //   title: res.data.fileName,
+          //   volume: 1.0,
+          //   autoplay: true,
+          //   autoSize: false,
+          //   autoMini: true,
+          //   loop: false,
+          //   flip: true,
+          //   playbackRate: true,
+          //   aspectRatio: true,
+          //   // "screenshot": true,
+          //   setting: true,
+          //   hotkey: true,
+          //   pip: true,
+          //   mutex: true,
+          //   fullscreen: true,
+          //   // "fullscreenWeb": true,
+          //   subtitleOffset: true,
+          //   miniProgressBar: false,
+          //   type: "mp4",
+          //   // "playsInline": true,
+          //   theme: "#1890ff",
+          //   quality: [],
+          //   whitelist: [],
+          //   settings: [],
+          //   moreVideoAttr: {
+          //     crossOrigin: "anonymous",
+          //   },
+          //   customType: {
+          //     m3u8: function (video, url) {
+          //       if (Hls.isSupported()) {
+          //         hlsPlayer.value = new Hls({
+          //           xhrSetup: (xhr) => {
+          //             xhr.withCredentials = false
+          //             if (url.includes('drive.quark.cn')) {
+          //               xhr.setRequestHeader('Referer', 'https://pan.quark.cn/')
+          //               xhr.setRequestHeader('Origin', 'https://pan.quark.cn')
+          //             }
+          //           },
+          //           enableWorker: false,
+          //         })
+          //         hlsPlayer.value.loadSource(url)
+          //         hlsPlayer.value.attachMedia(video)
+          //       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          //         video.src = url
+          //       }
+          //     },
+          //     flv: function (video, url) {
+          //       if (mpegts.getFeatureList().mseLivePlayback) {
+          //         flvPlayer.value = mpegts.createPlayer(
+          //             {
+          //               type: 'flv',
+          //               url: url,
+          //               isLive: false,
+          //             },
+          //             {
+          //               enableWorker: false,
+          //               lazyLoad: true,
+          //               lazyLoadMaxDuration: 3 * 60,
+          //               seekType: 'range',
+          //             }
+          //         )
+          //         flvPlayer.value.attachMediaElement(video)
+          //         flvPlayer.value.load()
+          //       }
+          //     },
+          //     mp4: function (video, url) {
+          //       // video.crossOrigin = 'anonymous'
+          //       video.src = url
+          //     }
+          //   },
+          //   lang: "zh-cn",
+          //   lock: true,
+          //   fastForward: true,
+          //   autoPlayback: true,
+          //   autoOrientation: true,
+          //   airplay: true
+          // }
+          // const player = new Artplayer(option)
+          // loadData.player = player;
+          // player.on("ready", () => {
+          //   player.video.src = res.data.url;
+          // })
+          // player.on("video:ended", () => {
+          //
+          // })
+          // player.on("error", () => {
+          //   if (player.video.crossOrigin) {
+          //     console.log(
+          //         "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+          //     )
+          //     player.video.crossOrigin = null;
+          //   }
+          // })
          // fetch(testUrl, {
          //    method: "HEAD",
          //    redirect: "manual", // 手动处理重定向
@@ -665,6 +783,10 @@ async function confirmVideo(item) {
       })
       .catch(() => {
       });
+}
+function ext(path){
+  return path.split(".").pop() ?? ""
+
 }
 async function checkRedirect(url) {
   try {
@@ -938,6 +1060,11 @@ async function handleParse() {
     width: 100%;
     height: 350px;
     background-color: black !important;
+    .video_player{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
     iframe{
       width: 100%;
       height: 350px;
@@ -952,7 +1079,7 @@ async function handleParse() {
     display: flex;
     align-items: center;
     img{
-      margin-left:5px;
+      margin-left:8px;
       width: 40px;
       height: 40px;
     }
@@ -964,16 +1091,21 @@ async function handleParse() {
 @media only screen and (min-width: 767px) {
   /* 使用深度选择器修改局部 loading 样式 */
   .loading-content :deep(.el-loading-mask) {
-    height: 500px;
     background-color: black !important;
   }
   .loading-content{
     width: 100%;
     height: 500px;
     background-color: black !important;
+    padding-top:45px;
+    .video_player{
+      width: 100%;
+      height: 400px;
+      background-color: black !important;
+    }
     iframe{
       width: 100%;
-      height: 500px;
+      height: 400px;
       background-color: black !important;
     }
   }
@@ -986,7 +1118,7 @@ async function handleParse() {
     display: flex;
     align-items: center;
     img{
-      margin-left:5px;
+      margin-left:8px;
       width: 50px;
       height: 50px;
     }

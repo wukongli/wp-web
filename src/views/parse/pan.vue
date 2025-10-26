@@ -1,5 +1,6 @@
 <template>
   <div class="app-container home">
+
 <!--    <div class="floewr left">-->
 <!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
 <!--    </div>-->
@@ -68,7 +69,7 @@
         <el-button
             type="primary"
             icon="Search"
-            style="width: 80px;height: 50px;margin-left: 10px;"
+            style="width: 70px;height: 50px;margin-left: 10px;"
             @click="handleSearch()"
         >搜索</el-button>
         <el-button  style="width: 80px;height: 50px;margin-left: 10px;" icon="Refresh" type="danger" @click="resetQuery">重置</el-button>
@@ -112,7 +113,7 @@
       <div v-if="tagShow" class="tag">
         <el-tag
         class="tag-header"
-        size="large"
+        size="small"
         v-for="(item, index) in tagHeader"
         :key="item"
         effect="dark"
@@ -566,6 +567,18 @@ const getTagType = (index) => {
 
 }
 
+@media only screen and (max-width: 767px) {
+  .tag{
+    .tag-header{
+      margin-left: 8%;
+      margin-top: 20px;
+      cursor: pointer;
+      width: 80px!important;
+      height: 30px!important;
+    }
+  }
+}
+
 @media only screen and (min-width: 768px) {
   .home{
     width: 72%;
@@ -575,7 +588,12 @@ const getTagType = (index) => {
   }
   .tag {
     width: 70%;
-
+    .tag-header{
+      width: 100px!important;
+      height: 40px!important;
+      margin-left: 20px;
+      margin-top: 20px;
+    }
   }
  }
   .header-search{
@@ -591,13 +609,8 @@ const getTagType = (index) => {
 
   .tag{
     margin:30px auto 0;
-    //position: relative;
     .tag-header{
-      margin-left: 20px;
-      margin-top: 20px;
       cursor: pointer;
-      width: 100px!important;
-      height: 40px!important;
       font-size: 15px;
       font-weight: bold;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
