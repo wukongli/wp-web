@@ -271,6 +271,16 @@
             <img :src="infuse" alt="">
           </el-tooltip>
         </a>
+        <a :href="loadData.potUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="potplayer播放器"
+              placement="top-start"
+          >
+            <img :src="pot" alt="">
+          </el-tooltip>
+        </a>
         <a :href="loadData.vlcUrl">
           <el-tooltip
               class="box-item"
@@ -291,7 +301,7 @@
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
         </a>
-        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放说明</el-link></span>
+        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link></span>
       </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
@@ -335,6 +345,7 @@ import logo from "@/assets/img/deep.jpg";
 import infuse from "@/assets/logo/infuse.png";
 import mobilePlayer from "@/assets/logo/mxplayer.png";
 import vlc from "@/assets/logo/vlc.png";
+import pot from "@/assets/logo/potplayer.png";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -381,6 +392,10 @@ const loadData = reactive({
   url: '',
   codeUrl: qrCode,
   ckId: null,
+  infuseUrl:"javascript:void(0)",
+  maxUrl:"javascript:void(0)",
+  vlcUrl:'javascript:void(0)',
+  potUrl:'javascript:void(0)',
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -803,6 +818,8 @@ function handleBeforeClose(){
   loadData.loading = false;
   loadData.infuseUrl = "javascript:void(0)";
   loadData.maxUrl = "javascript:void(0)";
+  loadData.vlcUrl = "javascript:void(0)";
+  loadData.potUrl = "javascript:void(0)";
 }
 
 async function confirmVideo(item) {
@@ -838,6 +855,7 @@ async function confirmVideo(item) {
             loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
             loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
             loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+            loadData.potUrl = "potplayer://"+loadData.videoUrl;
             setTimeout(()=>{
               loadData.loading = false;
             },1000)
@@ -1026,7 +1044,7 @@ async function handleParse() {
     display: flex;
     align-items: center;
     img{
-      margin-left:8px;
+      margin-left:10px;
       width: 50px;
       height: 50px;
     }

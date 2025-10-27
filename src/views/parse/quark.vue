@@ -240,6 +240,16 @@
             <img :src="infuse" alt="">
           </el-tooltip>
         </a>
+        <a :href="loadData.potUrl">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="potplayer播放器"
+              placement="top-start"
+          >
+            <img :src="pot" alt="">
+          </el-tooltip>
+        </a>
         <a :href="loadData.vlcUrl">
           <el-tooltip
               class="box-item"
@@ -260,7 +270,7 @@
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
         </a>
-        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">移动端播放说明</el-link></span>
+        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link></span>
       </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
@@ -282,6 +292,7 @@ import img from '@/assets/images/文件夹.png';
 import mobilePlayer from '@/assets/logo/mxplayer.png';
 import infuse from '@/assets/logo/infuse.png';
 import vlc from '@/assets/logo/vlc.png';
+import pot from "@/assets/logo/potplayer.png";
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
@@ -364,6 +375,7 @@ const loadData = reactive({
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',
+  potUrl:'javascript:void(0)',
   loading:true,
   title:'',
   player:null,
@@ -536,6 +548,8 @@ function handleBeforeClose(){
     loadData.loading = false;
     loadData.infuseUrl = "javascript:void(0)";
     loadData.maxUrl = "javascript:void(0)";
+    loadData.vlcUrl = "javascript:void(0)";
+    loadData.potUrl = "javascript:void(0)";
     // if (loadData.player && loadData.player.video) loadData.player.video.src = "";
     // loadData.player?.destroy();
     // loadData.hlsPlayer?.destroy();
@@ -661,6 +675,7 @@ async function confirmVideo(item) {
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
           loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+loadData.videoUrl;
+          loadData.potUrl = "potplayer://"+loadData.videoUrl;
           setTimeout(()=>{
             loadData.loading = false;
           },1000)
@@ -797,7 +812,6 @@ async function checkRedirect(url) {
         Range: "bytes=0-0", // 只请求少量数据，节省带宽
       },
     })
-    console.log(response)
     if (response.status >= 300 && response.status < 400) {
       console.log("会发生重定向")
       console.log("重定向状态码:", response.status)
@@ -1118,7 +1132,7 @@ async function handleParse() {
     display: flex;
     align-items: center;
     img{
-      margin-left:8px;
+      margin-left:10px;
       width: 50px;
       height: 50px;
     }
