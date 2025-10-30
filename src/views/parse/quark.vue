@@ -218,17 +218,17 @@
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
-<!--        <div class="video_player" id="video-player"></div>-->
-        <iframe
-                ref="iframeRef"
-                allowfullscreen
-                webkitallowfullscreen
-                mozallowfullscreen
-                frameborder="0"
-                :src="loadData.videoUrl">
-        </iframe>
+        <div class="video_player" id="video-player"></div>
+<!--        <iframe-->
+<!--                ref="iframeRef"-->
+<!--                allowfullscreen-->
+<!--                webkitallowfullscreen-->
+<!--                mozallowfullscreen-->
+<!--                frameborder="0"-->
+<!--                :src="loadData.videoUrl">-->
+<!--        </iframe>-->
       </div>
-        <el-button size="small" @click="refreshVideo" style="position: relative;left:3px;bottom: 30px;" :icon="Refresh">重新播放</el-button>
+<!--        <el-button size="small" @click="refreshVideo" style="position: relative;left:3px;bottom: 30px;" :icon="Refresh">重新播放</el-button>-->
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -550,9 +550,8 @@ function handleBeforeClose(){
     loadData.maxUrl = "javascript:void(0)";
     loadData.vlcUrl = "javascript:void(0)";
     loadData.potUrl = "javascript:void(0)";
-    // if (loadData.player && loadData.player.video) loadData.player.video.src = "";
-    // loadData.player?.destroy();
-    // loadData.hlsPlayer?.destroy();
+    if (loadData.player && loadData.player.video) loadData.player.video.src = "";
+    loadData.player?.destroy();
 }
 
 
@@ -676,124 +675,65 @@ async function confirmVideo(item) {
           loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+loadData.videoUrl;
           loadData.potUrl = "potplayer://"+loadData.videoUrl;
-          setTimeout(()=>{
-            loadData.loading = false;
-          },1000)
-          // const option = {
-          //   id: "/夸克网盘/来自：分享/"+res.data.fileName,
-          //   container: "#video-player",
-          //   url: loadData.videoUrl,
-          //   title: res.data.fileName,
-          //   volume: 1.0,
-          //   autoplay: true,
-          //   autoSize: false,
-          //   autoMini: true,
-          //   loop: false,
-          //   flip: true,
-          //   playbackRate: true,
-          //   aspectRatio: true,
-          //   // "screenshot": true,
-          //   setting: true,
-          //   hotkey: true,
-          //   pip: true,
-          //   mutex: true,
-          //   fullscreen: true,
-          //   // "fullscreenWeb": true,
-          //   subtitleOffset: true,
-          //   miniProgressBar: false,
-          //   type: "mp4",
-          //   // "playsInline": true,
-          //   theme: "#1890ff",
-          //   quality: [],
-          //   whitelist: [],
-          //   settings: [],
-          //   moreVideoAttr: {
-          //     crossOrigin: "anonymous",
-          //   },
-          //   customType: {
-          //     m3u8: function (video, url) {
-          //       if (Hls.isSupported()) {
-          //         hlsPlayer.value = new Hls({
-          //           xhrSetup: (xhr) => {
-          //             xhr.withCredentials = false
-          //             if (url.includes('drive.quark.cn')) {
-          //               xhr.setRequestHeader('Referer', 'https://pan.quark.cn/')
-          //               xhr.setRequestHeader('Origin', 'https://pan.quark.cn')
-          //             }
-          //           },
-          //           enableWorker: false,
-          //         })
-          //         hlsPlayer.value.loadSource(url)
-          //         hlsPlayer.value.attachMedia(video)
-          //       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          //         video.src = url
-          //       }
-          //     },
-          //     flv: function (video, url) {
-          //       if (mpegts.getFeatureList().mseLivePlayback) {
-          //         flvPlayer.value = mpegts.createPlayer(
-          //             {
-          //               type: 'flv',
-          //               url: url,
-          //               isLive: false,
-          //             },
-          //             {
-          //               enableWorker: false,
-          //               lazyLoad: true,
-          //               lazyLoadMaxDuration: 3 * 60,
-          //               seekType: 'range',
-          //             }
-          //         )
-          //         flvPlayer.value.attachMediaElement(video)
-          //         flvPlayer.value.load()
-          //       }
-          //     },
-          //     mp4: function (video, url) {
-          //       // video.crossOrigin = 'anonymous'
-          //       video.src = url
-          //     }
-          //   },
-          //   lang: "zh-cn",
-          //   lock: true,
-          //   fastForward: true,
-          //   autoPlayback: true,
-          //   autoOrientation: true,
-          //   airplay: true
-          // }
-          // const player = new Artplayer(option)
-          // loadData.player = player;
-          // player.on("ready", () => {
-          //   player.video.src = res.data.url;
-          // })
-          // player.on("video:ended", () => {
-          //
-          // })
-          // player.on("error", () => {
-          //   if (player.video.crossOrigin) {
-          //     console.log(
-          //         "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
-          //     )
-          //     player.video.crossOrigin = null;
-          //   }
-          // })
-         // fetch(testUrl, {
-         //    method: "HEAD",
-         //    redirect: "manual", // 手动处理重定向
-         //    headers: {
-         //      Range: "bytes=0-0", // 只请求少量数据，节省带宽
-         //    },
-         //  }).then(response=>{
-         //    console.log(response);
-         //   if (response.status >= 300 && response.status < 400) {
-         //      loadData.loading = false;
-         //      ElMessage.error("此资源无法播放,请更换资源播放！");
-         //      return;
-         //   }else{
-         //
-         //   }
-         // })
+          loadData.loading = false;
+          const option = {
+            id: "/夸克网盘/来自：分享/"+res.data.fileName,
+            container: "#video-player",
+            url: loadData.videoUrl,
+            title: res.data.fileName,
+            volume: 1.0,
+            autoplay: true,
+            autoSize: false,
+            autoMini: true,
+            loop: false,
+            flip: true,
+            playbackRate: true,
+            aspectRatio: true,
+            // "screenshot": true,
+            setting: true,
+            hotkey: true,
+            pip: true,
+            mutex: true,
+            fullscreen: true,
+            // "fullscreenWeb": true,
+            subtitleOffset: true,
+            miniProgressBar: false,
+            type: ext(res.data.fileName),
+            playsInline: true,
+            theme: "#1890ff",
+            quality: [],
+            whitelist: [],
+            settings: [],
+            moreVideoAttr: {
+              "webkit-playsinline": true,
+              playsInline: true,
+              // crossOrigin: "anonymous",
+            },
+            customType: {
+            },
+            lang: "zh-cn",
+            lock: true,
+            fastForward: true,
+            autoPlayback: true,
+            autoOrientation: true,
+            airplay: true
+          }
+          const player = new Artplayer(option)
+          loadData.player = player;
+          loadData.player.on("ready", () => {
+            loadData.player.video.src = res.data.url;
+          })
+          loadData.player.on("video:ended", () => {
 
-
+          })
+          loadData.player.on("error", () => {
+            if (player.video.crossOrigin) {
+              console.log(
+                  "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+              )
+              player.video.crossOrigin = null;
+            }
+          })
         }
       })
       .catch(() => {
@@ -1096,6 +1036,7 @@ async function handleParse() {
       margin-left:8px;
       width: 40px;
       height: 40px;
+      margin-top: 20px;
     }
     span{
       margin-left:5px;
