@@ -214,7 +214,7 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog class="play_dia" :style="{
+    <el-dialog class="play_dia" :close-on-click-modal ="false" :style="{
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">

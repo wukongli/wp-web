@@ -246,7 +246,7 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog class="play_dia" draggable :style="{
+    <el-dialog :close-on-click-modal="false" class="play_dia" :style="{
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
@@ -260,7 +260,7 @@
 <!--        </iframe>-->
       </div>
       <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
-      <div class="mobile_player" >
+      <div class="mobile_player" :close-on-click-modal ="false" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
               class="box-item"
@@ -392,6 +392,7 @@ const loadData = reactive({
   url: '',
   codeUrl: qrCode,
   ckId: null,
+  maxNum:false,
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',

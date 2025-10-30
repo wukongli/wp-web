@@ -16,7 +16,7 @@
               type="primary"
               icon="user"
           >登录</el-button></a>
-        <a class="logo-title" href="/source">
+        <a class="logo-title">
           <img :src="logo" alt="">
           <span>深度搜索 - 云端资源搜索专家</span>
         </a>
@@ -578,11 +578,15 @@ const getTagType = (index) => {
     }
   }
 }
-
-@media only screen and (min-width: 768px) {
+@media (min-width: 992px) {
   .home{
     width: 72%;
   }
+}
+@media only screen and (min-width: 767px) {
+  //.home{
+  //  width: 72%;
+  //}
   .header-search .header-input {
     width: 600px!important;
   }
@@ -594,8 +598,17 @@ const getTagType = (index) => {
       margin-left: 20px;
       margin-top: 20px;
     }
+    /* 鼠标悬停效果 */
+    .tag-inner:hover {
+      transform: scale(1.55);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+
+      /* 晃动动画 */
+      animation: shake 0.5s ease infinite;
+    }
   }
- }
+}
   .header-search{
     width: 100%;
     height: 50px;
@@ -646,15 +659,7 @@ const getTagType = (index) => {
       transition: all 0.3s ease;
       font-size: 15px;
     }
-    /* 鼠标悬停效果 */
-    .tag-inner:hover {
-      transform: scale(1.55);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 10;
 
-      /* 晃动动画 */
-      animation: shake 0.5s ease infinite;
-    }
 
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {
@@ -684,4 +689,5 @@ const getTagType = (index) => {
     font-weight: bold;
     font-size: 12px;
   }
+
 </style>
