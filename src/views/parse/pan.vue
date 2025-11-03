@@ -76,25 +76,22 @@
       </div>
       <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
         <el-table-column prop="name" show-overflow-tooltip label="名字">
-          <template #default="{row}">
-            <div
-                style="height: 67px;"
-                @click="goParse(row)"
-            >
-              <MySvg style="float:left;margin-left: 2%;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-              <el-tag v-if="row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>
-              <el-tag v-if="row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
-              <el-tag v-if="!row.url.includes('quark') && !row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>
+          <template #default="scope">
+            <div @click="goParse(scope.row)">
+              <MySvg style="float:left;margin-left: 2%;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
+              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>
+              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
+              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>
               <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>
               <span style="float:left;margin-left: 2%;margin-top:10px;">{{
-                  row.name.replace("夸克","").replace("百度","")
+                  scope.row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
           </template>
         </el-table-column>
         <el-table-column prop="time" label="修改时间">
-          <template #default="{row}">
-            {{ row.time }}
+          <template>
+            {{ time }}
           </template>
         </el-table-column>
       </el-table>
@@ -286,6 +283,7 @@ function getList() {
 }
 
 function goParse(row){
+  console.log(row);
   tableShow.value = false;
   showComponent.value = true;
   if(row.url.includes("quark")){
@@ -293,7 +291,8 @@ function goParse(row){
       ElMessage.error("文件已失效！");
       return;
     }
-    const pwdId =  row.url.match(/(?<=\/s\/)(\w+)(?=#)?/g)[0];
+    const match = row.url.match(/\/s\/(\w+)/);
+    const pwdId =  match ? match[1] : null;
     const info = extractQuarkInfo(row.url);
     router.push({
       path: '/source/parse/bt',
@@ -313,22 +312,23 @@ function goParse(row){
         root: '1'
       },
     })
-  }else if(row.url.includes("/s/")){
-    userStore.getXdUrl({"link":row.url}).then(res => {
-      if(res.code === 200){
-        const { url, pwd } = SubmitLink(res.data);
-        router.push({
-          path: '/source/parse/index',
-          query: {
-            shorturl: url,
-            pwd: pwd,
-            dir: '1',
-            root: '1'
-          },
-        })
-      }
-    })
   }
+  // else if(row.url.includes("/s/")){
+  //   userStore.getXdUrl({"link":row.url}).then(res => {
+  //     if(res.code === 200){
+  //       const { url, pwd } = SubmitLink(res.data);
+  //       router.push({
+  //         path: '/source/parse/index',
+  //         query: {
+  //           shorturl: url,
+  //           pwd: pwd,
+  //           dir: '1',
+  //           root: '1'
+  //         },
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 function extractQuarkInfo(text) {
@@ -475,6 +475,9 @@ const getTagType = (index) => {
 :deep(.header-input .el-select:hover) {
   box-shadow: 0 0 0 2px #0773e2,
   0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
+}
+:deep(.wp-table .el-table__body tr:hover > td) {
+  width: auto!important;
 }
 
 

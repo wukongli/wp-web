@@ -1,5 +1,5 @@
 <template>
-  <svg :class="svgClass" :style="{ width: width, height: height }" aria-hidden="true">
+  <svg viewBox="0 0 1024 1024" :class="svgClass" :style="{ width: width, height: height }" aria-hidden="true">
     <use :xlink:href="iconClassName" :fill="color" />
   </svg>
 </template>
@@ -48,6 +48,17 @@ const svgClass = computed(() => {
       //position: relative;
       //fill: currentColor;
       //vertical-align: -2px;
+    }
+    /* 或者更直接地重置所有SVG内容 */
+    /* 或者更彻底的重置 */
+    /* 深度选择器强制修改被引用的内容 */
+    .svg-icon :deep(svg) {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .svg-icon :deep(*) {
+      vector-effect: non-scaling-stroke;
     }
 </style>
 

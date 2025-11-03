@@ -228,7 +228,7 @@
 <!--                :src="loadData.videoUrl">-->
 <!--        </iframe>-->
       </div>
-<!--        <el-button size="small" @click="refreshVideo" style="position: relative;left:3px;bottom: 30px;" :icon="Refresh">重新播放</el-button>-->
+      <el-button type="danger" size="small" style="margin-top: 5px;" icon="Warning">视频卡顿或者大文件视频播放器内观看更流畅</el-button>
       <div class="mobile_player" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
