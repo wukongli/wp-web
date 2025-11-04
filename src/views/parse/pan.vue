@@ -77,7 +77,7 @@
       <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
         <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="scope">
-            <div @click="goParse(scope.row)">
+            <div style="min-height: 90px;" @click="goParse(scope.row)">
               <MySvg style="float:left;margin-left: 2%;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
               <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>
               <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
@@ -89,9 +89,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="time" label="修改时间">
-          <template>
-            {{ time }}
+        <el-table-column  prop="time" label="修改时间">
+          <template #default="scope">
+            {{ scope.row.time }}
           </template>
         </el-table-column>
       </el-table>
