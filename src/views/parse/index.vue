@@ -16,9 +16,9 @@
         ></MySvg>
         <span style="margin-left: 10px">{{ loadData.rootBackTitle }}</span>
       </div>
-      <div :title="loadData.bread" class="back-title">
-        {{ loadData.bread }}
-      </div>
+<!--      <div :title="loadData.bread" class="back-title">-->
+<!--        {{ loadData.bread }}-->
+<!--      </div>-->
     </header>
 <!--    <el-button-->
 <!--      style="margin: 10px 0"-->
@@ -75,7 +75,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
+        <el-table-column v-if="!hasDirData"
           prop="server_mtime"
           :formatter="timestampToTime"
           min-width="20%"
@@ -86,14 +86,14 @@
 <!--            {{ timestampToTime(row.server_mtime) }}-->
 <!--          </template>-->
 <!--        </el-table-column>-->
-        <el-table-column min-width="15%" prop="size" :formatter="getFilesize" label="大小" />
+        <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
         <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="25%" label="操作">
+        <el-table-column v-if="hasDirData" min-width="22%" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
@@ -330,7 +330,7 @@ import {
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted,computed } from 'vue';
 import iron from '@/assets/images/钢铁侠.png';
 import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
@@ -402,6 +402,11 @@ const loadData = reactive({
 onBeforeRouteLeave((to, from) => {
   proxy.$tab.closeOpenPage();
 });
+
+const hasDirData = computed(() => {
+  return loadData.tableData &&
+      loadData.tableData.some(item => !item.dir);
+});
 onMounted(() => {
   // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
   qrCode.value = xiaochengxu;
@@ -439,11 +444,11 @@ function parseList(item) {
 function parseCopyLink(params) {
   loadData.routeData.push(params);
   if (loadData.routeData.length === 1) {
-    loadData.rootBackTitle = '全部文件';
+    // loadData.rootBackTitle = '全部文件';
     loadData.parseLinkParams.dir = '/';
   } else {
     loadData.parseLinkParams.dir = params.dir;
-    loadData.rootBackTitle = '返回上一级';
+    // loadData.rootBackTitle = '返回上一级';
   }
   // 获取文件列表
   userStore

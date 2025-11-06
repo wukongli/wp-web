@@ -69,19 +69,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column min-width="20%" prop="updated_at" label="修改时间">
-          <template #default="{row}">
-            {{ moment(parseInt(row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
+        <el-table-column v-if="!hasDirData"  min-width="20%" prop="updated_at" label="修改时间">
+          <template #default="scope">
+            {{ moment(parseInt(scope.row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
         </el-table-column>
-        <el-table-column min-width="15%" prop="size" :formatter="getFilesize" label="大小" />
-        <!--        <el-table-column label="剩余下载次数"-->
-        <!--          >{{-->
-        <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
-        <!--          }}-->
-        <!--          次</el-table-column-->
-        <!--        >-->
-        <el-table-column min-width="25%" label="操作">
+        <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
+        <el-table-column v-if="hasDirData" min-width="22%" label="操作">
           <template #default="scope">
             <el-button
                 icon="menu"
@@ -296,7 +290,7 @@ import pot from "@/assets/logo/potplayer.png";
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
-import {onMounted} from 'vue';
+import {onMounted,computed} from 'vue';
 const userStore = useUserStore();
 import flvjs from 'flv.js'
 import Hls from 'hls.js'
@@ -392,7 +386,10 @@ onBeforeRouteLeave((to, from) => {
 const iframeRef = ref(null);
 
 
-
+const hasDirData = computed(() => {
+  return loadData.tableData &&
+      loadData.tableData.some(item => !item.dir);
+});
 onMounted(() => {
   qrCode.value = xiaochengxu;
 })
@@ -417,6 +414,7 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
+          console.log(data.data.list);
           data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;

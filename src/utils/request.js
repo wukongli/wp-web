@@ -127,7 +127,9 @@ service.interceptors.response.use(
       }
       return;
     } else if (code === 500) {
-        if(msg !== "SocketTimeoutException: connect timed out"){
+        if(msg === "SocketTimeoutException: connect timed out" || msg === "系统未知错误，请反馈给管理员" ){
+            return false;
+        }else{
             ElMessage({ message: msg, type: 'error' });
             return Promise.reject(new Error(msg));
         }

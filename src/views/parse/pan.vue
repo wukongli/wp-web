@@ -83,7 +83,7 @@
               <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
               <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>
               <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>
-              <span style="float:left;margin-left: 2%;margin-top:10px;">{{
+              <span style="max-width:100%;float:left;margin-left: 2%;margin-top:5px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{
                   scope.row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
