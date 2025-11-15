@@ -123,6 +123,15 @@ export function videoAddReq(data) {
     data: data,
   });
 }
+export function getPlayUrl(data) {
+  return request({
+    url: '/wp/getPlayUrl',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 export function parseLinkVisit(data) {
   return request({
     url: '/wp/pc/dlink',

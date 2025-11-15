@@ -22,7 +22,7 @@ import {
     getXdUrls,
     videoAddReq,
     addVideo,
-    getImgUrl
+    getImgUrl, getPlayUrl
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -105,6 +105,17 @@ const useUserStore = defineStore('user', {
       videoAdd(parseLink) {
           return new Promise((resolve, reject) => {
               videoAddReq(parseLink)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      getPlayUrl(parseLink) {
+          return new Promise((resolve, reject) => {
+              getPlayUrl(parseLink)
                   .then((res) => {
                       resolve(res);
                   })

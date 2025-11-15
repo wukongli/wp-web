@@ -366,6 +366,7 @@ const loadData = reactive({
   codeUrl: qrCode,
   ckId: null,
   videoUrl:'',
+  mobileUrl:'',
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',
@@ -542,6 +543,7 @@ function playVideo(item){
 function handleBeforeClose(){
     isSending.value = false;
     loadData.videoUrl = "";
+    loadData.mobileUrl = "";
     loadData.maxNum = false;
     loadData.loading = false;
     loadData.infuseUrl = "javascript:void(0)";
@@ -667,12 +669,13 @@ async function confirmVideo(item) {
           // }
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.mobileUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.videoUrl = res.data.url;
          //  loadData.videoUrl = testUrl;
-          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-          loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-          loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-          loadData.potUrl = "potplayer://"+loadData.videoUrl;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
+          loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+loadData.mobileUrl;
+          loadData.potUrl = "potplayer://"+loadData.mobileUrl;
           loadData.loading = false;
           const option = {
             id: "/夸克网盘/来自：分享/"+res.data.fileName,

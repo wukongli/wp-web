@@ -1,12 +1,5 @@
 <template>
   <div class="app-container home">
-
-<!--    <div class="floewr left">-->
-<!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
-<!--    </div>-->
-<!--    <div class="floewr right">-->
-<!--      <img :src="isLightTheme ? LightFlowerImg : DarkFlowerImg" alt="" />-->
-<!--    </div>-->
     <div class="content">
       <div class="logo">
         <a class="share-login" href="/vip/login">
@@ -47,25 +40,6 @@
 
       <div class="header-search">
         <el-input class="header-input" v-model="searchValue" placeholder="请输入关键词或者磁力链接" />
-<!--        <el-select-->
-<!--            v-model="searchValue"-->
-<!--            filterable-->
-<!--            remote-->
-<!--            remote-show-suffix-->
-<!--            placeholder="请输入关键词或者磁力链接"-->
-<!--            :remote-method="remoteMethod"-->
-<!--            :loading="selectLoading"-->
-<!--            @focus="handleFocus"-->
-<!--            ref="selectRef"-->
-<!--        >-->
-<!--          <el-option-->
-<!--              style="font-size: 15px;font-weight: bold"-->
-<!--              v-for="item in options"-->
-<!--              :key="item.value"-->
-<!--              :label="item.label"-->
-<!--              :value="item.value"-->
-<!--          />-->
-<!--        </el-select>-->
         <el-button
             type="primary"
             icon="Search"
@@ -77,13 +51,13 @@
       <el-table class="wp-table" :row-style="{height: '50px'}" v-if="tableShow" element-loading-text="数据正在加载中..." v-loading="loading" :data="tableData">
         <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="scope">
-            <div style="min-height: 90px;" @click="goParse(scope.row)">
+            <div @click="goParse(scope.row)">
               <MySvg style="float:left;margin-left: 2%;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>
-              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>
-              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>
-              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>
-              <span style="max-width:100%;float:left;margin-left: 2%;margin-top:5px;overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{
+<!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>-->
+<!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>-->
+<!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
+<!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
+              <span style="position:relative;top:22px;left: 2%;max-width:100%;overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{
                   scope.row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
@@ -118,21 +92,86 @@
         >
         {{ item }}
         </el-tag>
-        <div class="tag-title">
-          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>
+        <div class="block">
+          <div class="nav">电影</div>
+          <div class="content">
+            <div class="list">
+              <div v-for="(item,index) in movie" class="item">
+                <div @click="handleSearch(item.title)" :key="index" class="img">
+                  <img :src="item.src" alt="">
+                </div>
+                <p>{{item.title}}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <el-tag
-            class="tag-inner"
-            size="large"
-            v-for="(item, index) in tag"
-            :key="item.value"
-            effect="dark"
-            :type="getTagType(index)"
-            round
-            @click="handleSearch(item.value)"
-        >
-          {{ item.value }}
-        </el-tag>
+        <div class="block">
+          <div class="nav">电视剧</div>
+          <div class="content">
+            <div class="list">
+              <div v-for="(item,index) in tv" class="item">
+                <div @click="handleSearch(item.title)" :key="index" class="img">
+                  <img :src="item.src" alt="">
+                </div>
+                <p>{{item.title}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="nav">动漫</div>
+          <div class="content">
+            <div class="list">
+              <div v-for="(item,index) in anime" class="item">
+                <div @click="handleSearch(item.title)" :key="index" class="img">
+                  <img :src="item.src" alt="">
+                </div>
+                <p>{{item.title}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="nav">综艺</div>
+          <div class="content">
+            <div class="list">
+              <div v-for="(item,index) in variety" class="item">
+                <div @click="handleSearch(item.title)" :key="index" class="img">
+                  <img :src="item.src" alt="">
+                </div>
+                <p>{{item.title}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="nav">短剧</div>
+          <div class="content">
+            <div class="list">
+              <div v-for="(item,index) in shortVideo" class="item">
+                <div @click="handleSearch(item.title)" :key="index" class="img">
+                  <img :src="item.src" alt="">
+                </div>
+                <p>{{item.title}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--        <div class="tag-title">-->
+<!--          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>-->
+<!--        </div>-->
+<!--        <el-tag-->
+<!--            class="tag-inner"-->
+<!--            size="large"-->
+<!--            v-for="(item, index) in tag"-->
+<!--            :key="item.value"-->
+<!--            effect="dark"-->
+<!--            :type="getTagType(index)"-->
+<!--            round-->
+<!--            c-->
+<!--        >-->
+<!--          {{ item.value }}-->
+<!--        </el-tag>-->
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent">
@@ -178,7 +217,11 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const userStore = useUserStore();
 const tableData =  ref([])
-const tag =  ref([])
+const movie =  ref([])
+const tv =  ref([])
+const anime =  ref([])
+const variety =  ref([])
+const shortVideo =  ref([])
 const data = reactive({
   queryParams: {
     pageNum: 1,
@@ -347,7 +390,11 @@ function extractQuarkInfo(text) {
 function getTag(){
   userStore.getTag().then(res=>{
     if(res.code === 200){
-      tag.value = res.data.data;
+      movie.value = res.data.movie.data.slice(0, 20);
+      tv.value = res.data.tv.data.slice(0, 20);
+      anime.value = res.data.anime.data.slice(0, 20);
+      variety.value = res.data.variety.data.slice(0, 20);
+      shortVideo.value = res.data.shortVideo.data.slice(0, 20);
     }
   })
 }
@@ -523,6 +570,10 @@ const getTagType = (index) => {
           white-space: nowrap;  /* 禁止换行 */
           overflow: hidden;     /* 隐藏溢出内容 */
           text-overflow: ellipsis; /* 溢出显示省略号... */
+          background: linear-gradient(90deg, #33cc33, #ff9900,#ff0000, #3399ff, #cc33ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
       }
       .user{
@@ -579,6 +630,62 @@ const getTagType = (index) => {
       width: 80px!important;
       height: 30px!important;
     }
+    .block {
+      border-radius: 12px;
+      background-color: var(--theme-other_background);
+      box-shadow: 0 4px 10px rgba(225, 225, 225, 0.3);
+      margin-bottom: 20px;
+      padding-top: 20px;
+      .nav {
+        position: relative;
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--theme-color);
+        padding: 0 20px 4px;
+        display: flex;
+        align-items: center;
+      }
+      .content {
+        min-height: 200px;
+        .list {
+          display: flex;
+          flex-wrap: wrap;
+          padding: 0 0 10px 15px;
+          .item {
+            position: relative;
+            display: block;
+            width: 27%;
+            margin: 8px;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            text-align: center;
+            padding: 2px 0;
+            transition: all .5s;
+            .img {
+              position: relative;
+              width: 100%;
+              height: 192px;
+              border-radius: 8px;
+              overflow: hidden;
+              background: #f5f5f5;
+              img {
+                position: relative;
+                z-index: 9;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            p {
+              margin-top: 10px;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+    }
   }
 }
 @media (min-width: 992px) {
@@ -609,6 +716,63 @@ const getTagType = (index) => {
 
       /* 晃动动画 */
       animation: shake 0.5s ease infinite;
+    }
+    .block {
+      border-radius: 12px;
+      background-color: var(--theme-other_background);
+      box-shadow: 0 4px 10px rgba(225, 225, 225, 0.3);
+      margin-bottom: 20px;
+      padding-top: 20px;
+      .nav {
+        position: relative;
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--theme-color);
+        padding: 0 20px 4px;
+        display: flex;
+        align-items: center;
+      }
+      .content {
+        min-height: 200px;
+        .list {
+          display: flex;
+          flex-wrap: wrap;
+          padding: 0 0 10px 15px;
+          .item {
+            position: relative;
+            display: block;
+            width: 130.8px;
+            margin: 8px;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            text-align: center;
+            padding: 2px 0;
+            transition: all .5s;
+            cursor: pointer;
+            .img {
+              position: relative;
+              width: 100%;
+              height: 192px;
+              border-radius: 8px;
+              overflow: hidden;
+              background: #f5f5f5;
+              img {
+                position: relative;
+                z-index: 9;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            p {
+              margin-top: 10px;
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -641,6 +805,10 @@ const getTagType = (index) => {
       /* 晃动动画 */
       animation: shake 0.5s ease infinite;
     }
+
+
+
+
     .tag-title{
       margin-top: 15px;
       display: flex;

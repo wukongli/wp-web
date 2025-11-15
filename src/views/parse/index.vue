@@ -250,7 +250,8 @@
     miHeight: '600px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
-<!--        <iframe-->
+        <div class="video_player" id="video-player"></div>
+        <!--        <iframe-->
 <!--            ref="iframeRef"-->
 <!--            allowfullscreen-->
 <!--            webkitallowfullscreen-->
@@ -259,7 +260,8 @@
 <!--            :src="loadData.videoUrl">-->
 <!--        </iframe>-->
       </div>
-      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
+<!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
+      <el-button type="danger" size="small" icon="Warning" style="margin-top: 5px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
       <div class="mobile_player" :close-on-click-modal ="false" >
         <a :href="loadData.infuseUrl">
           <el-tooltip
@@ -346,6 +348,7 @@ import infuse from "@/assets/logo/infuse.png";
 import mobilePlayer from "@/assets/logo/mxplayer.png";
 import vlc from "@/assets/logo/vlc.png";
 import pot from "@/assets/logo/potplayer.png";
+import Artplayer from "artplayer"
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -397,6 +400,8 @@ const loadData = reactive({
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',
   potUrl:'javascript:void(0)',
+  player:null,
+  hlsPlayer:null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -826,6 +831,8 @@ function handleBeforeClose(){
   loadData.maxUrl = "javascript:void(0)";
   loadData.vlcUrl = "javascript:void(0)";
   loadData.potUrl = "javascript:void(0)";
+  if (loadData.player && loadData.player.video) loadData.player.video.src = "";
+  loadData.player?.destroy();
 }
 
 async function confirmVideo(item) {
@@ -857,14 +864,78 @@ async function confirmVideo(item) {
         if (res.code === 200) {
             let path = "baidu/我的资源/"+res.data.fileName;
             // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-            loadData.videoUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
-            loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.videoUrl;
-            loadData.maxUrl = "intent:"+loadData.videoUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-            loadData.vlcUrl = "vlc://"+loadData.videoUrl;
-            loadData.potUrl = "potplayer://"+loadData.videoUrl;
-            setTimeout(()=>{
-              loadData.loading = false;
-            },1000)
+          const signUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
+          loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+signUrl;
+          loadData.potUrl = "potplayer://"+signUrl;
+          userStore.getPlayUrl({"signUrl":signUrl}).then((result)=>{
+                  if(result.code === 200){
+                    loadData.videoUrl = result.data;
+                    loadData.loading = false;
+                    const option = {
+                      id: "/baidu/我的资源/"+res.data.fileName,
+                      container: "#video-player",
+                      // url: loadData.videoUrl,
+                      url:"https://d.pcs.baidu.com/file/af9fb4e55sb6f823f6be45a623c9de32?fid=1102021193212-250528-633241619032069&rt=pr&sign=FDtAERK-DCb740ccc5511e5e8fedcff06b081203-FVN4RBrGEu2G8qeSmxlQnzrCeQk%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=317895184745372792&dp-callid=0&dstime=1762614855&r=641099191&vuk=1102021193212&origin=dlna",
+                      title: res.data.fileName,
+                      volume: 1.0,
+                      autoplay: true,
+                      autoSize: false,
+                      autoMini: true,
+                      loop: false,
+                      flip: true,
+                      playbackRate: true,
+                      aspectRatio: true,
+                      // "screenshot": true,
+                      setting: true,
+                      hotkey: true,
+                      pip: true,
+                      mutex: true,
+                      fullscreen: true,
+                      // "fullscreenWeb": true,
+                      subtitleOffset: true,
+                      miniProgressBar: false,
+                      type: ext(res.data.fileName),
+                      playsInline: true,
+                      theme: "#1890ff",
+                      quality: [],
+                      whitelist: [],
+                      settings: [],
+                      moreVideoAttr: {
+                        "webkit-playsinline": true,
+                        playsInline: true,
+                        // crossOrigin: "anonymous",
+                      },
+                      customType: {
+                      },
+                      lang: "zh-cn",
+                      lock: true,
+                      fastForward: true,
+                      autoPlayback: true,
+                      autoOrientation: true,
+                      airplay: true
+                    }
+
+                    const player = new Artplayer(option);
+                    loadData.player = player;
+                    loadData.player.on("ready", () => {
+                      loadData.player.video.src = res.data.url;
+                    })
+                    loadData.player.on("video:ended", () => {
+
+                    })
+                    loadData.player.on("error", () => {
+                      if (player.video.crossOrigin) {
+                        console.log(
+                            "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+                        )
+                        player.video.crossOrigin = null;
+                      }
+                    })
+                  }
+          })
+
         }
       })
       .catch(() => {
@@ -875,7 +946,10 @@ async function confirmVideo(item) {
 function vipDownClick() {
   ElMessage.error('请扫码联系管理员开通权限！');
 }
+function ext(path){
+  return path.split(".").pop() ?? ""
 
+}
 
 function handleSelectionChange(selection) {
   if (selection.length === 1 && parseInt(selection[0].isdir) === 1) {
@@ -1002,6 +1076,11 @@ async function handleParse() {
     width: 100%;
     height: 350px;
     background-color: black !important;
+    .video_player{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
     iframe{
       width: 100%;
       height: 350px;
@@ -1035,6 +1114,12 @@ async function handleParse() {
     width: 100%;
     height: 500px;
     background-color: black !important;
+    padding-top:45px;
+    .video_player{
+      width: 100%;
+      height: 400px;
+      background-color: black !important;
+    }
     iframe{
       width: 100%;
       height: 500px;
