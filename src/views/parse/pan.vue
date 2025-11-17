@@ -52,18 +52,18 @@
         <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="scope">
             <div @click="goParse(scope.row)">
-              <MySvg style="float:left;margin-left: 2%;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
+              <MySvg style="float:left;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
 <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>-->
 <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>-->
 <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
 <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
-              <span style="position:relative;top:22px;left: 2%;max-width:100%;overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{
+              <span style="position:relative;top:22px;left: 2%;overflow: hidden;  text-overflow: ellipsis">{{
                   scope.row.name.replace("夸克","").replace("百度","")
                 }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column  prop="time" label="修改时间">
+        <el-table-column width="110px"  prop="time" label="更新时间">
           <template #default="scope">
             {{ scope.row.time }}
           </template>
@@ -93,10 +93,10 @@
         {{ item }}
         </el-tag>
         <div class="block">
-          <div class="nav">电影</div>
+          <div class="nav">电视剧</div>
           <div class="content">
             <div class="list">
-              <div v-for="(item,index) in movie" class="item">
+              <div v-for="(item,index) in tv" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
                   <img :src="item.src" alt="">
                 </div>
@@ -106,10 +106,10 @@
           </div>
         </div>
         <div class="block">
-          <div class="nav">电视剧</div>
+          <div class="nav">电影</div>
           <div class="content">
             <div class="list">
-              <div v-for="(item,index) in tv" class="item">
+              <div v-for="(item,index) in movie" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
                   <img :src="item.src" alt="">
                 </div>
@@ -390,11 +390,11 @@ function extractQuarkInfo(text) {
 function getTag(){
   userStore.getTag().then(res=>{
     if(res.code === 200){
-      movie.value = res.data.movie.data.slice(0, 20);
-      tv.value = res.data.tv.data.slice(0, 20);
-      anime.value = res.data.anime.data.slice(0, 20);
-      variety.value = res.data.variety.data.slice(0, 20);
-      shortVideo.value = res.data.shortVideo.data.slice(0, 20);
+      movie.value = res.data.movie.data.slice(0, 20).sort(() => Math.random() - 0.5);
+      tv.value = res.data.tv.data.slice(0, 20).sort(() => Math.random() - 0.5);
+      anime.value = res.data.anime.data.slice(0, 20).sort(() => Math.random() - 0.5);
+      variety.value = res.data.variety.data.slice(0, 20).sort(() => Math.random() - 0.5);
+      shortVideo.value = res.data.shortVideo.data.slice(0, 20).sort(() => Math.random() - 0.5);
     }
   })
 }
@@ -545,6 +545,8 @@ const getTagType = (index) => {
   flex-direction: column;
   min-height: 110vh; /* 至少占满整个视口高度 */
   overflow-x: hidden;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS Safari 滚动优化 */
   .content{
     flex: 1;
     .logo{
@@ -659,12 +661,11 @@ const getTagType = (index) => {
             border-radius: 8px 8px 0 0;
             overflow: hidden;
             text-align: center;
-            padding: 2px 0;
             transition: all .5s;
             .img {
               position: relative;
               width: 100%;
-              height: 192px;
+              height: 150px;
               border-radius: 8px;
               overflow: hidden;
               background: #f5f5f5;
@@ -677,7 +678,7 @@ const getTagType = (index) => {
               }
             }
             p {
-              margin-top: 10px;
+              //margin-top: 10px;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
@@ -746,7 +747,6 @@ const getTagType = (index) => {
             border-radius: 8px 8px 0 0;
             overflow: hidden;
             text-align: center;
-            padding: 2px 0;
             transition: all .5s;
             cursor: pointer;
             .img {
@@ -765,7 +765,7 @@ const getTagType = (index) => {
               }
             }
             p {
-              margin-top: 10px;
+              //margin-top: 10px;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
