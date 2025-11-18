@@ -10,7 +10,7 @@ import {
     loginNoPwd,
     getCourseByType, delCode, getInfoByUserKey,
     tryDownUrl, parseLinkVisit,
-    getSToken,getQuarkFileList,quarkTransfer,searchPanData,searchTag,searchNames
+    getSToken, getQuarkFileList, quarkTransfer, searchPanData, searchTag, searchNames, catCodeNum
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -181,6 +181,18 @@ const useUserStore = defineStore('user', {
             });
       });
     },
+      catCode(data){
+          return new Promise((resolve, reject) => {
+              catCodeNum(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+
 
       delCodeNum(data){
           return new Promise((resolve, reject) => {

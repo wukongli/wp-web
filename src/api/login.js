@@ -140,6 +140,15 @@ export function getCode(data) {
     data: data,
   });
 }
+export function catCodeNum(data) {
+  return request({
+    url: '/wp/catCode',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+
 
 export function getInfoByUserKey(data) {
   return request({
