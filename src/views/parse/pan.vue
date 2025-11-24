@@ -53,8 +53,8 @@
           <template #default="scope">
             <div @click="goParse(scope.row)">
               <MySvg style="float:left;margin-top: 10px;" :iconName="'icon-wenjianjia'" size="40"></MySvg>
-<!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="success">下载速度快</el-tag>-->
-<!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 2%;margin-top: 10px;"  type="danger">下载速度慢</el-tag>-->
+              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>
+              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>
 <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
 <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
               <span style="position:relative;top:22px;left: 2%;overflow: hidden;  text-overflow: ellipsis">{{
