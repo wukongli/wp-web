@@ -298,8 +298,8 @@ const loadData = reactive({
 });
 
 onMounted(() => {
-  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = randomItem;
+  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = xiaochengxu;
 })
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
