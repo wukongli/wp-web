@@ -277,28 +277,28 @@
                   </el-form-item>
                </el-col>
             </el-row>
-           <el-row>
-             <el-col :span="12">
-               <el-form-item label="影视时间">
-                 <el-select v-model="form.videoMark" placeholder="请选择">
-                   <el-option label="月卡" value="30" />
-                   <el-option label="季卡" value="90" />
-                   <el-option label="半年卡" value="180" />
-                   <el-option label="年卡" value="365" />
-                   <el-option label="永久卡" value="366" />
-                 </el-select>
-               </el-form-item>
-             </el-col>
-             <el-col :span="12">
-               <el-form-item label="到期时间">
-                 <el-date-picker
-                     v-model="form.videoEndTime"
-                     type="date"
-                     placeholder="选择日期">
-                 </el-date-picker>
-               </el-form-item>
-             </el-col>
-           </el-row>
+<!--           <el-row>-->
+<!--             <el-col :span="12">-->
+<!--               <el-form-item label="影视时间">-->
+<!--                 <el-select v-model="form.videoMark" placeholder="请选择">-->
+<!--                   <el-option label="月卡" value="30" />-->
+<!--                   <el-option label="季卡" value="90" />-->
+<!--                   <el-option label="半年卡" value="180" />-->
+<!--                   <el-option label="年卡" value="365" />-->
+<!--                   <el-option label="永久卡" value="366" />-->
+<!--                 </el-select>-->
+<!--               </el-form-item>-->
+<!--             </el-col>-->
+<!--             <el-col :span="12">-->
+<!--               <el-form-item label="到期时间">-->
+<!--                 <el-date-picker-->
+<!--                     v-model="form.videoEndTime"-->
+<!--                     type="date"-->
+<!--                     placeholder="选择日期">-->
+<!--                 </el-date-picker>-->
+<!--               </el-form-item>-->
+<!--             </el-col>-->
+<!--           </el-row>-->
 
            <el-row>
              <el-col :span="12">
@@ -396,7 +396,7 @@ const title = ref("");
 const dateRange = ref([]);
 const deptName = ref("");
 const deptOptions = ref(undefined);
-const initPassword = ref(undefined);
+const initPassword = ref("123456");
 const postOptions = ref([]);
 const roleOptions = ref([]);
 const cardArray = ref([
@@ -599,7 +599,7 @@ function reset() {
     email: undefined,
     sex: undefined,
     status: "0",
-    remark: undefined,
+    remark: "30",
     vipNum:0,
     vipCode:'',
     postIds: [],
@@ -625,6 +625,7 @@ function handleAdd() {
         return e.roleName !== "管理员";
       });
     }
+    data.form.roleIds = [response.roles[0].roleId];
     open.value = true;
     title.value = "添加用户";
     form.value.password = initPassword.value;
@@ -639,8 +640,6 @@ function handleUpdate(row) {
     //   response.data.vipNum = moment(response.data.vipEndTime).diff(moment(),'day');
     // }
     form.value = response.data;
-    console.log(form.value);
-
     postOptions.value = response.posts;
     const username = store.state.value.user.name;
     if(username === "admin"){
