@@ -664,6 +664,11 @@ async function confirmVideo(item) {
           //   loadData.maxNum = false;
           //   return;
           // }
+          if(!res.data.sign){
+              ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+              loadData.loading = false;
+              return;
+          }
           let path = "夸克网盘/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
