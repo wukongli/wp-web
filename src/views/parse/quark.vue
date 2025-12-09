@@ -595,14 +595,16 @@ const onSubmit = () => {
                   confirmVideo(loadData.item);
                 }  else if (res.data.data == 60) {
                   setTimeout(() => {
+                    isSending.value = false;
                     ElMessage.error('今日播放次数已达上限，请明天再来！');
-                  }, 2000);
+                  }, 1000);
                 } else if (res.data.data == 50) {
                   setTimeout(() => {
+                    isSending.value = false;
                     ElMessage.error(
                         '验证码错误,一个验证码只能播放一个文件,请重新获取!'
                     );
-                  }, 2000);
+                  }, 1000);
                 }
               }
             })
@@ -610,11 +612,6 @@ const onSubmit = () => {
               isSending.value = false;
             });
         return;
-      }
-      if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于3G,普通下载暂不支持，请使用快速下载！');
-        isSending.value = false;
-        return false;
       }
       userStore
           .getCodeNum(params)
@@ -626,14 +623,14 @@ const onSubmit = () => {
                 setTimeout(() => {
                   isSending.value = false;
                   ElMessage.error('今日下载次数已达上限，请明天再来！');
-                }, 2000);
+                }, 1000);
               } else if (res.data.data == 50) {
                 setTimeout(() => {
                   isSending.value = false;
                   ElMessage.error(
                       '验证码错误,一个验证码只能下载一个文件,请重新获取!'
                   );
-                }, 2000);
+                }, 1000);
               }
             }
           })
