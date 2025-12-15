@@ -6,7 +6,7 @@
         </div>
         <div class="content">
           <div class="top">
-            <el-link style="font-size: 20px;margin-top:10px;" type="primary">4K臻彩、1080P、流畅不卡顿</el-link>
+            <el-link :icon="Link" style="font-size: 20px;margin-top:10px;" href="https://gssource.com" target="_blank" type="danger">4K臻彩、1080P、流畅不卡顿</el-link>
             <el-link :icon="Link" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">免费领取vip</el-link>
 <!--            <el-link :icon="Download" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://gssource.com" target="_blank" type="danger">资源搜索</el-link>-->
 
