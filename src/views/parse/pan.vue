@@ -98,7 +98,7 @@
             <div class="list">
               <div v-for="(item,index) in tv" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src" alt="">
+                  <img :src="item.src.replace('http://','https://')" alt="">
                 </div>
                 <p>{{item.title}}</p>
               </div>
@@ -111,7 +111,7 @@
             <div class="list">
               <div v-for="(item,index) in movie" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src" alt="">
+                  <img :src="item.src.replace('http://','https://')" alt="">
                 </div>
                 <p>{{item.title}}</p>
               </div>
@@ -124,7 +124,7 @@
             <div class="list">
               <div v-for="(item,index) in anime" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src" alt="">
+                  <img :src="item.src.replace('http://','https://')" alt="">
                 </div>
                 <p>{{item.title}}</p>
               </div>
@@ -137,7 +137,7 @@
             <div class="list">
               <div v-for="(item,index) in variety" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src" alt="">
+                  <img :src="item.src.replace('http://','https://')" alt="">
                 </div>
                 <p>{{item.title}}</p>
               </div>
@@ -150,7 +150,7 @@
             <div class="list">
               <div v-for="(item,index) in shortVideo" class="item">
                 <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src" alt="">
+                  <img :src="item.src.replace('http://','https://')" alt="">
                 </div>
                 <p>{{item.title}}</p>
               </div>
