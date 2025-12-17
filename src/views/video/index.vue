@@ -72,7 +72,8 @@ const userStore = useUserStore();
 import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
-const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+// const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+const selectValue = ref('https://jx.xmflv.com/?url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -94,7 +95,8 @@ const codeRules = {
 };
 const options = [
   {
-    value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
+    value: 'https://jx.xmflv.com/?url=',
+    // value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
   {
