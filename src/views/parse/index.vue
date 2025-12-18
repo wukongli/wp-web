@@ -137,8 +137,8 @@
       </div>
       <div class="down-address">
         <span>配置说明：</span>
-        <a href="https://docs.qq.com/doc/DWnlpY2pkclpuUEFX?no_promotion=1" target="_blank">
-          https://docs.qq.com/doc/DWnlpY2pkclpuUEFX</a
+        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">
+          https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1</a
         >
       </div>
 <!--      <div class="down-address">-->
@@ -524,7 +524,7 @@ const onSubmit = () => {
         fsId: loadData.item.fs_id,
         version: '1.0.9',
       };
-      if(!downOrPlay){
+      if(!downOrPlay.value){
         const result = await testDownLoad();
         if (!result) {
           loadData.dialogVisible = true;
