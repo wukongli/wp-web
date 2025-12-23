@@ -116,8 +116,8 @@
       </div>
       <div class="down-address">
         <span>配置说明：</span>
-        <a href="https://docs.qq.com/doc/DWnlpY2pkclpuUEFX?no_promotion=1" target="_blank">
-          https://docs.qq.com/doc/DWnlpY2pkclpuUEFX</a
+        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">
+          https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1</a
         >
       </div>
 <!--      <div class="down-address">-->
@@ -147,7 +147,7 @@
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">扫一扫上方二维码获取验证码</div>
+      <div class="qr-hint">微信扫一扫上方二维码获取验证码</div>
 <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>

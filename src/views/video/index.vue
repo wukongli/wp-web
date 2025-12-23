@@ -6,7 +6,7 @@
         </div>
         <div class="content">
           <div class="top">
-            <el-link style="font-size: 20px;margin-top:10px;" type="primary">4K臻彩、1080P、流畅不卡顿</el-link>
+            <el-link :icon="Link" style="font-size: 20px;margin-top:10px;" href="https://gssource.com" target="_blank" type="danger">4K臻彩、1080P、流畅不卡顿</el-link>
             <el-link :icon="Link" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://docs.qq.com/doc/DWkNNSVNFVEhBU0NK?no_promotion=1" target="_blank" type="danger">免费领取vip</el-link>
 <!--            <el-link :icon="Download" style="font-size: 20px;margin-top:10px;margin-left:20px;" href="https://gssource.com" target="_blank" type="danger">资源搜索</el-link>-->
 
@@ -40,7 +40,7 @@
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">为防止恶意盗刷,扫一扫上方二维码获取验证码</div>
+      <div class="qr-hint">为防止恶意盗刷,微信扫一扫上方二维码获取验证码</div>
       <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
       <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -72,7 +72,8 @@ const userStore = useUserStore();
 import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
-const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+// const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
+const selectValue = ref('https://jx.zgjx.org/?key=06nzlBow93Dv&4k=true&url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -94,11 +95,12 @@ const codeRules = {
 };
 const options = [
   {
-    value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
+    value: 'https://jx.zgjx.org/?key=06nzlBow93Dv&4k=true&url=',
+    // value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
   {
-    value: 'https://play.okcdn100.top/analysis/art/?key=bekmvEHJMNORSVWZ17&url=',
+    value: 'https://jx.xmflv.com/?url=',
     label: '备用线路一',
   }
 ]
