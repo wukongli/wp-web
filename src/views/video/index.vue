@@ -64,7 +64,7 @@ import moment from 'moment';
 // import video from "@/assets/images/video.png";
 import { ElMessage } from 'element-plus';
 import { getToken, setToken, removeToken } from '@/utils/auth';
-import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import xiaochengxu from '@/assets/images/xiaochengxu2.jpg';
 const { proxy } = getCurrentInstance();
 import useUserStore from '@/store/modules/user';
 const userStore = useUserStore();
