@@ -77,15 +77,15 @@
         <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
         <el-table-column v-if="hasDirData" min-width="22%" label="操作">
           <template #default="scope">
-            <el-button
-                icon="menu"
-                style="margin-left:12px;margin-top: 5px;"
-                size="small"
-                @click="vipDownLoad(scope.row)"
-                v-if="!scope.row.dir"
-                :type="'warning'"
-            >&nbsp;VIP</el-button
-            >
+<!--            <el-button-->
+<!--                icon="menu"-->
+<!--                style="margin-left:12px;margin-top: 5px;"-->
+<!--                size="small"-->
+<!--                @click="vipDownLoad(scope.row)"-->
+<!--                v-if="!scope.row.dir"-->
+<!--                :type="'warning'"-->
+<!--            >&nbsp;VIP</el-button-->
+<!--            >-->
             <el-button
                 size="small"
                 @click="playVideo(scope.row)"
@@ -189,7 +189,7 @@
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://vip.gssource.com" target="_blank">点击开通快速下载</a></el-button>
+<!--          <el-button type="primary"><a href="https://vip.gssource.com" target="_blank">点击开通快速下载</a></el-button>-->
           <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>

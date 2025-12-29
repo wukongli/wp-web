@@ -95,15 +95,15 @@
         <!--        >-->
         <el-table-column v-if="hasDirData" min-width="22%" label="操作">
           <template #default="scope">
-            <el-button
-              @click="vipDownLoad(scope.row)"
-              v-if="!parseInt(scope.row.isdir)"
-              :type="'warning'"
-              style="margin-left:12px;margin-top: 5px;"
-              icon="menu"
-              size="small"
-              >&nbsp;VIP</el-button
-            >
+<!--            <el-button-->
+<!--              @click="vipDownLoad(scope.row)"-->
+<!--              v-if="!parseInt(scope.row.isdir)"-->
+<!--              :type="'warning'"-->
+<!--              style="margin-left:12px;margin-top: 5px;"-->
+<!--              icon="menu"-->
+<!--              size="small"-->
+<!--              >&nbsp;VIP</el-button-->
+<!--            >-->
             <el-button
                 @click="playVideo(scope.row)"
                 v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
