@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <a href="https://gssource.com">点击获取4k臻彩影视资源...</a>
+    <a href="http://154.201.66.44:8898">点击获取4k臻彩影视资源...</a>
   </div>
 </template>
 <script>
