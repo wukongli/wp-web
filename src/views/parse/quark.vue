@@ -75,7 +75,7 @@
           </template>
         </el-table-column>
         <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
-        <el-table-column v-if="hasDirData" min-width="22%" label="操作">
+        <el-table-column v-if="hasDirData" min-width="35%" label="操作">
           <template #default="scope">
             <el-button
                 icon="menu"
@@ -209,7 +209,7 @@
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
     <el-dialog class="play_dia" :close-on-click-modal ="false" :style="{
-    miHeight: '600px',
+    miHeight: '500px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
         <div class="video_player" id="video-player"></div>
@@ -669,7 +669,7 @@ async function confirmVideo(item) {
               loadData.loading = false;
               return;
           }
-          let path = "夸克网盘/来自：分享/"+res.data.fileName;
+          let path = "video/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
           loadData.videoUrl = res.data.url;
@@ -680,7 +680,7 @@ async function confirmVideo(item) {
           loadData.potUrl = "potplayer://"+loadData.mobileUrl;
           loadData.loading = false;
           const option = {
-            id: "/夸克网盘/来自：分享/"+res.data.fileName,
+            id: "/video/来自：分享/"+res.data.fileName,
             container: "#video-player",
             url: loadData.videoUrl,
             title: res.data.fileName,
@@ -1053,17 +1053,12 @@ async function handleParse() {
   }
   .loading-content{
     width: 100%;
-    height: 500px;
+    height: 400px;
     background-color: black !important;
     padding-top:45px;
     .video_player{
       width: 100%;
-      height: 400px;
-      background-color: black !important;
-    }
-    iframe{
-      width: 100%;
-      height: 400px;
+      height: 350px;
       background-color: black !important;
     }
   }

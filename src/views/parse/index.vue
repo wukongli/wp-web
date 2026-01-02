@@ -93,7 +93,7 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column v-if="hasDirData" min-width="22%" label="操作">
+        <el-table-column v-if="hasDirData" min-width="35%" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
@@ -247,7 +247,7 @@
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
     <el-dialog :close-on-click-modal="false" class="play_dia" :style="{
-    miHeight: '600px',
+    miHeight: '550px',
   }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
       <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
         <div class="video_player" id="video-player"></div>
@@ -864,7 +864,7 @@ async function confirmVideo(item) {
             loadData.loading = false;
             return;
           }
-          let path = "baidu/我的资源/"+res.data.fileName;
+          let path = "videob/我的资源/"+res.data.fileName;
           const signUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
@@ -1110,22 +1110,17 @@ async function handleParse() {
 @media only screen and (min-width: 767px) {
   /* 使用深度选择器修改局部 loading 样式 */
   .loading-content :deep(.el-loading-mask) {
-    height: 500px;
+    height: 400px;
     background-color: black !important;
   }
   .loading-content{
     width: 100%;
-    height: 500px;
+    height: 400px;
     background-color: black !important;
     padding-top:45px;
     .video_player{
       width: 100%;
-      height: 400px;
-      background-color: black !important;
-    }
-    iframe{
-      width: 100%;
-      height: 500px;
+      height: 350px;
       background-color: black !important;
     }
   }
@@ -1134,7 +1129,6 @@ async function handleParse() {
     width: 530px;
     height: 50px;
     margin:auto;
-    margin-top: 20px;
     display: flex;
     align-items: center;
     img{
