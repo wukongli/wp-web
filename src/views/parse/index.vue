@@ -178,7 +178,7 @@
 
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
-      <img class="qr-code" :src="qrCode" alt="" />
+      <img class="qr-code" :src="wechat" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
         快速下载无需验证码,不限次数,自由下载！
@@ -249,6 +249,7 @@ import duli from '@/assets/images/独立开发者.png';
 import duli2 from '@/assets/images/独立2.png';
 import yao from '@/assets/images/yaoyao.png';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import wechat from '@/assets/images/wechat.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 const { proxy } = getCurrentInstance();

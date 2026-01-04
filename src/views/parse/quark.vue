@@ -162,7 +162,7 @@
 
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" width="40%">
-      <img class="qr-code" :src="qrCode" alt="" />
+      <img class="qr-code" :src="wechat" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
         快速下载无需验证码,不限次数,自由下载！
@@ -249,6 +249,7 @@ const selectItem = ref([]);
 const pathList = ref([]);
 const qrCodeList = ref([iron,front,duli,duli2,yao]);
 const qrCode = ref('');
+import wechat from '@/assets/images/wechat.jpg';
 const loadData = reactive({
   bread: '',
   tableData: [],
