@@ -20,7 +20,7 @@
 <!--        </div>-->
 <!--      </div>-->
 <!--      <div class="video-play">-->
-    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://mac.aifenxiang.net.cn"></iframe>
+    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://gssource.com"></iframe>
 <!--      </div>-->
 <!--    </div>-->
 
@@ -130,25 +130,25 @@ onMounted(() => {
     return isMobileUserAgent && isMobileScreen;
   };
 
-  if (isMobile()) {
-   loadData.browseDia = true;
-  } else {
-
-    setInterval(() => {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) { /* Firefox */
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { /* IE/Edge */
-        document.msExitFullscreen();
-      }
-      loadData.dialog = true;
-    },10* 1000);
 
 
-  }
+
+  // if (isMobile()) {
+  //  loadData.browseDia = true;
+  // } else {
+  //
+  //   setInterval(() => {
+  //     if (document.exitFullscreen) {
+  //       document.exitFullscreen();
+  //     } else if (document.mozCancelFullScreen) { /* Firefox */
+  //       document.mozCancelFullScreen();
+  //     } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+  //       document.webkitExitFullscreen();
+  //     } else if (document.msExitFullscreen) { /* IE/Edge */
+  //       document.msExitFullscreen();
+  //     }
+  //     loadData.dialog = true;
+  //   },10* 1000);  }
 
 });
 
