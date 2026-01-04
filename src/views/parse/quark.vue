@@ -224,7 +224,7 @@
       </div>
       <el-button type="danger" size="small" style="margin-top: 5px;" icon="Warning">视频卡顿或者大文件视频播放器内观看更流畅</el-button>
       <div class="mobile_player" >
-        <a :href="loadData.infuseUrl">
+        <div @click="openUrl(loadData.infuseUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -233,8 +233,8 @@
           >
             <img :src="infuse" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.potUrl">
+        </div>
+        <div @click="openUrl(loadData.potUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -243,8 +243,8 @@
           >
             <img :src="pot" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.vlcUrl">
+        </div>
+        <div @click="openUrl(loadData.vlcUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -253,8 +253,8 @@
           >
             <img :src="vlc" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.maxUrl">
+        </div>
+        <div @click="openUrl(loadData.maxUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -263,7 +263,7 @@
           >
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
-        </a>
+        </div>
         <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link></span>
       </div>
     </el-dialog>
@@ -394,6 +394,9 @@ const hasDirData = computed(() => {
 onMounted(() => {
   qrCode.value = xiaochengxu;
 })
+function openUrl(url){
+  window.location.href = url;
+}
 async function parseQuark(params){
   loadData.tableLoading = true;
   let req;
@@ -409,6 +412,8 @@ async function parseQuark(params){
       stoken:loadData.stoken,
     }
   }
+
+
 
   await userStore
       .getQuarkList(req)
@@ -671,7 +676,7 @@ async function confirmVideo(item) {
           }
           let path = "video/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.mobileUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          loadData.mobileUrl = encodeURI("http://154.201.66.44:5244/d/"+path+"?sign="+res.data.sign);
           loadData.videoUrl = res.data.url;
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;

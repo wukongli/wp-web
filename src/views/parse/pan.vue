@@ -58,12 +58,13 @@
 <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
 <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
 
-              <div style="position:relative;top:20px;left: 2%;">
-                <el-tag v-if="scope.row.url.includes('quark')"  type="success">下载极快</el-tag>
-                <el-tag v-if="scope.row.url.includes('baidu')"  type="danger">下载很快</el-tag>
-                {{
-                  scope.row.name.replace("夸克","").replace("百度","")
-                }}</div>
+              <div style="min-height: 70px; display: flex; align-items: center; flex-wrap: wrap; line-height: normal;">
+                <el-tag style="margin-left:10px;" v-if="scope.row.url.includes('quark')"  type="success">下载极快</el-tag>
+                <el-tag style="margin-left:10px;" v-if="scope.row.url.includes('baidu')"  type="danger">下载很快</el-tag>
+                <span style="margin-left: 10px;">
+                 {{ scope.row.name.replace("夸克","").replace("百度","") }}
+                </span>
+              </div>
             </div>
           </template>
         </el-table-column>

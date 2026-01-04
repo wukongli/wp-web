@@ -84,7 +84,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright 2024 All Rights Reserved.</span>
+      <span>Copyright 2026 All Rights Reserved.</span>
     </div>
     <!-- 获取验证码弹窗 -->
     <el-dialog

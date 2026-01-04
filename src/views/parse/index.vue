@@ -263,7 +263,7 @@
       <el-button  type="danger" size="small" icon="Warning" style="position: relative;left:3px;bottom: 30px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
 <!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
       <div class="mobile_player" :close-on-click-modal ="false" >
-        <a :href="loadData.infuseUrl">
+        <div @click="openUrl(loadData.infuseUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -272,8 +272,8 @@
           >
             <img :src="infuse" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.potUrl">
+        </div>
+        <div @click="openUrl(loadData.potUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -282,8 +282,8 @@
           >
             <img :src="pot" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.vlcUrl">
+        </div>
+        <div @click="openUrl(loadData.vlcUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -292,8 +292,8 @@
           >
             <img :src="vlc" alt="">
           </el-tooltip>
-        </a>
-        <a :href="loadData.maxUrl">
+        </div>
+        <div @click="openUrl(loadData.maxUrl)">
           <el-tooltip
               class="box-item"
               effect="dark"
@@ -302,7 +302,7 @@
           >
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
-        </a>
+        </div>
         <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link></span>
       </div>
     </el-dialog>
@@ -487,6 +487,10 @@ function parseCopyLink(params) {
       loadData.tableLoading = false;
       // loadData.errorDia = true;
     });
+}
+
+function openUrl(url){
+  window.location.href = url;
 }
 
 function downLoad(item) {
@@ -865,7 +869,7 @@ async function confirmVideo(item) {
             return;
           }
           let path = "videob/我的资源/"+res.data.fileName;
-          const signUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          const signUrl = encodeURI("http://154.201.66.44:5244/d/"+path+"?sign="+res.data.sign);
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
