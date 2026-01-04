@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <a href="https://gssource.com">点击获取4k臻彩影视资源...</a>
 <!--    <div class="video-header">-->
 <!--      <input v-model="input" placeholder="请输入视频播放链接" />-->
 <!--      <div @click="playVideo" class="play">播放</div>-->
@@ -20,43 +21,43 @@
 <!--        </div>-->
 <!--      </div>-->
 <!--      <div class="video-play">-->
-    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://mac.aifenxiang.net.cn"></iframe>
+<!--    <iframe  frameborder="no" onload="this.style.border='none';" ref="myElement" allowfullscreen width="100%" height="100%" src="https://mac.aifenxiang.net.cn"></iframe>-->
 <!--      </div>-->
 <!--    </div>-->
 
-    <el-dialog width="500px;" :close-on-press-escape="false" title="提示" v-model="loadData.dialog">
-            <img class="qr-code" :src="qrCode" alt="" />
-      <div class="qr-hint">
-<!--        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>-->
-        <div>获得完整观看地址，支持移动端APP,TV端APP，联系管理员开通权限！</div>
-      </div>
-      <template #footer>
-        <span class="dialog-footer">
+<!--    <el-dialog width="500px;" :close-on-press-escape="false" title="提示" v-model="loadData.dialog">-->
+<!--            <img class="qr-code" :src="qrCode" alt="" />-->
+<!--      <div class="qr-hint">-->
+<!--&lt;!&ndash;        <div>请勿相信视频内的任何广告，谨防上当受骗！！</div>&ndash;&gt;-->
+<!--        <div>获得完整观看地址，支持移动端APP,TV端APP，联系管理员开通权限！</div>-->
+<!--      </div>-->
+<!--      <template #footer>-->
+<!--        <span class="dialog-footer">-->
+<!--&lt;!&ndash;          <el-button type="primary"&ndash;&gt;-->
+<!--&lt;!&ndash;          ><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通</a></el-button&ndash;&gt;-->
+<!--&lt;!&ndash;          >&ndash;&gt;-->
+
+<!--        </span>-->
+<!--      </template>-->
+<!--    </el-dialog>-->
+
+<!--    <el-dialog-->
+<!--        :visible.sync="dialogVisible"-->
+<!--        :show-close="false"-->
+<!--    :close-on-click-modal="false"-->
+<!--    :close-on-press-escape="false"-->
+<!--               title="提示" v-model="loadData.browseDia">-->
+<!--      <div>-->
+<!--        <div>移动端观看视频请联系管理员下载移动端app</div>-->
+<!--      </div>-->
+<!--      <template #footer>-->
+<!--        <span class="dialog-footer">-->
 <!--          <el-button type="primary"-->
-<!--          ><a href="https://vip.aifenxiang.net.cn" target="_blank">点击开通</a></el-button-->
+<!--          ><router-link :to="'/parse/login'">确定</router-link></el-button-->
 <!--          >-->
-
-        </span>
-      </template>
-    </el-dialog>
-
-    <el-dialog
-        :visible.sync="dialogVisible"
-        :show-close="false"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-               title="提示" v-model="loadData.browseDia">
-      <div>
-        <div>移动端观看视频请联系管理员下载移动端app</div>
-      </div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary"
-          ><router-link :to="'/parse/login'">确定</router-link></el-button
-          >
-        </span>
-      </template>
-    </el-dialog>
+<!--        </span>-->
+<!--      </template>-->
+<!--    </el-dialog>-->
   </div>
 </template>
 
@@ -130,25 +131,25 @@ onMounted(() => {
     return isMobileUserAgent && isMobileScreen;
   };
 
-  if (isMobile()) {
-   loadData.browseDia = true;
-  } else {
-
-    setInterval(() => {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) { /* Firefox */
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { /* IE/Edge */
-        document.msExitFullscreen();
-      }
-      loadData.dialog = true;
-    },10* 1000);
-
-
-  }
+  // if (isMobile()) {
+  //  loadData.browseDia = true;
+  // } else {
+  //
+  //   setInterval(() => {
+  //     if (document.exitFullscreen) {
+  //       document.exitFullscreen();
+  //     } else if (document.mozCancelFullScreen) { /* Firefox */
+  //       document.mozCancelFullScreen();
+  //     } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+  //       document.webkitExitFullscreen();
+  //     } else if (document.msExitFullscreen) { /* IE/Edge */
+  //       document.msExitFullscreen();
+  //     }
+  //     loadData.dialog = true;
+  //   },10* 1000);
+  //
+  //
+  // }
 
 });
 
@@ -169,6 +170,10 @@ getUser();
 <style scoped lang="scss">
 
 .app-container{
+  a{
+    color: red ;
+    font-weight:bold ;
+  }
   width: 100%;
   height:calc(100vh - 84px);
   .qr-hint {
