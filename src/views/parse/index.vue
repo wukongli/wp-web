@@ -866,10 +866,11 @@ async function confirmVideo(item) {
           if(!res.data.sign){
             ElMessage.error("视频播放失败,请更换资源或者下载后观看");
             loadData.loading = false;
+            loadData.maxNum = false;
             return;
           }
-          let path = "videob/我的资源/"+res.data.fileName;
-          const signUrl = encodeURI("http://154.201.66.44:5244/d/"+path+"?sign="+res.data.sign);
+          let path = "http://154.201.66.44:5244/d/videob/我的资源/"+res.data.fileName+"?sign=";
+          const signUrl = path+encodeURIComponent(res.data.sign);
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
@@ -946,6 +947,8 @@ async function confirmVideo(item) {
         }
       })
       .catch(() => {
+        loadData.loading = false;
+        loadData.maxNum = false;
       });
 }
 

@@ -420,7 +420,6 @@ async function parseQuark(params){
       .then((data) => {
         loadData.tableLoading = false;
         if(data.code === 200){
-          console.log(data.data.list);
           data.data.list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
@@ -672,11 +671,12 @@ async function confirmVideo(item) {
           if(!res.data.sign){
               ElMessage.error("视频播放失败,请更换资源或者下载后观看");
               loadData.loading = false;
+              loadData.maxNum = false;
               return;
           }
-          let path = "video/来自：分享/"+res.data.fileName;
+          let path = "http://154.201.66.44:5244/d/video/来自：分享/"+res.data.fileName+"?sign=";
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.mobileUrl = encodeURI("http://154.201.66.44:5244/d/"+path+"?sign="+res.data.sign);
+          loadData.mobileUrl = path+encodeURIComponent(res.data.sign);
           loadData.videoUrl = res.data.url;
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
@@ -745,6 +745,8 @@ async function confirmVideo(item) {
         }
       })
       .catch(() => {
+        loadData.loading = false;
+        loadData.maxNum = false;
       });
 }
 function ext(path){
@@ -807,7 +809,6 @@ async function confirm(item) {
       .quarkTransfer(params)
       .then((res) => {
         if (res.code === 200) {
-          console.log(res);
           isSending.value = false;
           item.loading = false;
           item.disable = false;
