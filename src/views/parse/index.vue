@@ -817,6 +817,8 @@ function playVideo(item){
   loadData.item = item;
   form.code = '';
   downOrPlay.value = true;
+  loadData.loading = false;
+  isSending.value = false;
   if (getToken()) {
     confirmVideo(loadData.item);
   } else {
@@ -863,14 +865,14 @@ async function confirmVideo(item) {
       .videoAdd(params)
       .then((res) => {
         if (res.code === 200) {
-          if(!res.data.sign){
+          if(!res.data.fileName){
             ElMessage.error("视频播放失败,请更换资源或者下载后观看");
             loadData.loading = false;
             loadData.maxNum = false;
             return;
           }
-          let path = "http://154.201.66.44:5244/d/videob/我的资源/"+res.data.fileName+"?sign=";
-          const signUrl = path+encodeURIComponent(res.data.sign);
+          let path = "http://154.201.66.44:5244/d/videob/我的资源/"+res.data.fileName;
+          const signUrl = path;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;

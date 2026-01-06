@@ -537,6 +537,8 @@ function playVideo(item){
   loadData.item = item;
   form.code = '';
   downOrPlay.value = true;
+  loadData.loading = false;
+  isSending.value = false;
   if (getToken()) {
     confirmVideo(loadData.item);
   } else {
@@ -668,15 +670,15 @@ async function confirmVideo(item) {
           //   loadData.maxNum = false;
           //   return;
           // }
-          if(!res.data.sign){
+          if(!res.data.fileName){
               ElMessage.error("视频播放失败,请更换资源或者下载后观看");
               loadData.loading = false;
               loadData.maxNum = false;
               return;
           }
-          let path = "http://154.201.66.44:5244/d/video/来自：分享/"+res.data.fileName+"?sign=";
+          let path = "http://154.201.66.44:5244/d/video/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
-          loadData.mobileUrl = path+encodeURIComponent(res.data.sign);
+          loadData.mobileUrl = path;
           loadData.videoUrl = res.data.url;
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;

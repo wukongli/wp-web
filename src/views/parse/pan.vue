@@ -331,7 +331,6 @@ function getList() {
 }
 
 function goParse(row){
-  console.log(row);
   tableShow.value = false;
   showComponent.value = true;
   if(row.url.includes("quark")){
@@ -417,7 +416,6 @@ async function handleFocus() {
   // 确保输入框保持可输入状态
   await nextTick()
   const input = document.querySelector('.el-select .el-input__inner')
-  console.log(input);
   if (input) {
     input.focus();
   }
