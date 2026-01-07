@@ -859,13 +859,13 @@ async function confirmVideo(item) {
       .videoAdd(params)
       .then((res) => {
         if (res.code === 200) {
-          if(!res.data.sign){
+          if(!res.data.fileName){
             ElMessage.error("视频播放失败,请更换资源或者下载后观看");
             loadData.loading = false;
             return;
           }
           let path = "baidu/我的资源/"+res.data.fileName;
-          const signUrl = "https://play.gssource.com/d/"+encodeURI(path)+"?sign="+res.data.sign;
+          const signUrl = "https://play.gssource.com/d/"+path
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
