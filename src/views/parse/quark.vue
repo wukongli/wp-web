@@ -424,7 +424,7 @@ async function parseQuark(params){
             // 0 下载，1，下载中
             item.status = 0;
           });
-          loadData.tableData = data.data.list;
+          loadData.tableData = data.data.list.sort((a, b) => b.l_updated_at - a.l_updated_at);
           loadImagesSequentially(loadData.tableData);
         }
       })
