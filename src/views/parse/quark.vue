@@ -184,7 +184,7 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
-        深度搜索VIP无需验证码,不限下载次数，支持在线播放！
+        爱看资源VIP无需验证码,不限下载次数，支持在线播放！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -713,7 +713,45 @@ async function confirmVideo(item) {
             theme: "#1890ff",
             quality: [],
             whitelist: [],
-            settings: [],
+            settings: [
+              {
+                width: 200,
+                html: '视频旋转',
+                tooltip: '0°',
+                selector: [
+                  { html: '0°', rotate: 0, default: true },
+                  { html: '90°', rotate: 90 },
+                  { html: '180°', rotate: 180 },
+                  { html: '270°', rotate: 270 },
+                ],
+                onSelect: function (item, $dom, art) {
+                  const deg = item.rotate;
+                  const $video = art.video;
+                  const $container = art.container;
+
+                  if ($video) {
+                    // 1. 设置平滑过渡效果
+                    $video.style.transition = 'transform 0.3s ease';
+
+                    if (deg === 90 || deg === 270) {
+                      // 2. 计算缩放比例：容器高度 / 视频宽度 (或反之) 以适应屏幕
+                      // 防止 90 度旋转后视频超出边界
+                      const rect = $container.getBoundingClientRect();
+                      const scale = rect.height / rect.width;
+
+                      // 只有当高度确实小于宽度时才缩放，否则可能会变太小
+                      // 如果你希望强行铺满，可以根据实际场景调整这个 scale
+                      $video.style.transform = `rotate(${deg}deg) scale(${scale})`;
+                    } else {
+                      // 3. 恢复 0 或 180 度，取消缩放
+                      $video.style.transform = `rotate(${deg}deg) scale(1)`;
+                    }
+                  }
+
+                  return item.html;
+                },
+              },
+            ],
             moreVideoAttr: {
               "webkit-playsinline": true,
               playsInline: true,

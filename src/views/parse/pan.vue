@@ -11,7 +11,7 @@
           >登录</el-button></a>
         <a class="logo-title">
           <img :src="logo" alt="">
-          <span>深度搜索 - 云端资源搜索专家</span>
+          <span>爱看资源 - 云端资源搜索专家</span>
         </a>
         <div class="user">
           <div v-if="loginData.login" class="avatar-container">

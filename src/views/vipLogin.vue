@@ -1,12 +1,20 @@
 <template>
   <div class="login">
+    <div class="logo">
+      <a class="share-login" href="/index">
+        <el-button
+            style="position:fixed;top:5%;right:5%;"
+            type="primary"
+            icon="user"
+        >首页</el-button></a>
+    </div>
     <el-form
       ref="loginRef"
       :model="loginForm"
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">深度搜索平台</h3>
+      <h3 class="title">爱看资源平台</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -93,6 +101,8 @@ const userStore = useUserStore();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
 import {createBy} from "@/utils/wp";
+import logo from "@/assets/img/deep.jpg";
+import userLogo from "@/assets/logo/img.png";
 const loginForm = ref({
   username: Cookies.get('username') ? Cookies.get('username') : '',
   password: Cookies.get('password') ? Cookies.get('password') : '',

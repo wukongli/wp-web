@@ -222,7 +222,7 @@
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        深度搜索VIP无需验证码,不限下载次数，支持在线播放！
+        爱看资源VIP无需验证码,不限下载次数，支持在线播放！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -260,7 +260,7 @@
 <!--            :src="loadData.videoUrl">-->
 <!--        </iframe>-->
       </div>
-      <el-button  type="danger" size="small" icon="Warning" style="position: relative;left:3px;bottom: 30px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>
+      <el-button  type="danger" size="small" icon="Warning" style="margin-top: 5px;">{{loadData.diaHit}}</el-button>
 <!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
       <div class="mobile_player" :close-on-click-modal ="false" >
         <div @click="openUrl(loadData.infuseUrl)">
@@ -402,6 +402,7 @@ const loadData = reactive({
   potUrl:'javascript:void(0)',
   player:null,
   hlsPlayer:null,
+  diaHit:"视频卡顿或者大文件视频播放器内观看更流畅"
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -877,74 +878,79 @@ async function confirmVideo(item) {
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
           loadData.potUrl = "potplayer://"+signUrl;
-          loadData.loading = false;
-          loadData.videoUrl = signUrl
-          // userStore.getPlayUrl({"signUrl":signUrl}).then((result)=>{
-          //         if(result.code === 200){
-          //           loadData.videoUrl = result.data;
-          //           loadData.loading = false;
-          //           const option = {
-          //             id: "/baidu/我的资源/"+res.data.fileName,
-          //             container: "#video-player",
-          //             // url: loadData.videoUrl,
-          //             url:"https://d.pcs.baidu.com/file/af9fb4e55sb6f823f6be45a623c9de32?fid=1102021193212-250528-633241619032069&rt=pr&sign=FDtAERK-DCb740ccc5511e5e8fedcff06b081203-FVN4RBrGEu2G8qeSmxlQnzrCeQk%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=317895184745372792&dp-callid=0&dstime=1762614855&r=641099191&vuk=1102021193212&origin=dlna",
-          //             title: res.data.fileName,
-          //             volume: 1.0,
-          //             autoplay: true,
-          //             autoSize: false,
-          //             autoMini: true,
-          //             loop: false,
-          //             flip: true,
-          //             playbackRate: true,
-          //             aspectRatio: true,
-          //             // "screenshot": true,
-          //             setting: true,
-          //             hotkey: true,
-          //             pip: true,
-          //             mutex: true,
-          //             fullscreen: true,
-          //             // "fullscreenWeb": true,
-          //             subtitleOffset: true,
-          //             miniProgressBar: false,
-          //             type: ext(res.data.fileName),
-          //             playsInline: true,
-          //             theme: "#1890ff",
-          //             quality: [],
-          //             whitelist: [],
-          //             settings: [],
-          //             moreVideoAttr: {
-          //               "webkit-playsinline": true,
-          //               playsInline: true,
-          //               // crossOrigin: "anonymous",
-          //             },
-          //             customType: {
-          //             },
-          //             lang: "zh-cn",
-          //             lock: true,
-          //             fastForward: true,
-          //             autoPlayback: true,
-          //             autoOrientation: true,
-          //             airplay: true
-          //           }
-          //
-          //           const player = new Artplayer(option);
-          //           loadData.player = player;
-          //           loadData.player.on("ready", () => {
-          //             loadData.player.video.src = res.data.url;
-          //           })
-          //           loadData.player.on("video:ended", () => {
-          //
-          //           })
-          //           loadData.player.on("error", () => {
-          //             if (player.video.crossOrigin) {
-          //               console.log(
-          //                   "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
-          //               )
-          //               player.video.crossOrigin = null;
-          //             }
-          //           })
-          //         }
-          // })
+          const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if(isPC){
+            userStore.getPlayUrl({"signUrl":signUrl}).then((result)=>{
+              if(result.code === 200){
+                loadData.loading = false;
+                loadData.videoUrl = result.data;
+                loadData.loading = false;
+                const option = {
+                  id: "/baidu/我的资源/"+res.data.fileName,
+                  container: "#video-player",
+                  url: loadData.videoUrl,
+                  title: res.data.fileName,
+                  volume: 1.0,
+                  autoplay: true,
+                  autoSize: false,
+                  autoMini: true,
+                  loop: false,
+                  flip: true,
+                  playbackRate: true,
+                  aspectRatio: true,
+                  // "screenshot": true,
+                  setting: true,
+                  hotkey: true,
+                  // pip: true,
+                  mutex: true,
+                  fullscreen: true,
+                  // "fullscreenWeb": true,
+                  subtitleOffset: true,
+                  miniProgressBar: false,
+                  type: ext(res.data.fileName),
+                  playsInline: true,
+                  theme: "#1890ff",
+                  quality: [],
+                  whitelist: [],
+                  settings: [],
+                  moreVideoAttr: {
+                    "webkit-playsinline": true,
+                    playsInline: true,
+                    // crossOrigin: "anonymous",
+                  },
+                  customType: {
+                  },
+                  lang: "zh-cn",
+                  lock: true,
+                  fastForward: true,
+                  autoPlayback: true,
+                  autoOrientation: true,
+                  airplay: true
+                }
+
+                const player = new Artplayer(option);
+                loadData.player = player;
+                loadData.player.on("ready", () => {
+                  loadData.player.video.src = res.data.url;
+                })
+                loadData.player.on("video:ended", () => {
+
+                })
+                loadData.player.on("error", () => {
+                  if (player.video.crossOrigin) {
+                    console.log(
+                        "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+                    )
+                    player.video.crossOrigin = null;
+                  }
+                })
+              }
+            })
+          }else{
+            loadData.diaHit = "此资源只能在播放器内播放,请点击下方按钮播放";
+            loadData.loading = false;
+          }
+
 
         }
       })
@@ -1138,6 +1144,7 @@ async function handleParse() {
     width: 530px;
     height: 50px;
     margin:auto;
+    margin-top: 20px;
     display: flex;
     align-items: center;
     img{
