@@ -150,7 +150,9 @@
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">微信扫一扫上方二维码获取验证码</div>
+      <div class="qr-hint">微信扫一扫上方二维码获取验证码
+        <el-link href="https://pan.quark.cn/s/c32f0125e825" target="_blank" type="success">PC客户端下载地址</el-link>
+      </div>
       <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
       <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -264,7 +266,12 @@
             <img :src="mobilePlayer" alt="">
           </el-tooltip>
         </div>
-        <span><el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link></span>
+        <span>
+          <el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link>
+          <br />
+          <el-link href="https://pan.quark.cn/s/c32f0125e825" target="_blank" type="success">PC客户端下载地址</el-link>
+        </span>
+
       </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
