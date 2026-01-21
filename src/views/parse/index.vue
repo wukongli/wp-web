@@ -275,16 +275,16 @@
             <img :src="infuse" alt="">
           </el-tooltip>
         </div>
-        <div @click="openUrl(loadData.potUrl)">
-          <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="potplayer播放器"
-              placement="top-start"
-          >
-            <img :src="pot" alt="">
-          </el-tooltip>
-        </div>
+<!--        <div @click="openUrl(loadData.potUrl)">-->
+<!--          <el-tooltip-->
+<!--              class="box-item"-->
+<!--              effect="dark"-->
+<!--              content="potplayer播放器"-->
+<!--              placement="top-start"-->
+<!--          >-->
+<!--            <img :src="pot" alt="">-->
+<!--          </el-tooltip>-->
+<!--        </div>-->
         <div @click="openUrl(loadData.vlcUrl)">
           <el-tooltip
               class="box-item"
@@ -321,14 +321,15 @@
 </template>
 
 <script setup name="Index">
-import moment from 'moment';
+import Player from 'xgplayer';
+import 'xgplayer/dist/index.min.css';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
-import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
+import Hls from 'hls.js';
 import {
   generateRandomLetters,
   getFilesize,
@@ -406,10 +407,10 @@ const loadData = reactive({
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',
-  potUrl:'javascript:void(0)',
+  // potUrl:'javascript:void(0)',
   player:null,
   hlsPlayer:null,
-  diaHit:"视频卡顿或者大文件视频播放器内观看更流畅"
+  diaHit:"视频卡顿或者无法播放,建议使用下面播放器内观看"
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -498,7 +499,13 @@ function parseCopyLink(params) {
 }
 
 function openUrl(url){
-  window.location.href = url;
+  // window.location.href = url;
+  const a = document.createElement('a');
+  a.href = url;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function downLoad(item) {
@@ -841,7 +848,7 @@ function handleBeforeClose(){
   loadData.infuseUrl = "javascript:void(0)";
   loadData.maxUrl = "javascript:void(0)";
   loadData.vlcUrl = "javascript:void(0)";
-  loadData.potUrl = "javascript:void(0)";
+  // loadData.potUrl = "javascript:void(0)";
   if (loadData.player && loadData.player.video) loadData.player.video.src = "";
   loadData.player?.destroy();
 }
@@ -879,12 +886,12 @@ async function confirmVideo(item) {
             loadData.maxNum = false;
             return;
           }
-          let path = "http://154.201.66.44:5244/d/videob/我的资源/"+res.data.fileName;
+          let path = "http://154.201.66.44:5244/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
           const signUrl = path;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
-          loadData.potUrl = "potplayer://"+signUrl;
+          // loadData.potUrl = "potplayer://"+signUrl;
           const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
           if(isPC){
             userStore.getPlayUrl({"signUrl":signUrl}).then((result)=>{
@@ -914,7 +921,7 @@ async function confirmVideo(item) {
                   // "fullscreenWeb": true,
                   subtitleOffset: true,
                   miniProgressBar: false,
-                  type: ext(res.data.fileName),
+                  type: ext(res.data.fileName).toLowerCase().replace('.', ''),
                   playsInline: true,
                   theme: "#1890ff",
                   quality: [],
@@ -923,9 +930,19 @@ async function confirmVideo(item) {
                   moreVideoAttr: {
                     "webkit-playsinline": true,
                     playsInline: true,
-                    // crossOrigin: "anonymous",
+                    crossOrigin: "anonymous",
                   },
                   customType: {
+                    // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
+                    m3u8: function (video, url) {
+                      if (Hls.isSupported()) {
+                        const hls = new Hls();
+                        hls.loadSource(url);
+                        hls.attachMedia(video);
+                      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = url;
+                      }
+                    },
                   },
                   lang: "zh-cn",
                   lock: true,

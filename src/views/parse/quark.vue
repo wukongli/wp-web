@@ -236,16 +236,16 @@
             <img :src="infuse" alt="">
           </el-tooltip>
         </div>
-        <div @click="openUrl(loadData.potUrl)">
-          <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="potplayer播放器"
-              placement="top-start"
-          >
-            <img :src="pot" alt="">
-          </el-tooltip>
-        </div>
+<!--        <div @click="openUrl(loadData.potUrl)">-->
+<!--          <el-tooltip-->
+<!--              class="box-item"-->
+<!--              effect="dark"-->
+<!--              content="potplayer播放器"-->
+<!--              placement="top-start"-->
+<!--          >-->
+<!--            <img :src="pot" alt="">-->
+<!--          </el-tooltip>-->
+<!--        </div>-->
         <div @click="openUrl(loadData.vlcUrl)">
           <el-tooltip
               class="box-item"
@@ -377,7 +377,7 @@ const loadData = reactive({
   infuseUrl:"javascript:void(0)",
   maxUrl:"javascript:void(0)",
   vlcUrl:'javascript:void(0)',
-  potUrl:'javascript:void(0)',
+  // potUrl:'javascript:void(0)',
   loading:true,
   title:'',
   player:null,
@@ -401,8 +401,15 @@ const hasDirData = computed(() => {
 onMounted(() => {
   qrCode.value = xiaochengxu;
 })
-function openUrl(url){
-  window.location.href = url;
+function openUrl(url) {
+  // window.location.href = url;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 async function parseQuark(params){
   loadData.tableLoading = true;
@@ -562,7 +569,7 @@ function handleBeforeClose(){
     loadData.infuseUrl = "javascript:void(0)";
     loadData.maxUrl = "javascript:void(0)";
     loadData.vlcUrl = "javascript:void(0)";
-    loadData.potUrl = "javascript:void(0)";
+    // loadData.potUrl = "javascript:void(0)";
     if (loadData.player && loadData.player.video) loadData.player.video.src = "";
     loadData.player?.destroy();
 }
@@ -683,7 +690,7 @@ async function confirmVideo(item) {
               loadData.maxNum = false;
               return;
           }
-          let path = "http://154.201.66.44:5244/d/video/来自：分享/"+res.data.fileName;
+          let path = "http://154.201.66.44:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = path;
           loadData.videoUrl = res.data.url;
@@ -691,7 +698,7 @@ async function confirmVideo(item) {
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
           loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+loadData.mobileUrl;
-          loadData.potUrl = "potplayer://"+loadData.mobileUrl;
+          // loadData.potUrl = "potplayer://"+loadData.mobileUrl;
           loadData.loading = false;
           const option = {
             id: "/video/来自：分享/"+res.data.fileName,
@@ -762,7 +769,6 @@ async function confirmVideo(item) {
             moreVideoAttr: {
               "webkit-playsinline": true,
               playsInline: true,
-              // crossOrigin: "anonymous",
             },
             customType: {
             },
