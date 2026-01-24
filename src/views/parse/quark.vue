@@ -781,6 +781,22 @@ async function confirmVideo(item) {
           }
           const player = new Artplayer(option)
           loadData.player = player;
+          player.on('fullscreenWeb', (state) => {
+            // 关键点：使用 art.template.container 获取底层的 DOM 元素
+            const playerNode = player.template.$player;
+            if (state) {
+              // 进入网页全屏
+              if (playerNode instanceof Node) {
+                document.body.appendChild(playerNode);
+                playerNode.style.zIndex = '3000';
+              }
+            } else {
+              // 退出网页全屏：将播放器归还到 dialog 中的容器
+              if (playerNode instanceof Node && artRef.value) {
+                artRef.value.appendChild(playerNode);
+              }
+            }
+          });
           loadData.player.on("ready", () => {
             loadData.player.video.src = res.data.url;
           })
