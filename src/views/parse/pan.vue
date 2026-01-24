@@ -394,11 +394,17 @@ function extractQuarkInfo(text) {
 function getTag(){
   userStore.getTag().then(res=>{
     if(res.code === 200){
-      movie.value = res.data.movie.data.slice(0, 20).sort(() => Math.random() - 0.5);
-      tv.value = res.data.tv.data.slice(0, 20).sort(() => Math.random() - 0.5);
-      anime.value = res.data.anime.data.slice(0, 20).sort(() => Math.random() - 0.5);
-      variety.value = res.data.variety.data.slice(0, 20).sort(() => Math.random() - 0.5);
-      shortVideo.value = res.data.shortVideo.data.slice(0, 20).sort(() => Math.random() - 0.5);
+      console.log(navigator.userAgent);
+      const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      let count = 5;
+      if(!isPC){
+         count = 3;
+      }
+      movie.value = res.data.movie.data.slice(0, 20).sort(() => Math.random() - 0.5).splice(0,count);
+      tv.value = res.data.tv.data.slice(0, 20).sort(() => Math.random() - 0.5).splice(0,count);
+      anime.value = res.data.anime.data.slice(0, 20).sort(() => Math.random() - 0.5).splice(0,count);
+      variety.value = res.data.variety.data.slice(0, 20).sort(() => Math.random() - 0.5).splice(0,count);
+      shortVideo.value = res.data.shortVideo.data.slice(0, 20).sort(() => Math.random() - 0.5).splice(0,count);
     }
   })
 }
@@ -628,6 +634,9 @@ const getTagType = (index) => {
 }
 
 @media only screen and (max-width: 767px) {
+  .home{
+    width: 100%;
+  }
   :deep(.el-table .cell.el-tooltip) {
     white-space: wrap;
   }
@@ -643,7 +652,7 @@ const getTagType = (index) => {
       border-radius: 12px;
       background-color: var(--theme-other_background);
       box-shadow: 0 4px 10px rgba(225, 225, 225, 0.3);
-      margin-bottom: 20px;
+      //margin-bottom: 20px;
       padding-top: 20px;
       .nav {
         position: relative;
@@ -658,13 +667,13 @@ const getTagType = (index) => {
         min-height: 200px;
         .list {
           display: flex;
-          flex-wrap: wrap;
+          //flex-wrap: wrap;
           padding: 0 0 10px 15px;
           .item {
             position: relative;
             display: block;
             width: 27%;
-            margin: 8px;
+            margin: 0 8px;
             border-radius: 8px 8px 0 0;
             overflow: hidden;
             text-align: center;
@@ -685,7 +694,8 @@ const getTagType = (index) => {
               }
             }
             p {
-              //margin-top: 10px;
+              margin: 8px 0!important;
+              font-weight: bold;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
@@ -702,9 +712,9 @@ const getTagType = (index) => {
   }
 }
 @media only screen and (min-width: 767px) {
-  //.home{
-  //  width: 72%;
-  //}
+  .home{
+    width: 72%;
+  }
   .header-search .header-input {
     width: 600px!important;
   }
@@ -729,7 +739,7 @@ const getTagType = (index) => {
       border-radius: 12px;
       background-color: var(--theme-other_background);
       box-shadow: 0 4px 10px rgba(225, 225, 225, 0.3);
-      margin-bottom: 20px;
+      //margin-bottom: 20px;
       padding-top: 20px;
       .nav {
         position: relative;
@@ -744,13 +754,13 @@ const getTagType = (index) => {
         min-height: 200px;
         .list {
           display: flex;
-          flex-wrap: wrap;
+          //flex-wrap: wrap;
           padding: 0 0 10px 15px;
           .item {
             position: relative;
             display: block;
-            width: 130.8px;
-            margin: 8px;
+            width: 130px;
+            margin:0 8px;
             border-radius: 8px 8px 0 0;
             overflow: hidden;
             text-align: center;
@@ -772,7 +782,8 @@ const getTagType = (index) => {
               }
             }
             p {
-              //margin-top: 10px;
+              margin: 10px 0!important;
+              font-weight: bold;
               overflow: hidden;
               white-space: nowrap;
               text-overflow: ellipsis;
