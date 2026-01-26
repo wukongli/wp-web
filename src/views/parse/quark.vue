@@ -669,10 +669,10 @@ async function confirmVideo(item) {
               loadData.loading = false;
               return;
           }
-          let path = "夸克网盘/来自：分享/"+res.data.fileName;
+          let path = "video/来自：分享/"+res.data.fileName;
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = "https://play.gssource.com/d/"+path;
-          loadData.videoUrl = res.data.url;
+          loadData.videoUrl = loadData.mobileUrl
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
           loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
@@ -710,7 +710,7 @@ async function confirmVideo(item) {
             moreVideoAttr: {
               "webkit-playsinline": true,
               playsInline: true,
-              // crossOrigin: "anonymous",
+              crossOrigin: "anonymous",
             },
             customType: {
             },
@@ -802,7 +802,6 @@ async function confirm(item) {
       .quarkTransfer(params)
       .then((res) => {
         if (res.code === 200) {
-          console.log(res);
           isSending.value = false;
           item.loading = false;
           item.disable = false;

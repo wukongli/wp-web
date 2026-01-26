@@ -864,7 +864,7 @@ async function confirmVideo(item) {
             loadData.loading = false;
             return;
           }
-          let path = "baidu/我的资源/"+res.data.fileName;
+          let path = "videob/我的资源/"+res.data.fileName;
           const signUrl = "https://play.gssource.com/d/"+path
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
