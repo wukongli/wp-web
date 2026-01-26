@@ -690,10 +690,11 @@ async function confirmVideo(item) {
               loadData.maxNum = false;
               return;
           }
-          let path = "http://154.201.66.44:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
+          let path = "https://154.201.66.44:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = path;
-          loadData.videoUrl = res.data.url;
+          // loadData.videoUrl = res.data.url;
+          loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
           loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
@@ -718,8 +719,8 @@ async function confirmVideo(item) {
             hotkey: true,
             pip: true,
             mutex: true,
-            // fullscreen: true,
-            fullscreenWeb: true,
+            fullscreen: true,
+            // fullscreenWeb: true,
             subtitleOffset: true,
             miniProgressBar: false,
             type: ext(res.data.fileName),
@@ -769,6 +770,7 @@ async function confirmVideo(item) {
             moreVideoAttr: {
               "webkit-playsinline": true,
               playsInline: true,
+              crossOrigin: "anonymous",
             },
             customType: {
             },
@@ -781,22 +783,6 @@ async function confirmVideo(item) {
           }
           const player = new Artplayer(option)
           loadData.player = player;
-          player.on('fullscreenWeb', (state) => {
-            // 关键点：使用 art.template.container 获取底层的 DOM 元素
-            const playerNode = player.template.$player;
-            if (state) {
-              // 进入网页全屏
-              if (playerNode instanceof Node) {
-                document.body.appendChild(playerNode);
-                playerNode.style.zIndex = '3000';
-              }
-            } else {
-              // 退出网页全屏：将播放器归还到 dialog 中的容器
-              if (playerNode instanceof Node && artRef.value) {
-                artRef.value.appendChild(playerNode);
-              }
-            }
-          });
           loadData.player.on("ready", () => {
             loadData.player.video.src = res.data.url;
           })

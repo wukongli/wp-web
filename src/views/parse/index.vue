@@ -410,7 +410,8 @@ const loadData = reactive({
   // potUrl:'javascript:void(0)',
   player:null,
   hlsPlayer:null,
-  diaHit:"视频卡顿或者无法播放,建议使用下面播放器内观看"
+  diaHit:"此资源只能点击下面按钮在播放器内播放！",
+  videoUrl:"",
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -887,109 +888,89 @@ async function confirmVideo(item) {
             return;
           }
           let path = "http://154.201.66.44:5244/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
+          loadData.videoUrl = "https://play.gssource.com/dd/videob/"+encodeURI("我的资源/" + res.data.fileName);
           const signUrl = path;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
           loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
           loadData.vlcUrl = "vlc://"+signUrl;
           // loadData.potUrl = "potplayer://"+signUrl;
-          const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if(isPC){
-            userStore.getPlayUrl({"signUrl":signUrl}).then((result)=>{
-              if(result.code === 200){
-                loadData.loading = false;
-                loadData.videoUrl = result.data;
-                loadData.loading = false;
-                const option = {
-                  id: "/baidu/我的资源/"+res.data.fileName,
-                  container: "#video-player",
-                  url: loadData.videoUrl,
-                  title: res.data.fileName,
-                  volume: 1.0,
-                  autoplay: true,
-                  autoSize: false,
-                  autoMini: true,
-                  loop: false,
-                  flip: true,
-                  playbackRate: true,
-                  aspectRatio: true,
-                  // "screenshot": true,
-                  setting: true,
-                  hotkey: true,
-                  // pip: true,
-                  mutex: true,
-                  // fullscreen: true,
-                  fullscreenWeb: true,
-                  subtitleOffset: true,
-                  miniProgressBar: false,
-                  type: ext(res.data.fileName).toLowerCase().replace('.', ''),
-                  playsInline: true,
-                  theme: "#1890ff",
-                  quality: [],
-                  whitelist: [],
-                  settings: [],
-                  moreVideoAttr: {
-                    "webkit-playsinline": true,
-                    playsInline: true,
-                    crossOrigin: "anonymous",
-                  },
-                  customType: {
-                    // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
-                    m3u8: function (video, url) {
-                      if (Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(url);
-                        hls.attachMedia(video);
-                      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = url;
-                      }
-                    },
-                  },
-                  lang: "zh-cn",
-                  lock: true,
-                  fastForward: true,
-                  autoPlayback: true,
-                  autoOrientation: true,
-                  airplay: true
+          // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          loadData.loading = false;
+          const option = {
+            id: "/baidu/我的资源/"+res.data.fileName,
+            container: "#video-player",
+            url: loadData.videoUrl,
+            title: res.data.fileName,
+            volume: 1.0,
+            autoplay: true,
+            autoSize: false,
+            autoMini: true,
+            loop: false,
+            flip: true,
+            playbackRate: true,
+            aspectRatio: true,
+            // "screenshot": true,
+            setting: true,
+            hotkey: true,
+            // pip: true,
+            mutex: true,
+            fullscreen: true,
+            // fullscreenWeb: true,
+            subtitleOffset: true,
+            miniProgressBar: false,
+            type: ext(res.data.fileName).toLowerCase().replace('.', ''),
+            playsInline: true,
+            theme: "#1890ff",
+            quality: [],
+            whitelist: [],
+            settings: [],
+            moreVideoAttr: {
+              "webkit-playsinline": true,
+              playsInline: true,
+              crossOrigin: "anonymous",
+            },
+            customType: {
+              // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
+              m3u8: function (video, url) {
+                if (Hls.isSupported()) {
+                  const hls = new Hls();
+                  hls.loadSource(url);
+                  hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                  video.src = url;
                 }
-
-                const player = new Artplayer(option);
-                loadData.player = player;
-                player.on('fullscreenWeb', (state) => {
-                  // 关键点：使用 art.template.container 获取底层的 DOM 元素
-                  const playerNode = player.template.$player;
-                  if (state) {
-                    // 进入网页全屏
-                    if (playerNode instanceof Node) {
-                      document.body.appendChild(playerNode);
-                      playerNode.style.zIndex = '3000';
-                    }
-                  } else {
-                    // 退出网页全屏：将播放器归还到 dialog 中的容器
-                    if (playerNode instanceof Node && artRef.value) {
-                      artRef.value.appendChild(playerNode);
-                    }
-                  }
-                });
-                loadData.player.on("ready", () => {
-                  loadData.player.video.src = res.data.url;
-                })
-                loadData.player.on("video:ended", () => {
-
-                })
-                loadData.player.on("error", () => {
-                  if (player.video.crossOrigin) {
-                    console.log(
-                        "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
-                    )
-                    player.video.crossOrigin = null;
-                  }
-                })
-              }
-            })
-          }else{
-            loadData.diaHit = "此资源只能在播放器内播放,请点击下方按钮播放";
-            loadData.loading = false;
+              },
+            },
+            lang: "zh-cn",
+            i18n: {
+              "zh-cn": {
+                "Video load error": "此资源只能点击下面按钮在播放器内播放！",
+              },
+            },
+            lock: true,
+            fastForward: true,
+            // autoPlayback: true,
+            autoOrientation: true,
+            airplay: true
           }
+
+          const player = new Artplayer(option);
+          loadData.player = player;
+          loadData.player.on("ready", () => {
+            loadData.player.video.src = res.data.url;
+          })
+          loadData.player.on("video:ended", () => {
+
+          })
+          loadData.player.on("error", () => {
+            loadData.player.notice.show = '此资源只能点击下面按钮在播放器内播放！';
+            if (player.video.crossOrigin) {
+              console.log(
+                  "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+              )
+              player.video.crossOrigin = null;
+            }
+          })
 
 
         }
