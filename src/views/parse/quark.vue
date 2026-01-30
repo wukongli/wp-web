@@ -690,7 +690,7 @@ async function confirmVideo(item) {
               loadData.maxNum = false;
               return;
           }
-          let path = "https://154.201.66.44:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
+          let path = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
           loadData.mobileUrl = path;
           // loadData.videoUrl = res.data.url;

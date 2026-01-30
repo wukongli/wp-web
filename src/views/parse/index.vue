@@ -887,7 +887,7 @@ async function confirmVideo(item) {
             loadData.maxNum = false;
             return;
           }
-          let path = "http://154.201.66.44:5244/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
+          let path = "https://play.gssource.com/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
           loadData.videoUrl = "https://play.gssource.com/dd/videob/"+encodeURI("我的资源/" + res.data.fileName);
           const signUrl = path;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
