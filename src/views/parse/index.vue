@@ -23,11 +23,12 @@
 <!--      @click="handleParse"-->
 <!--      >批量解析</el-button-->
 <!--    >-->
-    <el-button
-        type="primary"
-        plain
-        icon="Promotion"
-    ><a href="https://vip.gssource.com" target="_blank">快速下载</a></el-button>
+<!--    <el-button-->
+<!--        v-if="getToken()"-->
+<!--        type="primary"-->
+<!--        plain-->
+<!--        icon="Promotion"-->
+<!--    ><a href="https://vip.gssource.com" target="_blank">快速下载</a></el-button>-->
 <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
 <!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
     <div id="content">
@@ -90,7 +91,7 @@
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
-              v-if="!parseInt(scope.row.isdir) && !getToken()"
+              v-if="!parseInt(scope.row.isdir)"
               :type="'primary'"
               >快速下载</el-button
             >
@@ -181,7 +182,7 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        快速下载无需验证码,不限次数,自由下载！
+        快速下载无需验证码，不限文件大小，不限次数，自由下载！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -288,7 +289,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: 100698669056,
+  fileSize: getToken() ? 100698669056 : 2147483648,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
@@ -419,7 +420,7 @@ const onSubmit = () => {
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于3G,普通下载暂不支持，请使用快速下载！');
+        ElMessage.error('为维护下载速度体验，文件大于2G，需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
