@@ -75,7 +75,7 @@
           <template #default="scope">
             <el-button
                 @click="vipDownLoad(scope.row)"
-                v-if="!scope.row.dir"
+                v-if="!scope.row.dir && !getToken()"
                 :type="'primary'"
             >快速下载</el-button
             >
@@ -86,7 +86,7 @@
                 :disabled="scope.row.disable"
                 :loading="scope.row.loading"
             >
-              <span v-if="scope.row.status === 0">下 载</span>
+              <span v-if="scope.row.status === 0">{{getToken() ? "快速下载" : "下 载"}}</span>
               <span v-if="scope.row.status === 1">下载中</span>
               <span v-if="scope.row.status === 2">已下载</span>
             </el-button>
