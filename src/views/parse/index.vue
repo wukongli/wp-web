@@ -887,7 +887,7 @@ async function confirmVideo(item) {
             loadData.maxNum = false;
             return;
           }
-          let path = "https://play.gssource.com/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
+          let path = "http://154.201.66.14:5244/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
           loadData.videoUrl = "https://play.gssource.com/dd/videob/"+encodeURI("我的资源/" + res.data.fileName);
           const signUrl = path;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
@@ -957,7 +957,6 @@ async function confirmVideo(item) {
           const player = new Artplayer(option);
           loadData.player = player;
           loadData.player.on("ready", () => {
-            loadData.player.video.src = res.data.url;
           })
           loadData.player.on("video:ended", () => {
 
@@ -968,7 +967,7 @@ async function confirmVideo(item) {
               console.log(
                   "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
               )
-              player.video.crossOrigin = null;
+              loadData.player.video.crossOrigin = null;
             }
           })
 

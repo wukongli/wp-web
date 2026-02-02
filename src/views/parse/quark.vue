@@ -690,10 +690,9 @@ async function confirmVideo(item) {
               loadData.maxNum = false;
               return;
           }
-          let path = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
-          // loadData.videoUrl = "http://154.201.66.44:5244/d/"+encodeURI(path)+"?sign="+res.data;
+          let path = "http://154.201.66.14:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           loadData.mobileUrl = path;
-          // loadData.videoUrl = res.data.url;
+          // loadData.videoUrl = path;
           loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
          //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
@@ -784,7 +783,6 @@ async function confirmVideo(item) {
           const player = new Artplayer(option)
           loadData.player = player;
           loadData.player.on("ready", () => {
-            loadData.player.video.src = res.data.url;
           })
           loadData.player.on("video:ended", () => {
 
@@ -794,7 +792,7 @@ async function confirmVideo(item) {
               console.log(
                   "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
               )
-              player.video.crossOrigin = null;
+              loadData.player.video.crossOrigin = null;
             }
           })
         }
