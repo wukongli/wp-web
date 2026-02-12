@@ -79,6 +79,15 @@
                 :type="'primary'"
             >快速下载</el-button
             >
+<!--            <el-button-->
+<!--                size="small"-->
+<!--                @click="playVideo(scope.row)"-->
+<!--                v-if="!scope.row.dir && showPlay(scope.row)"-->
+<!--                :type="'success'"-->
+<!--                icon="videoPlay"-->
+<!--                style="margin-top:5px;"-->
+<!--            >播放</el-button-->
+<!--            >-->
             <el-button
                 v-if="!scope.row.dir"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -137,7 +146,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-          >解 析</el-button
+          >{{downOrPlay ? "播 放": "下 载"}}</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -189,16 +198,69 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
-      <!--      <img class="qr-code" :src="wechar" alt="" />-->
-      <div class="qr-hint">今天下载次数已达20次，请休息一下明天再来下载吧!</div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.maxNum = false"
-          >确 定</el-button
+    <el-dialog class="play_dia" :close-on-click-modal ="false" :style="{
+    miHeight: '500px',
+  }" :before-close="handleBeforeClose" :title="loadData.title" v-model="loadData.maxNum">
+      <div class="loading-content" v-loading="loadData.loading" element-loading-text="视频加载中...">
+        <div class="video_player" id="video-player"></div>
+        <!--        <iframe-->
+        <!--                ref="iframeRef"-->
+        <!--                allowfullscreen-->
+        <!--                webkitallowfullscreen-->
+        <!--                mozallowfullscreen-->
+        <!--                frameborder="0"-->
+        <!--                :src="loadData.videoUrl">-->
+        <!--        </iframe>-->
+      </div>
+      <el-button type="danger" size="small" style="margin-top: 5px;" icon="Warning">视频卡顿或者大文件视频播放器内观看更流畅</el-button>
+      <div class="mobile_player" >
+        <div @click="openUrl(loadData.infuseUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="苹果infuse播放器"
+              placement="top-start"
           >
+            <img :src="infuse" alt="">
+          </el-tooltip>
+        </div>
+        <!--        <div @click="openUrl(loadData.potUrl)">-->
+        <!--          <el-tooltip-->
+        <!--              class="box-item"-->
+        <!--              effect="dark"-->
+        <!--              content="potplayer播放器"-->
+        <!--              placement="top-start"-->
+        <!--          >-->
+        <!--            <img :src="pot" alt="">-->
+        <!--          </el-tooltip>-->
+        <!--        </div>-->
+        <div @click="openUrl(loadData.vlcUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="vlc播放器"
+              placement="top-start"
+          >
+            <img :src="vlc" alt="">
+          </el-tooltip>
+        </div>
+        <div @click="openUrl(loadData.maxUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="安卓mx播放器"
+              placement="top-start"
+          >
+            <img :src="mobilePlayer" alt="">
+          </el-tooltip>
+        </div>
+        <span>
+          <el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link>
+          <br />
+          <el-link href="https://pan.quark.cn/s/c32f0125e825" target="_blank" type="success">PC客户端下载地址</el-link>
         </span>
-      </template>
+
+      </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
     <!--      <img :src="wechar" alt="" />-->
@@ -216,12 +278,13 @@ import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
+import Artplayer from "artplayer"
 import {
   generateRandomLetters,
   getFilesize,
   getIconClass,
   timestampToTime, transQuarkIcon,
-  userKey,
+  userKey,showPlay
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
@@ -281,7 +344,7 @@ const loadData = reactive({
   url: '',
   ckId: null,
 });
-
+const downOrPlay = ref(true);//true 播放，false 下载
 
 onMounted(() => {
   const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
@@ -394,6 +457,7 @@ function parseCopyLink(params) {
 function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
+  downOrPlay.value = false;
   // showParse.value = true;
   if (getToken()) {
     loadData.noLimit = true;
@@ -425,10 +489,40 @@ const onSubmit = () => {
         fsId: loadData.item.fid,
         version: '1.0.9',
       };
-      const result = await testDownLoad();
-      if (!result) {
-        loadData.dialogVisible = true;
-        isSending.value = false;
+      if(!downOrPlay.value){
+        const result = await testDownLoad();
+        if (!result) {
+          loadData.dialogVisible = true;
+          isSending.value = false;
+          return;
+        }
+      }
+
+      if(downOrPlay.value){
+        userStore
+            .getCodeNum(params)
+            .then((res) => {
+              if (res.code === 200) {
+                if (res.data.data == 100) {
+                  confirmVideo(loadData.item);
+                }  else if (res.data.data == 60) {
+                  setTimeout(() => {
+                    isSending.value = false;
+                    ElMessage.error('今日播放次数已达上限，请明天再来！');
+                  }, 1000);
+                } else if (res.data.data == 50) {
+                  setTimeout(() => {
+                    isSending.value = false;
+                    ElMessage.error(
+                        '验证码错误,一个验证码只能播放一个文件,请重新获取!'
+                    );
+                  }, 1000);
+                }
+              }
+            })
+            .catch(() => {
+              isSending.value = false;
+            });
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
@@ -499,6 +593,187 @@ async function confirm(item) {
         isSending.value = false;
         // loadData.errorDia = true;
       });
+}
+function playVideo(item){
+  loadData.item = item;
+  form.code = '';
+  downOrPlay.value = true;
+  loadData.loading = false;
+  isSending.value = false;
+  if (getToken()) {
+    confirmVideo(loadData.item);
+  } else {
+    loadData.WeCharVisible = true;
+  }
+}
+async function confirmVideo(item) {
+  const{fid,file_name,duration,size} = item;
+  loadData.title = file_name;
+  loadData.WeCharVisible = false;
+  loadData.maxNum = true;
+  const params = {
+    pwd_id: route.query.shorturl,
+    fid_list:[fid],
+    stoken:loadData.stoken,
+    fileName:file_name,
+    duration:duration,
+    size:size,
+  };
+  loadData.loading = true;
+  userStore
+      .addVideo(params)
+      .then((res) => {
+        if (res.code === 200) {
+          // if(res.data.url.includes("&mt=")){
+          //   ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+          //   loadData.maxNum = false;
+          //   return;
+          // }
+          if(!res.data.fileName){
+            ElMessage.error("视频播放失败,请更换资源或者下载后观看");
+            loadData.loading = false;
+            loadData.maxNum = false;
+            return;
+          }
+          let path = "http://154.201.66.14:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
+          loadData.mobileUrl = path;
+          loadData.videoUrl = path;
+          // loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
+          //  loadData.videoUrl = testUrl;
+          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
+          loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
+          loadData.vlcUrl = "vlc://"+loadData.mobileUrl;
+          // loadData.potUrl = "potplayer://"+loadData.mobileUrl;
+          loadData.loading = false;
+          const option = {
+            id: "/video/来自：分享/"+res.data.fileName,
+            container: "#video-player",
+            url: loadData.videoUrl,
+            title: res.data.fileName,
+            volume: 1.0,
+            autoplay: true,
+            autoSize: false,
+            autoMini: true,
+            loop: false,
+            flip: true,
+            playbackRate: true,
+            aspectRatio: true,
+            // "screenshot": true,
+            setting: true,
+            hotkey: true,
+            pip: true,
+            mutex: true,
+            fullscreen: true,
+            // fullscreenWeb: true,
+            subtitleOffset: true,
+            miniProgressBar: false,
+            type: ext(res.data.fileName),
+            playsInline: true,
+            theme: "#1890ff",
+            quality: [],
+            whitelist: [],
+            settings: [
+              {
+                width: 200,
+                html: '视频旋转',
+                tooltip: '0°',
+                selector: [
+                  { html: '0°', rotate: 0, default: true },
+                  { html: '90°', rotate: 90 },
+                  { html: '180°', rotate: 180 },
+                  { html: '270°', rotate: 270 },
+                ],
+                onSelect: function (item, $dom, art) {
+                  const deg = item.rotate;
+                  const $video = art.video;
+                  const $container = art.container;
+
+                  if ($video) {
+                    // 1. 设置平滑过渡效果
+                    $video.style.transition = 'transform 0.3s ease';
+
+                    if (deg === 90 || deg === 270) {
+                      // 2. 计算缩放比例：容器高度 / 视频宽度 (或反之) 以适应屏幕
+                      // 防止 90 度旋转后视频超出边界
+                      const rect = $container.getBoundingClientRect();
+                      const scale = rect.height / rect.width;
+
+                      // 只有当高度确实小于宽度时才缩放，否则可能会变太小
+                      // 如果你希望强行铺满，可以根据实际场景调整这个 scale
+                      $video.style.transform = `rotate(${deg}deg) scale(${scale})`;
+                    } else {
+                      // 3. 恢复 0 或 180 度，取消缩放
+                      $video.style.transform = `rotate(${deg}deg) scale(1)`;
+                    }
+                  }
+
+                  return item.html;
+                },
+              },
+            ],
+            moreVideoAttr: {
+              "webkit-playsinline": true,
+              playsInline: true,
+              crossOrigin: "anonymous",
+            },
+            customType: {
+            },
+            lang: "zh-cn",
+            lock: true,
+            fastForward: true,
+            autoPlayback: true,
+            autoOrientation: true,
+            airplay: true
+          }
+          const player = new Artplayer(option)
+          loadData.player = player;
+          loadData.player.on("ready", () => {
+          })
+          loadData.player.on("video:ended", () => {
+
+          })
+          loadData.player.on("error", () => {
+            if (player.video.crossOrigin) {
+              console.log(
+                  "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
+              )
+              loadData.player.video.crossOrigin = null;
+            }
+          })
+        }
+      })
+      .catch(() => {
+        loadData.loading = false;
+        loadData.maxNum = false;
+      });
+}
+function ext(path){
+  return path.split(".").pop() ?? ""
+
+}
+function openUrl(url) {
+  // window.location.href = url;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function handleBeforeClose(){
+  isSending.value = false;
+  loadData.videoUrl = "";
+  loadData.mobileUrl = "";
+  loadData.maxNum = false;
+  loadData.loading = false;
+  loadData.infuseUrl = "javascript:void(0)";
+  loadData.maxUrl = "javascript:void(0)";
+  loadData.vlcUrl = "javascript:void(0)";
+  // loadData.potUrl = "javascript:void(0)";
+  if (loadData.player && loadData.player.video) loadData.player.video.src = "";
+  loadData.player?.destroy();
 }
 
 async function sendToMotrix(data,id) {
@@ -671,7 +946,79 @@ async function handleParse() {
   :deep(.dia-code) {
     width: 80%;
   }
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 350px;
+    background-color: black !important;
+  }
+  .loading-content{
+    width: 100%;
+    height: 350px;
+    background-color: black !important;
+    .video_player{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+    iframe{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:8px;
+      width: 40px;
+      height: 40px;
+      margin-top: 20px;
+    }
+    span{
+      margin-left:5px;
+    }
+  }
 }
+@media only screen and (min-width: 767px) {
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    background-color: black !important;
+  }
+  .loading-content{
+    width: 100%;
+    height: 400px;
+    background-color: black !important;
+    padding-top:45px;
+    .video_player{
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player{
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin:auto;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    img{
+      margin-left:10px;
+      width: 50px;
+      height: 50px;
+    }
+    span{
+      margin-left:5px;
+    }
+  }
+}
+
 .home {
   width: 98%;
   height: calc(100vh - 100px);

@@ -201,6 +201,27 @@ export function generateRandomLetters(count) {
 
     return result;
 }
+export function showPlay(row) {
+    const {file_name ,isdir} = row;
+    if(isdir){
+        return "icon-wenjianjia";
+    }
+    const filetype = {
+        "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
+    };
+    let index = file_name.lastIndexOf(".");
+    if (index === -1) return "icon-wenjianjia";
+    let name = file_name.substring(index + 1);
+    name = name.toLowerCase();
+    for (let icon in filetype){
+        for (let type in filetype[icon]){
+            if (name === filetype[icon][type]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 export const userKey = "main";
 export const createBy = "admin";

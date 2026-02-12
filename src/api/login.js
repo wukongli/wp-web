@@ -236,7 +236,14 @@ export function searchNames(data){
     data: data,
   });
 }
-
+export function addVideo(data){
+  return request({
+    url: '/quark/addVideo',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
 
 
 
