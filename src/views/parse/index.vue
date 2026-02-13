@@ -92,8 +92,18 @@
             <el-button
               @click="vipDownLoad(scope.row)"
               v-if="!parseInt(scope.row.isdir) && !getToken()"
-              :type="'primary'"
+              icon="menu"
+              size="small"
               >快速下载</el-button
+            >
+            <el-button
+                @click="playVideo(scope.row)"
+                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
+                :type="'success'"
+                icon="videoPlay"
+                size="small"
+                style="margin-top: 5px"
+            >播放</el-button
             >
             <el-button
               v-if="!parseInt(scope.row.isdir)"
@@ -101,6 +111,8 @@
               @click="downLoad(scope.row)"
               :disabled="scope.row.disable"
               :loading="scope.row.loading"
+              icon="download"
+              size="small"
             >
               <span v-if="scope.row.status === 0">{{getToken() ? "快速下载" : "下 载"}}</span>
               <span v-if="scope.row.status === 1">下载中</span>
@@ -154,7 +166,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit"
-            >解 析</el-button
+            >{{downOrPlay ? "播 放": "下 载"}}</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -206,16 +218,96 @@
       </template>
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
-    <el-dialog title="提示" v-model="loadData.maxNum" width="40%">
-      <!--      <img class="qr-code" :src="wechar" alt="" />-->
-      <div class="qr-hint">今天下载次数已达20次，请休息一下明天再来下载吧!</div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" @click="loadData.maxNum = false"
-            >确 定</el-button
+    <el-dialog
+        :close-on-click-modal="false"
+        class="play_dia"
+        :style="{
+    miHeight: '550px',
+  }"
+        :before-close="handleBeforeClose"
+        :title="loadData.title"
+        v-model="loadData.maxNum"
+    >
+      <div
+          class="loading-content"
+          v-loading="loadData.loading"
+          element-loading-text="视频加载中..."
+      >
+        <div class="video_player" id="video-player"></div>
+        <!--        <iframe-->
+        <!--            ref="iframeRef"-->
+        <!--            allowfullscreen-->
+        <!--            webkitallowfullscreen-->
+        <!--            mozallowfullscreen-->
+        <!--            frameborder="0"-->
+        <!--            :src="loadData.videoUrl">-->
+        <!--        </iframe>-->
+      </div>
+      <el-button
+          type="danger"
+          size="small"
+          icon="Warning"
+          style="margin-top: 5px"
+      >{{loadData.diaHit}}</el-button
+      >
+      <!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
+      <div class="mobile_player" :close-on-click-modal="false">
+        <div @click="openUrl(loadData.infuseUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="苹果infuse播放器"
+              placement="top-start"
+          >
+            <img :src="infuse" alt="" />
+          </el-tooltip>
+        </div>
+        <!--        <div @click="openUrl(loadData.potUrl)">-->
+        <!--          <el-tooltip-->
+        <!--              class="box-item"-->
+        <!--              effect="dark"-->
+        <!--              content="potplayer播放器"-->
+        <!--              placement="top-start"-->
+        <!--          >-->
+        <!--            <img :src="pot" alt="">-->
+        <!--          </el-tooltip>-->
+        <!--        </div>-->
+        <div @click="openUrl(loadData.vlcUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="vlc播放器"
+              placement="top-start"
+          >
+            <img :src="vlc" alt="" />
+          </el-tooltip>
+        </div>
+        <div @click="openUrl(loadData.maxUrl)">
+          <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="安卓mx播放器"
+              placement="top-start"
+          >
+            <img :src="mobilePlayer" alt="" />
+          </el-tooltip>
+        </div>
+        <span>
+          <el-link
+              href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1"
+              target="_blank"
+              type="success"
+          >播放器使用说明</el-link
+          >
+          <br />
+          <el-link
+              href="https://pan.quark.cn/s/c32f0125e825"
+              target="_blank"
+              type="success"
+          >PC客户端下载地址</el-link
           >
         </span>
-      </template>
+      </div>
     </el-dialog>
     <!--    <div class="we-chart">-->
     <!--      <img :src="wechar" alt="" />-->
@@ -231,6 +323,11 @@ import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';
+import infuse from '@/assets/logo/infuse.png';
+import mobilePlayer from '@/assets/logo/mxplayer.png';
+import vlc from '@/assets/logo/vlc.png';
+import pot from '@/assets/logo/potplayer.png';
+import Artplayer from 'artplayer';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
 import {onMounted} from 'vue';
@@ -297,7 +394,7 @@ const loadData = reactive({
   url: '',
   ckId: null,
 });
-
+const downOrPlay = ref(true); //t
 onMounted(() => {
   const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
   qrCode.value = randomItem;
@@ -379,9 +476,51 @@ function parseCopyLink(params) {
     });
 }
 
+
+function playVideo(item) {
+  // console.log(item);
+  // loadData.item = item;
+  // form.playName = localStorage.getItem("searchName") + item.server_filename;
+  // loadData.playVideo = true;
+
+  loadData.item = item;
+  form.code = '';
+  downOrPlay.value = true;
+  loadData.loading = false;
+  isSending.value = false;
+  if (getToken()) {
+    confirmVideo(loadData.item);
+  } else {
+    loadData.WeCharVisible = true;
+  }
+}
+function handleBeforeClose() {
+  isSending.value = false;
+  loadData.videoUrl = '';
+  loadData.maxNum = false;
+  loadData.loading = false;
+  loadData.infuseUrl = 'javascript:void(0)';
+  loadData.maxUrl = 'javascript:void(0)';
+  loadData.vlcUrl = 'javascript:void(0)';
+  // loadData.potUrl = "javascript:void(0)";
+  if (loadData.player && loadData.player.video)
+    loadData.player.video.src = '';
+  loadData.player?.destroy();
+}
+function openUrl(url) {
+  // window.location.href = url;
+  const a = document.createElement('a');
+  a.href = url;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
+  downOrPlay.value = false;
   // showParse.value = true;
   if (getToken()) {
     loadData.noLimit = true;
@@ -390,6 +529,141 @@ function downLoad(item) {
     form.code = '';
   }
 }
+
+async function confirmVideo(item) {
+  const { fid, server_filename, duration, size } = item;
+  loadData.title = server_filename;
+  loadData.WeCharVisible = false;
+  loadData.maxNum = true;
+  loadData.loading = true;
+  const params = {
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    randsk: loadData.parseLinkParams.seckey,
+    sekey: loadData.parseLinkParams.seckey,
+    fsId: loadData.item.fs_id,
+    fs_ids: [loadData.item.fs_id],
+    path: loadData.item.server_filename,
+    userKey: userKey,
+    size: loadData.item.size,
+    pwd: loadData.query.pwd,
+    surl: loadData.query.shorturl,
+    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
+    dir: loadData.parseLinkParams.dir,
+    fileNewName: form.playName,
+    fileName: loadData.item.server_filename,
+  };
+  userStore
+      .videoAdd(params)
+      .then((res) => {
+        if (res.code === 200) {
+          if (!res.data.fileName) {
+            ElMessage.error('视频播放失败,请更换资源或者下载后观看');
+            loadData.loading = false;
+            loadData.maxNum = false;
+            return;
+          }
+          let path =
+              'http://154.201.66.14:5244/d/videob/' +
+              encodeURI('我的资源/' + res.data.fileName);
+          loadData.videoUrl =
+              'https://play.gssource.com/dd/videob/' +
+              encodeURI('我的资源/' + res.data.fileName);
+          const signUrl = path;
+          loadData.infuseUrl = 'infuse://x-callback-url/play?url=' + signUrl;
+          loadData.maxUrl =
+              'intent:' +
+              signUrl +
+              '#Intent;package=com.mxtech.videoplayer.ad;S.title=' +
+              res.data.fileName +
+              ';end';
+          loadData.vlcUrl = 'vlc://' + signUrl;
+          // loadData.potUrl = "potplayer://"+signUrl;
+          // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          loadData.loading = false;
+          const option = {
+            id: '/baidu/我的资源/' + res.data.fileName,
+            container: '#video-player',
+            url: loadData.videoUrl,
+            title: res.data.fileName,
+            volume: 1.0,
+            autoplay: true,
+            autoSize: false,
+            autoMini: true,
+            loop: false,
+            flip: true,
+            playbackRate: true,
+            aspectRatio: true,
+            // "screenshot": true,
+            setting: true,
+            hotkey: true,
+            // pip: true,
+            mutex: true,
+            fullscreen: true,
+            // fullscreenWeb: true,
+            subtitleOffset: true,
+            miniProgressBar: false,
+            type: ext(res.data.fileName).toLowerCase().replace('.', ''),
+            playsInline: true,
+            theme: '#1890ff',
+            quality: [],
+            whitelist: [],
+            settings: [],
+            moreVideoAttr: {
+              'webkit-playsinline': true,
+              playsInline: true,
+              crossOrigin: 'anonymous',
+            },
+            customType: {
+              // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
+              m3u8: function (video, url) {
+                if (Hls.isSupported()) {
+                  const hls = new Hls();
+                  hls.loadSource(url);
+                  hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                  video.src = url;
+                }
+              },
+            },
+            lang: 'zh-cn',
+            i18n: {
+              'zh-cn': {
+                'Video load error': '此资源只能点击下面按钮在播放器内播放！',
+              },
+            },
+            lock: true,
+            fastForward: true,
+            // autoPlayback: true,
+            autoOrientation: true,
+            airplay: true,
+          };
+
+          const player = new Artplayer(option);
+          loadData.player = player;
+          loadData.player.on('ready', () => {});
+          loadData.player.on('video:ended', () => {});
+          loadData.player.on('error', () => {
+            loadData.player.notice.show =
+                '此资源只能点击下面按钮在播放器内播放！';
+            if (player.video.crossOrigin) {
+              console.log(
+                  'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.'
+              );
+              loadData.player.video.crossOrigin = null;
+            }
+          });
+        }
+      })
+      .catch(() => {
+        loadData.loading = false;
+        loadData.maxNum = false;
+      });
+}
+function ext(path) {
+  return path.split('.').pop() ?? '';
+}
+
 
 async function noLimit() {
   //直接下载文件

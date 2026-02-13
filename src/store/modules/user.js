@@ -11,7 +11,7 @@ import {
     getCourseByType, delCode, getInfoByUserKey,
     tryDownUrl, parseLinkVisit,
     getSToken, getQuarkFileList, quarkTransfer, searchPanData, searchTag, searchNames, catCodeNum,
-    addVideo
+    addVideo, videoAddReq
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -309,6 +309,17 @@ const useUserStore = defineStore('user', {
       addVideo(data){
           return new Promise((resolve, reject) => {
               addVideo(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      videoAdd(parseLink) {
+          return new Promise((resolve, reject) => {
+              videoAddReq(parseLink)
                   .then((res) => {
                       resolve(res);
                   })

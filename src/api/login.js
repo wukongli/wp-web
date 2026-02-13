@@ -244,6 +244,14 @@ export function addVideo(data){
     data: data,
   });
 }
+export function videoAddReq(data) {
+  return request({
+    url: '/wp/addVideo',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
 
 
 
