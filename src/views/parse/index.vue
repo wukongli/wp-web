@@ -87,12 +87,13 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="100px" label="操作">
+        <el-table-column min-width="200px" label="操作">
           <template #default="scope">
             <el-button
               @click="vipDownLoad(scope.row)"
               v-if="!parseInt(scope.row.isdir) && !getToken()"
               icon="menu"
+              :type="'warning'"
               size="small"
               >快速下载</el-button
             >
@@ -102,7 +103,6 @@
                 :type="'success'"
                 icon="videoPlay"
                 size="small"
-                style="margin-top: 5px"
             >播放</el-button
             >
             <el-button
@@ -180,7 +180,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="noLimit"
-            >解 析</el-button
+            >下 载</el-button
           >
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
@@ -299,13 +299,6 @@
               type="success"
           >播放器使用说明</el-link
           >
-          <br />
-          <el-link
-              href="https://pan.quark.cn/s/c32f0125e825"
-              target="_blank"
-              type="success"
-          >PC客户端下载地址</el-link
-          >
         </span>
       </div>
     </el-dialog>
@@ -337,7 +330,8 @@ import {
   getIconClass,
   timestampToTime,
   userKey,
-  formatToYMD
+  formatToYMD,
+  baiduShowPlay
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
@@ -393,6 +387,8 @@ const loadData = reactive({
   item: null,
   url: '',
   ckId: null,
+  player: null,
+  diaHit: '此资源只能点击下面按钮在播放器内播放！',
 });
 const downOrPlay = ref(true); //t
 onMounted(() => {
@@ -687,10 +683,39 @@ const onSubmit = () => {
         fsId: loadData.item.fs_id,
         version: '1.0.9',
       };
-      const result = await testDownLoad();
-      if (!result) {
-        loadData.dialogVisible = true;
-        isSending.value = false;
+      if (!downOrPlay.value) {
+        const result = await testDownLoad();
+        if (!result) {
+          loadData.dialogVisible = true;
+          isSending.value = false;
+          return;
+        }
+      }
+      if (downOrPlay.value) {
+        userStore
+            .getCodeNum(params)
+            .then((res) => {
+              if (res.code === 200) {
+                if (res.data.data == 100) {
+                  confirmVideo(loadData.item);
+                } else if (res.data.data == 60) {
+                  setTimeout(() => {
+                    isSending.value = false;
+                    ElMessage.error('今日播放次数已达上限，请明天再来！');
+                  }, 2000);
+                } else if (res.data.data == 50) {
+                  setTimeout(() => {
+                    isSending.value = false;
+                    ElMessage.error(
+                        '验证码错误,一个验证码只能播放一个文件,请重新获取!'
+                    );
+                  }, 1000);
+                }
+              }
+            })
+            .catch(() => {
+              isSending.value = false;
+            });
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
@@ -1049,6 +1074,85 @@ async function handleParse() {
 @media only screen and (max-width: 767px) {
   :deep(.dia-code) {
     width: 80%;
+  }
+  :deep(.el-dialog) {
+    width: 96% !important;
+  }
+  :deep(.el-dialog__body) {
+    padding: 0;
+    padding-bottom: 20px;
+  }
+
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 350px;
+    background-color: black !important;
+  }
+  .loading-content {
+    width: 100%;
+    height: 350px;
+    background-color: black !important;
+    .video_player {
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+    iframe {
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player {
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    img {
+      margin-left: 5px;
+      width: 40px;
+      height: 40px;
+    }
+    span {
+      margin-left: 5px;
+    }
+  }
+}
+@media only screen and (min-width: 767px) {
+  /* 使用深度选择器修改局部 loading 样式 */
+  .loading-content :deep(.el-loading-mask) {
+    height: 400px;
+    background-color: black !important;
+  }
+  .loading-content {
+    width: 100%;
+    height: 400px;
+    background-color: black !important;
+    padding-top: 45px;
+    .video_player {
+      width: 100%;
+      height: 350px;
+      background-color: black !important;
+    }
+  }
+  .mobile_player {
+    cursor: pointer;
+    width: 530px;
+    height: 50px;
+    margin: auto;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    img {
+      margin-left: 10px;
+      width: 50px;
+      height: 50px;
+    }
+    span {
+      margin-left: 5px;
+    }
   }
 }
 .home {

@@ -222,6 +222,27 @@ export function showPlay(row) {
     }
     return false;
 }
+export function baiduShowPlay(row) {
+    const {server_filename,isdir} = row;
+    if(isdir){
+        return "icon-wenjianjia";
+    }
+    const filetype = {
+        "icon-shipin": ["wmv", "rmvb", "mpeg4", "mpeg2", "flv", "avi", "3gp", "mpga", "qt", "rm", "wmz", "wmd", "wvx", "wmx", "wm", "mpg", "mp4", "mkv", "mpeg", "mov", "asf", "m4v", "m3u8", "swf"],
+    };
+    let index = server_filename.lastIndexOf(".");
+    if (index === -1) return "icon-wenjianjia";
+    let name = server_filename.substring(index + 1);
+    name = name.toLowerCase();
+    for (let icon in filetype){
+        for (let type in filetype[icon]){
+            if (name === filetype[icon][type]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 export const userKey = "main";
 export const createBy = "admin";
