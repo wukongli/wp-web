@@ -71,13 +71,14 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column min-width="100px" label="操作">
+        <el-table-column min-width="200px" label="操作">
           <template #default="scope">
             <el-button
+                icon="menu"
                 size="small"
                 @click="vipDownLoad(scope.row)"
                 v-if="!scope.row.dir && !getToken()"
-                :type="'primary'"
+                :type="'warning'"
             >快速下载</el-button
             >
             <el-button
@@ -86,10 +87,10 @@
                 v-if="!scope.row.dir && showPlay(scope.row)"
                 :type="'success'"
                 icon="videoPlay"
-                style="margin-top:5px;"
             >播放</el-button
             >
             <el-button
+                icon="download"
                 v-if="!scope.row.dir"
                 size="small"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -258,8 +259,6 @@
         </div>
         <span>
           <el-link href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1" target="_blank" type="success">播放器使用说明</el-link>
-          <br />
-          <el-link href="https://pan.quark.cn/s/c32f0125e825" target="_blank" type="success">PC客户端下载地址</el-link>
         </span>
 
       </div>
