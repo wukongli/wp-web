@@ -347,6 +347,7 @@ const loadData = reactive({
   vipDown: false,
   item: null,
   url: '',
+  player: null,
   ckId: null,
 });
 const downOrPlay = ref(true);//true 播放，false 下载
