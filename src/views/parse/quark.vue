@@ -299,10 +299,7 @@ import Cookies from 'js-cookie';
 import MySvg from '@/components/icon/Svg.vue';
 import {onMounted,computed} from 'vue';
 const userStore = useUserStore();
-import flvjs from 'flv.js'
-import Hls from 'hls.js'
 import Artplayer from "artplayer"
-import mpegts from "mpegts.js"
 import {
   generateRandomLetters,
   getFilesize,
@@ -322,7 +319,6 @@ import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
-import videojs from "video.js";
 const qrCodeList = ref([front,duli,yao,iron,duli2]);
 const qrCode = ref('');
 const { proxy } = getCurrentInstance();
