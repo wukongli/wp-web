@@ -74,22 +74,24 @@
         <el-table-column min-width="100px" label="操作">
           <template #default="scope">
             <el-button
+                size="small"
                 @click="vipDownLoad(scope.row)"
                 v-if="!scope.row.dir && !getToken()"
                 :type="'primary'"
             >快速下载</el-button
             >
-<!--            <el-button-->
-<!--                size="small"-->
-<!--                @click="playVideo(scope.row)"-->
-<!--                v-if="!scope.row.dir && showPlay(scope.row)"-->
-<!--                :type="'success'"-->
-<!--                icon="videoPlay"-->
-<!--                style="margin-top:5px;"-->
-<!--            >播放</el-button-->
-<!--            >-->
+            <el-button
+                size="small"
+                @click="playVideo(scope.row)"
+                v-if="!scope.row.dir && showPlay(scope.row)"
+                :type="'success'"
+                icon="videoPlay"
+                style="margin-top:5px;"
+            >播放</el-button
+            >
             <el-button
                 v-if="!scope.row.dir"
+                size="small"
                 :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 @click="downLoad(scope.row)"
                 :disabled="scope.row.disable"
@@ -293,6 +295,10 @@ import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import duli2 from '@/assets/images/独立2.png';
 import yao from '@/assets/images/yaoyao.png';
+import mobilePlayer from '@/assets/logo/mxplayer.png';
+import infuse from '@/assets/logo/infuse.png';
+import vlc from '@/assets/logo/vlc.png';
+import pot from "@/assets/logo/potplayer.png";
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
