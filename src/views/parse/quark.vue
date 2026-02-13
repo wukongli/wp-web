@@ -643,8 +643,8 @@ async function confirmVideo(item) {
           }
           let path = "http://154.201.66.14:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           loadData.mobileUrl = path;
-          loadData.videoUrl = path;
-          // loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
+          // loadData.videoUrl = path;
+          loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
           //  loadData.videoUrl = testUrl;
           loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
           loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
