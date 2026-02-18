@@ -321,8 +321,6 @@
 </template>
 
 <script setup name="Index">
-import Player from 'xgplayer';
-import 'xgplayer/dist/index.min.css';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
@@ -465,17 +463,16 @@ function parseCopyLink(params) {
     loadData.parseLinkParams.dir = params.dir;
     // loadData.rootBackTitle = '返回上一级';
   }
+  const {root} = params;
   // 获取文件列表
   userStore
     .parseCopyLink(params)
     .then((data) => {
-      loadData.tableLoading = false;
       if (data.code === 200) {
         if (parseInt(data.data.errno) === 0) {
           const list = data.data.data.list;
           const title = data.data.data.title;
           loadData.bread = title;
-          // const code = Cookies.get('code');
           list.forEach((item) => {
             // 0 下载，1，下载中
             item.status = 0;
@@ -487,6 +484,17 @@ function parseCopyLink(params) {
           loadData.parseLinkParams.seckey = data.data.data.seckey;
           loadData.parseLinkParams.shareid = data.data.data.shareid;
           loadData.parseLinkParams.uk = data.data.data.uk;
+          if(root === "1" && list.length === 1){
+            const data = {
+              dir: list[0].path,
+              root: '0', // 1 文件夹，0 文件
+              shorturl: loadData.query.shorturl,
+              pwd: loadData.query.pwd,
+            };
+            parseCopyLink(data);
+            return;
+          }
+          loadData.tableLoading = false;
         } else {
           loadData.limitSpeedVisible = true;
           return;

@@ -52,13 +52,13 @@
                 style="height:75px!important;"
                 @click="parseList(scope.row)"
             >
-              <MySvg v-if="!scope.row.base64Image" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
+              <MySvg v-if="!scope.row.big_thumbnail" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
               <el-image
                   style="width:110px;height: 50px;"
-                  v-if="scope.row.base64Image"
-                  :src="scope.row.base64Image"
+                  v-if="scope.row.big_thumbnail"
+                  :src="scope.row.big_thumbnail"
                   fit="cover"
-                  :preview-src-list="[scope.row.base64Image]"
+                  :preview-src-list="[scope.row.big_thumbnail]"
                   hide-on-click-modal
                   preview-teleported
               >
@@ -414,7 +414,7 @@ async function parseQuark(params){
       req = {
       pwd_id:route.query.shorturl,
       pdir_fid:params.pid,
-        stoken:loadData.stoken,
+      stoken:loadData.stoken,
     }
   }else{
     req = {
@@ -435,7 +435,7 @@ async function parseQuark(params){
             item.status = 0;
           });
           loadData.tableData = data.data.list.sort((a, b) => b.l_updated_at - a.l_updated_at);
-          loadImagesSequentially(loadData.tableData);
+          // loadImagesSequentially(loadData.tableData);
         }
       })
       .catch(() => {
@@ -958,7 +958,14 @@ async function initToken(){
         if(data.code === 200){
           loadData.tableData = data.data.data.list;
           loadData.stoken = data.data.sToken;
-          loadData.tableLoading = false;
+          // loadData.tableLoading = false;
+          if(data.data.data.list.length === 1 && data.data.data.list[0].dir){
+            const params = {
+              dir:true,
+              fid:data.data.data.list[0].fid,
+            };
+            parseList(params);
+          }
         }
       })
       .catch(() => {

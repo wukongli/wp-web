@@ -13,6 +13,10 @@
     />
     <link rel="icon" href="/云服务.svg" />
     <title>爱看资源</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/ios/icon-192.png">
 <!--      <script src="https://3nbf4.com/act/files/tag.min.js?z=10393224" data-cfasync="false" async></script>-->
 <!--      <script>(function(s){s.dataset.zone='10393226',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>-->
 <!--      <script>(function(s){s.dataset.zone='10393228',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>-->
@@ -211,6 +215,9 @@
 
   <body>
     <div id="app">
+        <button id="pwa-install-btn" style="display:none; padding:10px 20px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">
+            安装app
+        </button>
       <div id="loader-wrapper">
         <div id="loader"></div>
         <div class="loader-section section-left"></div>
@@ -219,5 +226,44 @@
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/pwabuilder-sw.js');
+        }
+        // 1. 注册 Service Worker
+
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install-btn');
+
+        // 2. 监听 Windows/Android 的安装事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // 阻止默认弹出
+            deferredPrompt = e;  // 保存事件
+            installBtn.style.display = 'block'; // 显示你的自定义按钮
+        });
+
+        // 3. 按钮点击逻辑
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt(); // 触发原生安装弹窗
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('用户安装了应用');
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            } else {
+                // 如果没有 deferredPrompt (比如在 iOS 上)
+                alert('请点击浏览器下方的“分享”按钮，然后选择“添加到主屏幕”来安装。');
+            }
+        });
+
+        // 4. 监听安装成功
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            console.log('PWA 已成功安装');
+        });
+    </script>
   </body>
 </html>
