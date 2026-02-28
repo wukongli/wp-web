@@ -89,7 +89,7 @@
             <el-button
                 size="small"
                 @click="playVideo(scope.row)"
-                v-if="!scope.row.dir && showPlay(scope.row)"
+                v-if="!scope.row.dir && showPlay(scope.row) && loadData.isAdmin"
                 :type="'success'"
                 icon="videoPlay"
                 style="margin-top:5px;"
@@ -378,6 +378,7 @@ const loadData = reactive({
   title:'',
   player:null,
   hlsPlayer:null,
+  isAdmin:false
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -396,6 +397,7 @@ const hasDirData = computed(() => {
 });
 onMounted(() => {
   qrCode.value = xiaochengxu;
+  loadData.isAdmin = localStorage.getItem('role') === 'admin'
 })
 function openUrl(url) {
   // window.location.href = url;

@@ -151,6 +151,7 @@ function handleLogin() {
               .then((res) => {
                 if(res.code === 200){
                   router.push({ path: '/source'});
+                  localStorage.setItem("role",res.roles[0]);
                   // if(res.user.createBy === createBy){
                   //   router.push({ path: '/parse/login'});
                   // }else{

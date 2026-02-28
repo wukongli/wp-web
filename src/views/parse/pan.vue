@@ -291,6 +291,7 @@ function logout() {
   })
       .then(() => {
         userStore.logOut().then(() => {
+          localStorage.removeItem("role");
           location.href = '/source';
         });
       })
