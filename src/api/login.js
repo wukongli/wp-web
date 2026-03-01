@@ -108,7 +108,7 @@ export function getImgUrl(data) {
 export function parseLinkReq(data) {
   return request({
     // url: '/wp/dlink',
-    url: '/wp/fast/pc/dlink',
+    url: '/wp/source/fast/pc/dlink',
     // url: '/wp/pc/dlink',
     method: 'post',
     timeout: 20000,
@@ -222,7 +222,7 @@ export function getQuarkFileList(data){
 
 export function quarkTransfer(data){
   return request({
-    url: '/quark/transfer',
+    url: '/quark/source/transfer',
     method: 'post',
     timeout: 20000,
     data: data,
