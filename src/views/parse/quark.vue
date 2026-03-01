@@ -52,7 +52,17 @@
                 @click="parseList(scope.row)"
                 style="display: flex; align-items: center"
             >
-              <MySvg :iconName="transQuarkIcon(scope.row)" size="40"></MySvg>
+              <MySvg v-if="!scope.row.big_thumbnail" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
+              <el-image
+                  style="width:110px;height: 50px;"
+                  v-if="scope.row.big_thumbnail"
+                  :src="scope.row.big_thumbnail"
+                  fit="cover"
+                  :preview-src-list="[scope.row.big_thumbnail]"
+                  hide-on-click-modal
+                  preview-teleported
+              >
+              </el-image>
               <span style="margin-left: 10px">{{
                   scope.row.file_name
                 }}</span>
@@ -81,14 +91,14 @@
                 :type="'warning'"
             >快速下载</el-button
             >
-            <el-button
-                size="small"
-                @click="playVideo(scope.row)"
-                v-if="!scope.row.dir && showPlay(scope.row)"
-                :type="'success'"
-                icon="videoPlay"
-            >播放</el-button
-            >
+<!--            <el-button-->
+<!--                size="small"-->
+<!--                @click="playVideo(scope.row)"-->
+<!--                v-if="!scope.row.dir && showPlay(scope.row)"-->
+<!--                :type="'success'"-->
+<!--                icon="videoPlay"-->
+<!--            >播放</el-button-->
+<!--            >-->
             <el-button
                 icon="download"
                 v-if="!scope.row.dir"
