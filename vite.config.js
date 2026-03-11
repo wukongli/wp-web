@@ -26,7 +26,7 @@ export default defineConfig(({ mode, command }) => {
     // vite 相关配置
     server: {
       port: 8899,
-      host: "0.0.0.0",
+      host: '0.0.0.0',
       open: true,
       cors: true, // 允许跨域
       hmr: true, // 开启热更新
