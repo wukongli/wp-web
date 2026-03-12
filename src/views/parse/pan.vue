@@ -381,7 +381,7 @@ function handleSearch(value) {
         const uniqueArray = Array.from(
           new Set(res.data.map((item) => JSON.stringify(item)))
         ).map((item) => JSON.parse(item));
-        tableData.value = uniqueArray;
+        tableData.value = uniqueArray.filter(item => item.url.includes("baidu"));
         sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
         window.scrollTo({ top: 0, behavior: 'instant' });
       }

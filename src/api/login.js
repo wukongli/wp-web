@@ -117,7 +117,7 @@ export function parseLinkReq(data) {
 }
 export function videoAddReq(data) {
   return request({
-    url: '/wp/addVideo',
+    url: '/wp/changeVideo',
     method: 'post',
     timeout: 20000,
     data: data,
