@@ -1,11 +1,13 @@
 <template>
   <router-view />
+  <SiteAnnouncement />
 </template>
 
 <script setup>
 import useSettingsStore from '@/store/modules/settings';
 import { handleThemeStyle } from '@/utils/theme';
 import DisableDevtool from 'disable-devtool';
+import SiteAnnouncement from '@/components/SiteAnnouncement.vue';
 DisableDevtool();
 onMounted(() => {
   nextTick(() => {
