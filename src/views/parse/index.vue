@@ -389,11 +389,19 @@ const loadData = reactive({
   ckId: null,
   player: null,
   diaHit: '此资源只能点击下面按钮在播放器内播放！',
+  isMobile:false,
 });
 const downOrPlay = ref(true); //t
 onMounted(() => {
   const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
   qrCode.value = randomItem;
+  const isMobile = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    // const isMobileScreen = window.innerWidth <= 768;
+    return isMobileUserAgent;
+  };
+  loadData.isMobile = isMobile();
 })
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -664,7 +672,7 @@ function ext(path) {
 async function noLimit() {
   //直接下载文件
   isSending.value = true;
-  const result = await testDownLoad();
+  const result = loadData.isMobile ? await testGopeed() : await testMotrix();
   if (!result) {
     loadData.dialogVisible = true;
     isSending.value = false;
@@ -684,7 +692,7 @@ const onSubmit = () => {
         version: '1.0.9',
       };
       if (!downOrPlay.value) {
-        const result = await testDownLoad();
+        const result =  loadData.isMobile ? await testGopeed() : await testMotrix();
         if (!result) {
           loadData.dialogVisible = true;
           isSending.value = false;
@@ -791,7 +799,8 @@ async function confirm(item) {
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
             }
-            sendToMotrix(item);
+            loadData.isMobile ?  sendToGopeed(item) :  sendToMotrix(item);
+
           } else {
             item.status = 0;
             item.disable = false;
@@ -809,13 +818,37 @@ async function confirm(item) {
 }
 
 async function sendToMotrix(item) {
-  //发送到下载器
+  // 发送到下载器
+  fetch('http://127.0.0.1:16800/jsonrpc', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'test1',
+      method: 'aria2.addUri',
+      params: [
+        [loadData.url],
+        {
+          'user-agent': loadData.ua,
+          'max-connection-per-server': '64',
+          'split': '64'
+        }
+      ]
+    })
+  })
+      .then(r => r.json())
+      .then(()=>{
+        item.status = 2;
+        ElMessage({
+          message: `${item.server_filename}开始下载！`,
+          type: 'success',
+        });
+      });
+}
 
-
-
+async function sendToGopeed(item) {
   // 调用API创建任务
-
-  fetch('http://127.0.0.1:6066/api/v1/tasks', {
+  fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -826,14 +859,25 @@ async function sendToMotrix(item) {
             extra:{
               header:{
                 "User-Agent":loadData.ua,
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive"
               }
             }
           },
-          opt:{
-            extra:{
-              connections:256,
-            }
-          }
+      opt:{
+        // HTTP协议专属配置
+        http: {
+          // 并发连接数，这就是你想要的"maxConnsPerHost"的API版本
+          connections: 256,
+          chunkSize: 8388608,
+          keepAlive: true,
+          compression: true
+        },
+        // 如果需要设置超时时间
+        timeout: 120,
+        maxRetries: 5
+      }
     }),
   }).then((resp) => resp.json())
       .then((res) => {
@@ -843,43 +887,10 @@ async function sendToMotrix(item) {
           type: 'success',
         });
       }).catch(e=>{
-      })
-  //
-  //
-  // let splitMax = true;
-  // if (!loadData.url.includes('qdall01')) {
-  //   splitMax = false;
-  // }
-  //
-  // const o = {
-  //   id: 'wp',
-  //   method: 'aria2.addUri',
-  //   params: [
-  //     [loadData.url + '&origin=dlna'],
-  //     {
-  //       //'user-agent': 'netdisk;P2SP;3.0.10.22;netdisk;7.44.0.4;PC;PC-Windows;10.0.22631;BaiduYunGuanJia',
-  //       'user-agent': loadData.ua,
-  //       split: splitMax ? '100' : '2',
-  //     },
-  //   ],
-  // };
-  //
-  // fetch('http://localhost:16800/jsonrpc', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify(o),
-  // })
-  //   .then((resp) => resp.json())
-  //   .then((res) => {
-  //     item.status = 2;
-  //     ElMessage({
-  //       message: `${item.server_filename}开始下载！`,
-  //       type: 'success',
-  //     });
-  //   });
+  })
 }
+
+
 
 function goBack() {
   if (loadData.routeData.length === 1) {
@@ -898,27 +909,6 @@ function goBack() {
 //   router.push({ path: '/login' });
 // }
 function init() {
-  setInterval(()=>{
-    fetch("http://127.0.0.1:6066/api/v1/tasks?status=running")
-        .then((resp) => resp.json()).then((res)=>{
-      if(res.code === 0){
-        const result = res.data.filter(e=>
-            e.status === "running"
-        ).filter((e)=>e.progress.speed < 1048576).map(e=>e.id);
-        const ids = result.map((e)=>{
-          return `id=${e}`
-        }).join('&')
-        if(ids && ids.length){
-          fetch( `http://127.0.0.1:6066/api/v1/tasks/pause?${ids}`,{method:"put"})
-              .then((resp) => resp.json()).then((res)=>{
-            fetch( `http://127.0.0.1:6066/api/v1/tasks/continue?${ids}`,{method:"put"})
-                .then((resp) => resp.json()).then((res)=>{
-            })
-          })
-        }
-      }
-    })
-  },15000)
   if (
     !route.query.shorturl ||
     !route.query.pwd ||
@@ -943,20 +933,50 @@ init();
 //   })
 // }
 
-async function testDownLoad() {
-  return fetch('http://127.0.0.1:6066/api/v1/tasks', {
+async function testMotrix() {
+  return fetch('http://127.0.0.1:16800/jsonrpc', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'test',
+      method: 'aria2.getVersion',
+      params: []
+    })
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        // 检查是否返回成功（没有error字段）
+        if (res && !res.error) {
+          return true;
+        }
+        return false;
+      }).catch(e => {
+        return false;
+      });
+
+}
+async function testGopeed() {
+  return fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
   })
-  .then((resp) => resp.json())
-  .then((res) => {
-    return true;
-  }).catch(e=>{
-    return false;
-  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        return true;
+      }).catch(e=>{
+        return false;
+      })
 }
+
+
+
+
+
 function vipDownLoad(item) {
   loadData.item = item;
   loadData.vipDown = true;
@@ -983,7 +1003,7 @@ async function handleParse() {
     ElMessage.error('批量解析请开通快速下载！');
     return false;
   }
-  const result = await testDownLoad();
+  const result =  loadData.isMobile ? await testGopeed() : await testMotrix();
   if (!result) {
     loadData.dialogVisible = true;
     return;
@@ -1029,7 +1049,7 @@ async function handleParse() {
               loadData.url = res.data.data.urls[0].url;
               loadData.ua = res.data.data.ua;
             }
-            fetch('http://127.0.0.1:6066/api/v1/tasks', {
+            fetch('http://127.0.0.1:16800/api/v1/tasks', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
