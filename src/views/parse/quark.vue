@@ -378,7 +378,8 @@ const loadData = reactive({
   title:'',
   player:null,
   hlsPlayer:null,
-  isAdmin:false
+  isAdmin:false,
+  isMobile:false,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -397,7 +398,13 @@ const hasDirData = computed(() => {
 });
 onMounted(() => {
   qrCode.value = xiaochengxu;
-  loadData.isAdmin = localStorage.getItem('role') === 'admin'
+  loadData.isAdmin = localStorage.getItem('role') === 'admin';
+  const isMobile = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    return isMobileUserAgent;
+  };
+  loadData.isMobile = isMobile();
 })
 function openUrl(url) {
   // window.location.href = url;
@@ -576,7 +583,7 @@ function handleBeforeClose(){
 async function noLimit() {
   //直接下载文件
   isSending.value = true;
-  const result = await testDownLoad();
+  const result = loadData.isMobile ? await testGopeed() : await testMotrix();
   if (!result) {
     loadData.dialogVisible = true;
     isSending.value = false;
@@ -596,7 +603,7 @@ const onSubmit = () => {
       };
       isSending.value = true;
       if(!downOrPlay.value){
-        const result = await testDownLoad();
+        const result = loadData.isMobile ? await testGopeed() : await testMotrix();
         if (!result) {
           loadData.dialogVisible = true;
           isSending.value = false;
@@ -864,7 +871,7 @@ async function confirm(item) {
           item.loading = false;
           item.disable = false;
           res.data.data.data.forEach((data)=>{
-            sendToMotrix(data,res.data.id);
+            loadData.isMobile ? sendToGopeed(data,):sendToMotrix(data);
             item.status = 2;
           })
         } else {
@@ -885,14 +892,48 @@ async function confirm(item) {
 
 async function sendToMotrix(data,id) {
   //发送到下载器
-  fetch('http://127.0.0.1:6066/api/v1/tasks', {
+  fetch('http://127.0.0.1:16800/jsonrpc', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'test1',
+      method: 'aria2.addUri',
+      params: [
+        [data.download_url],
+        {
+          'header': [
+            `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.0.2 Chrome/100.0.4896.160 Electron/18.3.5.12-a038f7b798 Safari/537.36 Channel/pckk_clouddrive_share_ch`,
+            `Cookie: ${id}` // Cookie 必须包含在 header 里
+          ],
+          'max-connection-per-server': '64',
+          'split': '64',
+        }
+      ]
+    })
+  })
+      .then(r => r.json())
+      .then(()=>{
+        data.satus = 2;
+        ElMessage({
+          message: `文件开始下载！`,
+          type: 'success',
+        });
+      });
+
+}
+
+
+async function sendToGopeed(data,id) {
+  // 调用API创建任务
+  fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({req:
           {
-            url:data.download_url,
+            url:loadData.url,
             extra:{
               header:{
                 "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.0.2 Chrome/100.0.4896.160 Electron/18.3.5.12-a038f7b798 Safari/537.36 Channel/pckk_clouddrive_share_ch",
@@ -901,9 +942,17 @@ async function sendToMotrix(data,id) {
             }
           },
       opt:{
-        extra:{
-          connections:256,
-        }
+        // HTTP协议专属配置
+        http: {
+          // 并发连接数，这就是你想要的"maxConnsPerHost"的API版本
+          connections: 256,
+          chunkSize: 8388608,
+          keepAlive: true,
+          compression: true
+        },
+        // 如果需要设置超时时间
+        timeout: 120,
+        maxRetries: 5
       }
     }),
   }).then((resp) => resp.json())
@@ -983,8 +1032,33 @@ async function initToken(){
 //   })
 // }
 
-async function testDownLoad() {
-  return fetch('http://127.0.0.1:6066/api/v1/tasks', {
+async function testMotrix() {
+  return fetch('http://127.0.0.1:16800/jsonrpc', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 'test',
+      method: 'aria2.getVersion',
+      params: []
+    })
+  })
+      .then((resp) => resp.json())
+      .then((res) => {
+        // 检查是否返回成功（没有error字段）
+        if (res && !res.error) {
+          return true;
+        }
+        return false;
+      }).catch(e => {
+        return false;
+      });
+
+}
+async function testGopeed() {
+  return fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -997,6 +1071,7 @@ async function testDownLoad() {
         return false;
       })
 }
+
 function vipDownLoad(item) {
   loadData.item = item;
   loadData.vipDown = true;
