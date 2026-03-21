@@ -231,7 +231,7 @@ export function quarkTransfer(data){
 
 export function addVideo(data){
   return request({
-    url: '/quark/addVideo',
+    url: '/quark/change',
     method: 'post',
     timeout: 20000,
     data: data,

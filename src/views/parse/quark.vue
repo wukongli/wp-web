@@ -77,38 +77,43 @@
         <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
         <el-table-column v-if="hasDirData" min-width="35%" label="操作">
           <template #default="scope">
-            <el-button
-                icon="menu"
-                style="margin-left:12px;margin-top: 5px;"
-                size="small"
-                @click="vipDownLoad(scope.row)"
-                v-if="!scope.row.dir"
-                :type="'warning'"
-            >&nbsp;VIP</el-button
-            >
+<!--            <el-button-->
+<!--                icon="menu"-->
+<!--                style="margin-left:12px;margin-top: 5px;"-->
+<!--                size="small"-->
+<!--                @click="vipDownLoad(scope.row)"-->
+<!--                v-if="!scope.row.dir"-->
+<!--                :type="'warning'"-->
+<!--            >&nbsp;VIP</el-button-->
+<!--            >-->
             <el-button
                 size="small"
                 @click="playVideo(scope.row)"
-                v-if="!scope.row.dir && showPlay(scope.row) && loadData.isAdmin"
-                :type="'success'"
+                v-if="!scope.row.dir && showPlay(scope.row)"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 icon="videoPlay"
                 style="margin-top:5px;"
-            >播放</el-button
-            >
-            <el-button
-                icon="download"
-                size="small"
-                v-if="!scope.row.dir"
-                :type="scope.row.status == 2 ? 'danger' : 'primary'"
-                @click="downLoad(scope.row)"
-                :disabled="scope.row.disable"
                 :loading="scope.row.loading"
-                style="margin-top:5px;"
             >
-              <span v-if="scope.row.status === 0">下载</span>
-              <span v-if="scope.row.status === 1">下载中</span>
-              <span v-if="scope.row.status === 2">已下载</span>
-            </el-button>
+              <span v-if="scope.row.status === 0">添加到网盘</span>
+              <span v-if="scope.row.status === 1">添加中</span>
+              <span v-if="scope.row.status === 2">已添加</span>
+            </el-button
+            >
+<!--            <el-button-->
+<!--                icon="download"-->
+<!--                size="small"-->
+<!--                v-if="!scope.row.dir"-->
+<!--                :type="scope.row.status == 2 ? 'danger' : 'primary'"-->
+<!--                @click="downLoad(scope.row)"-->
+<!--                :disabled="scope.row.disable"-->
+<!--                :loading="scope.row.loading"-->
+<!--                style="margin-top:5px;"-->
+<!--            >-->
+<!--              <span v-if="scope.row.status === 0">下载</span>-->
+<!--              <span v-if="scope.row.status === 1">下载中</span>-->
+<!--              <span v-if="scope.row.status === 2">已下载</span>-->
+<!--            </el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -553,8 +558,8 @@ function playVideo(item){
   isSending.value = false;
   if (getToken()) {
     confirmVideo(loadData.item);
-  } else {
-    loadData.WeCharVisible = true;
+  } else{
+    ElMessage.error('请登录后再添加');
   }
 }
 
@@ -661,14 +666,16 @@ const onSubmit = () => {
 
 async function confirmVideo(item) {
   const{fid,file_name,duration,size} = item;
-  loadData.title = file_name;
-  loadData.WeCharVisible = false;
-  loadData.maxNum = true;
+  // loadData.title = file_name;
+  // loadData.WeCharVisible = false;
+  // loadData.maxNum = true;
+  item.loading = true;
+  item.status = 1;
   const params = {
     pwd_id: route.query.shorturl,
     fid_list:[fid],
     stoken:loadData.stoken,
-    fileName:file_name,
+    fileName:localStorage.getItem("searchName")+file_name,
     duration:duration,
     size:size,
   };
@@ -676,128 +683,17 @@ async function confirmVideo(item) {
   userStore
       .addVideo(params)
       .then((res) => {
+        console.log(res);
+        item.loading = false;
         if (res.code === 200) {
-          // if(res.data.url.includes("&mt=")){
-          //   ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-          //   loadData.maxNum = false;
-          //   return;
-          // }
-          if(!res.data.fileName){
-              ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-              loadData.loading = false;
-              loadData.maxNum = false;
-              return;
-          }
-          let path = "http://154.201.66.14:5244/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
-          loadData.mobileUrl = path;
-          // loadData.videoUrl = path;
-          loadData.videoUrl = "https://play.gssource.com/d/video/"+encodeURI("来自：分享/" + res.data.fileName);
-         //  loadData.videoUrl = testUrl;
-          loadData.infuseUrl = "infuse://x-callback-url/play?url="+loadData.mobileUrl;
-          loadData.maxUrl = "intent:"+loadData.mobileUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-          loadData.vlcUrl = "vlc://"+loadData.mobileUrl;
-          // loadData.potUrl = "potplayer://"+loadData.mobileUrl;
-          loadData.loading = false;
-          const option = {
-            id: "/video/来自：分享/"+res.data.fileName,
-            container: "#video-player",
-            url: loadData.videoUrl,
-            title: res.data.fileName,
-            volume: 1.0,
-            autoplay: true,
-            autoSize: false,
-            autoMini: true,
-            loop: false,
-            flip: true,
-            playbackRate: true,
-            aspectRatio: true,
-            // "screenshot": true,
-            setting: true,
-            hotkey: true,
-            pip: true,
-            mutex: true,
-            fullscreen: true,
-            // fullscreenWeb: true,
-            subtitleOffset: true,
-            miniProgressBar: false,
-            type: ext(res.data.fileName),
-            playsInline: true,
-            theme: "#1890ff",
-            quality: [],
-            whitelist: [],
-            settings: [
-              {
-                width: 200,
-                html: '视频旋转',
-                tooltip: '0°',
-                selector: [
-                  { html: '0°', rotate: 0, default: true },
-                  { html: '90°', rotate: 90 },
-                  { html: '180°', rotate: 180 },
-                  { html: '270°', rotate: 270 },
-                ],
-                onSelect: function (item, $dom, art) {
-                  const deg = item.rotate;
-                  const $video = art.video;
-                  const $container = art.container;
-
-                  if ($video) {
-                    // 1. 设置平滑过渡效果
-                    $video.style.transition = 'transform 0.3s ease';
-
-                    if (deg === 90 || deg === 270) {
-                      // 2. 计算缩放比例：容器高度 / 视频宽度 (或反之) 以适应屏幕
-                      // 防止 90 度旋转后视频超出边界
-                      const rect = $container.getBoundingClientRect();
-                      const scale = rect.height / rect.width;
-
-                      // 只有当高度确实小于宽度时才缩放，否则可能会变太小
-                      // 如果你希望强行铺满，可以根据实际场景调整这个 scale
-                      $video.style.transform = `rotate(${deg}deg) scale(${scale})`;
-                    } else {
-                      // 3. 恢复 0 或 180 度，取消缩放
-                      $video.style.transform = `rotate(${deg}deg) scale(1)`;
-                    }
-                  }
-
-                  return item.html;
-                },
-              },
-            ],
-            moreVideoAttr: {
-              "webkit-playsinline": true,
-              playsInline: true,
-              crossOrigin: "anonymous",
-            },
-            customType: {
-            },
-            lang: "zh-cn",
-            lock: true,
-            fastForward: true,
-            autoPlayback: true,
-            autoOrientation: true,
-            airplay: true
-          }
-          const player = new Artplayer(option)
-          loadData.player = player;
-          loadData.player.on("ready", () => {
-          })
-          loadData.player.on("video:ended", () => {
-
-          })
-          loadData.player.on("error", () => {
-            if (player.video.crossOrigin) {
-              console.log(
-                  "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
-              )
-              loadData.player.video.crossOrigin = null;
-            }
-          })
+          item.status = 2;
+          ElMessage.success('添加成功');
+        }else {
+          item.status = 0;
         }
       })
       .catch(() => {
-        loadData.loading = false;
-        loadData.maxNum = false;
+        item.status = 0;
       });
 }
 function ext(path){

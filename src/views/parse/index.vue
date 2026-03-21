@@ -107,13 +107,13 @@
             <el-button
                 @click="playVideo(scope.row)"
                 v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
-                :type="'success'"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
                 icon="videoPlay"
                 size="small"
                 style="margin-top:5px;"
                 :loading="scope.row.loading"
             >
-              <span v-if="scope.row.status === 0">添加</span>
+              <span v-if="scope.row.status === 0">添加到网盘</span>
               <span v-if="scope.row.status === 1">添加中</span>
               <span v-if="scope.row.status === 2">已添加</span>
             </el-button
@@ -850,6 +850,8 @@ function playVideo(item){
   isSending.value = false;
   if (getToken()) {
     confirmVideo(loadData.item);
+  }else{
+    ElMessage.error('请登录后再添加');
   }
 }
 function handleBeforeClose(){
@@ -886,112 +888,23 @@ async function confirmVideo(item) {
     surl: loadData.query.shorturl,
     url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
     dir: loadData.parseLinkParams.dir,
-    fileNewName: item.path.replace("我的资源","").replaceAll("/",""),
-    fileName: loadData.item.server_filename,
+    // fileNewName: item.path.replace("我的资源","").replaceAll("/",""),
+    fileNewName: localStorage.getItem("searchName") + item.server_filename,
+    fileName: item.server_filename,
   };
   userStore
       .videoAdd(params)
       .then((res) => {
+        item.loading = false;
         if (res.code === 200) {
-          item.loading = false;
           item.status = 2;
           ElMessage.success('添加成功');
-          // if(!res.data.fileName){
-          //   ElMessage.error("视频播放失败,请更换资源或者下载后观看");
-          //   loadData.loading = false;
-          //   loadData.maxNum = false;
-          //   return;
-          // }
-          // let path = "http://154.201.66.14:5244/d/videob/"+encodeURI("我的资源/" + res.data.fileName);
-          // loadData.videoUrl = "https://play.gssource.com/dd/videob/"+encodeURI("我的资源/" + res.data.fileName);
-          // const signUrl = path;
-          // loadData.infuseUrl = "infuse://x-callback-url/play?url="+signUrl;
-          // loadData.maxUrl = "intent:"+signUrl+"#Intent;package=com.mxtech.videoplayer.ad;S.title="+res.data.fileName+";end";
-          // loadData.vlcUrl = "vlc://"+signUrl;
-          // // loadData.potUrl = "potplayer://"+signUrl;
-          // // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          // loadData.loading = false;
-          // const option = {
-          //   id: "/baidu/我的资源/"+res.data.fileName,
-          //   container: "#video-player",
-          //   url: loadData.videoUrl,
-          //   title: res.data.fileName,
-          //   volume: 1.0,
-          //   autoplay: true,
-          //   autoSize: false,
-          //   autoMini: true,
-          //   loop: false,
-          //   flip: true,
-          //   playbackRate: true,
-          //   aspectRatio: true,
-          //   // "screenshot": true,
-          //   setting: true,
-          //   hotkey: true,
-          //   // pip: true,
-          //   mutex: true,
-          //   fullscreen: true,
-          //   // fullscreenWeb: true,
-          //   subtitleOffset: true,
-          //   miniProgressBar: false,
-          //   type: ext(res.data.fileName).toLowerCase().replace('.', ''),
-          //   playsInline: true,
-          //   theme: "#1890ff",
-          //   quality: [],
-          //   whitelist: [],
-          //   settings: [],
-          //   moreVideoAttr: {
-          //     "webkit-playsinline": true,
-          //     playsInline: true,
-          //     crossOrigin: "anonymous",
-          //   },
-          //   customType: {
-          //     // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
-          //     m3u8: function (video, url) {
-          //       if (Hls.isSupported()) {
-          //         const hls = new Hls();
-          //         hls.loadSource(url);
-          //         hls.attachMedia(video);
-          //       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          //         video.src = url;
-          //       }
-          //     },
-          //   },
-          //   lang: "zh-cn",
-          //   i18n: {
-          //     "zh-cn": {
-          //       "Video load error": "此资源只能点击下面按钮在播放器内播放！",
-          //     },
-          //   },
-          //   lock: true,
-          //   fastForward: true,
-          //   // autoPlayback: true,
-          //   autoOrientation: true,
-          //   airplay: true
-          // }
-          //
-          // const player = new Artplayer(option);
-          // loadData.player = player;
-          // loadData.player.on("ready", () => {
-          // })
-          // loadData.player.on("video:ended", () => {
-          //
-          // })
-          // loadData.player.on("error", () => {
-          //   loadData.player.notice.show = '此资源只能点击下面按钮在播放器内播放！';
-          //   if (player.video.crossOrigin) {
-          //     console.log(
-          //         "Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.",
-          //     )
-          //     loadData.player.video.crossOrigin = null;
-          //   }
-          // })
-
-
+        }else{
+          item.status = 0;
         }
       })
       .catch(() => {
-        loadData.loading = false;
-        loadData.maxNum = false;
+        item.status = 0;
       });
 }
 

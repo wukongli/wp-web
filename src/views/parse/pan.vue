@@ -91,13 +91,13 @@
                   style="margin-left: 10px"
                   v-if="scope.row.url.includes('quark')"
                   type="success"
-                  >下载极快</el-tag
+                  >夸克资源</el-tag
                 >
                 <el-tag
                   style="margin-left: 10px"
                   v-if="scope.row.url.includes('baidu')"
                   type="danger"
-                  >下载很快</el-tag
+                  >百度资源</el-tag
                 >
                 <span style="margin-left: 10px">
                   {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
@@ -303,6 +303,7 @@ const { isLightTheme } = useTheme();
 const { queryParams } = toRefs(data);
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
+  searchValue.value = localStorage.getItem("searchName");
   const cache = sessionStorage.getItem('tableData');
   if (
     route.path === '/source/parse/bt' ||
@@ -363,13 +364,17 @@ function logout() {
 }
 getLogin();
 function handleSearch(value) {
+  if (value) {
+    searchValue.value = value;
+  }
+  if(!searchValue.value){
+    ElMessage.error('请输入关键词搜索！');
+    return;
+  }
   loading.value = true;
   tableShow.value = true;
   tagShow.value = false;
   showComponent.value = false;
-  if (value) {
-    searchValue.value = value;
-  }
   localStorage.setItem('searchName', searchValue.value);
   userStore
     .search({
@@ -381,8 +386,8 @@ function handleSearch(value) {
         const uniqueArray = Array.from(
           new Set(res.data.map((item) => JSON.stringify(item)))
         ).map((item) => JSON.parse(item));
-        tableData.value = uniqueArray.filter(item => item.url.includes("baidu"));
-        sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+        tableData.value = uniqueArray;
+        sessionStorage.setItem('tableData', JSON.stringify(uniqueArray));
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
       // total.value = res.data.Memory_get_usage;

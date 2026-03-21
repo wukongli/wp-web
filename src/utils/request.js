@@ -136,7 +136,11 @@ service.interceptors.response.use(
     } else if (code === 601) {
       ElMessage({ message: msg, type: 'warning' });
       return Promise.reject(new Error(msg));
-    } else if (code !== 200) {
+    } else if (code === 501) {
+        ElMessage({ message: msg, type: 'error' });
+        return Promise.resolve(res.data);
+    }
+    else if (code !== 200) {
       ElNotification.error({ title: msg });
       return Promise.reject('error');
     } else {
