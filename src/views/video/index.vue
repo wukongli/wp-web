@@ -73,7 +73,7 @@ import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
 // const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
-const selectValue = ref('https://jx.zgjx.org/?key=06nzlBow93Dv&4k=true&url=')
+const selectValue = ref('https://jx.zg12.xyz/?4k=true&key=06nzlBow93Dv&url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -95,7 +95,7 @@ const codeRules = {
 };
 const options = [
   {
-    value: 'https://jx.zgjx.org/?key=06nzlBow93Dv&4k=true&url=',
+    value: 'https://jx.zg12.xyz/?4k=true&key=06nzlBow93Dv&url=',
     // value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
