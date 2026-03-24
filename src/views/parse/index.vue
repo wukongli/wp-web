@@ -1105,6 +1105,9 @@ async function handleParse() {
     }
   }
 }
+::v-deep .el-table .cell{
+  overflow: inherit !important;
+}
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);

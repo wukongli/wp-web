@@ -63,7 +63,7 @@
                   preview-teleported
               >
               </el-image>
-              <div style="font-size: 16px;font-weight: bold;overflow:hidden;text-overflow: ellipsis;">{{
+              <div style="width:300px;font-size: 16px;font-weight: bold;white-space: nowrap;">{{
                   scope.row.file_name
                 }}</div>
             </div>
@@ -1040,7 +1040,9 @@ async function handleParse() {
     }
   }
 }
-
+::v-deep .el-table .cell{
+  overflow: inherit !important;
+}
 
 .app1 {
   width: 100%;
