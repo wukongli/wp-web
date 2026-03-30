@@ -26,6 +26,7 @@ import {
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
+import {checkQuarkLoginStatus, generateQuarkLoginQR} from "@/api/quark";
 
 const useUserStore = defineStore('user', {
   state: () => ({
@@ -363,7 +364,28 @@ const useUserStore = defineStore('user', {
                   });
           });
       },
-
+      generateQuark(data){
+          return new Promise((resolve, reject) => {
+              generateQuarkLoginQR(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      checkQuarkStatus(data){
+          return new Promise((resolve, reject) => {
+              checkQuarkLoginStatus(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
 
 
   },

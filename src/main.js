@@ -11,6 +11,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 import directive from './directive' // directive
+import VueQrcode from '@chenfengyuan/vue-qrcode';
 
 
 // 注册指令
@@ -65,6 +66,7 @@ app.component('FileUpload', FileUpload)
 app.component('ImageUpload', ImageUpload)
 app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
+app.component(VueQrcode.name, VueQrcode);
 
 app.use(router)
 app.use(store)
