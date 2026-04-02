@@ -493,7 +493,6 @@ function parseCopyLink(params) {
             }
             return true; // 保留
           });
-          console.log(loadData.tableData);
           loadData.parseLinkParams.seckey = data.data.data.seckey;
           loadData.parseLinkParams.shareid = data.data.data.shareid;
           loadData.parseLinkParams.uk = data.data.data.uk;
