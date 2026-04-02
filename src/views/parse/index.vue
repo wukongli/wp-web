@@ -70,7 +70,7 @@
               >
               </el-image>
               <div style="font-size: 16px;font-weight: bold;overflow:hidden;text-overflow: ellipsis;">{{
-                scope.row.server_filename
+                scope.row.server_filename.replace("百度","").replace("群","").replace("加","").replace("网盘","").replace("影视","").replace("更新","")
               }}</div>
             </div>
           </template>
@@ -487,12 +487,7 @@ function parseCopyLink(params) {
             //   item.disable = true;
             // }
           });
-          loadData.tableData = list.filter(item => {
-            if (item.isdir === 0 && item.size < 1048576) {
-              return false; // 删除
-            }
-            return true; // 保留
-          });
+          loadData.tableData = list;
           loadData.parseLinkParams.seckey = data.data.data.seckey;
           loadData.parseLinkParams.shareid = data.data.data.shareid;
           loadData.parseLinkParams.uk = data.data.data.uk;
