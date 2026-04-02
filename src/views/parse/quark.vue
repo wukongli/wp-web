@@ -443,7 +443,12 @@ async function parseQuark(params){
             // 0 下载，1，下载中
             item.status = 0;
           });
-          loadData.tableData = data.data.list.sort((a, b) => b.l_updated_at - a.l_updated_at);
+          loadData.tableData = data.data.list.sort((a, b) => b.l_updated_at - a.l_updated_at).filter(item => {
+            if (!item.dir && item.size < 1048576) {
+              return false; // 删除
+            }
+            return true; // 保留
+          });
           // loadImagesSequentially(loadData.tableData);
         }
       })
@@ -513,7 +518,7 @@ function parseCopyLink(params) {
               //   item.disable = true;
               // }
             });
-            loadData.tableData = list;
+            loadData.tableData = list
             loadData.parseLinkParams.seckey = data.data.data.seckey;
             loadData.parseLinkParams.shareid = data.data.data.shareid;
             loadData.parseLinkParams.uk = data.data.data.uk;
