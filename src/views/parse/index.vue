@@ -485,7 +485,12 @@ function parseCopyLink(params) {
             //   item.disable = true;
             // }
           });
-          loadData.tableData = list;
+          loadData.tableData = list.filter(item => {
+            if (item.isdir === 0 && item.size < 1048576) {
+              return false; // 删除
+            }
+            return true; // 保留
+          });
           loadData.parseLinkParams.seckey = data.data.data.seckey;
           loadData.parseLinkParams.shareid = data.data.data.shareid;
           loadData.parseLinkParams.uk = data.data.data.uk;
