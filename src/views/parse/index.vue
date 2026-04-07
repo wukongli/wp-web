@@ -105,7 +105,7 @@
               >&nbsp;VIP</el-button
             >
             <el-button
-                @click="playVideo(scope.row)"
+                @click="playShow(scope.row)"
                 v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
                 :type="'success'"
                 icon="videoPlay"
@@ -187,19 +187,16 @@
 
    <!-- 视频播放弹窗 -->
     <el-dialog class = "dia-code" height="300px" title="提示" v-model="loadData.playVideo">
-      <div class="file-name">原文件名：{{ loadData.item.server_filename }}</div>
-      <el-form
-          ref="codeRef"
-          :model="form"
-      >
-        <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="播放文件名">
-          <el-input v-model="form.playName" auto-complete="off" />
-        </el-form-item>
-      </el-form>
+      <img class="qr-code" :src="zhizhuxia" alt="" />
+      <div class="qr-hint">
+        以上资源均可在安卓、Ios、电脑、电视Tv端在线播放
+        <br><br/>
+        请添加开发者获取影视库【备注"影视库"】
+      </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="videoAdd"
-          >添加播放</el-button
+          <el-button type="primary" @click="loadData.playVideo=false"
+          >确定</el-button
           >
         </span>
       </template>
@@ -340,6 +337,7 @@ import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import { onMounted,computed } from 'vue';
 import iron from '@/assets/images/钢铁侠.png';
+import zhizhuxia from '@/assets/images/zhizhuxia.png';
 import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import duli2 from '@/assets/images/独立2.png';
@@ -835,6 +833,11 @@ function vipDownLoad(item) {
   loadData.item = item;
   loadData.vipDown = true;
 }
+
+function playShow(){
+  loadData.playVideo = true;
+}
+
 
 function playVideo(item){
   // console.log(item);

@@ -88,8 +88,8 @@
             >
             <el-button
                 size="small"
-                @click="playVideo(scope.row)"
-                v-if="!scope.row.dir && showPlay(scope.row) && loadData.isAdmin"
+                @click="playShow(scope.row)"
+                v-if="!scope.row.dir && showPlay(scope.row)"
                 :type="'success'"
                 icon="videoPlay"
                 style="margin-top:5px;"
@@ -193,6 +193,21 @@
         <span class="dialog-footer">
           <el-button type="primary"><a href="https://vip.gssource.com" target="_blank">点击开通快速下载</a></el-button>
           <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog class = "dia-code" height="300px" title="提示" v-model="loadData.playVideo">
+      <img class="qr-code" :src="zhizhuxia" alt="" />
+      <div class="qr-hint">
+        以上资源均可在安卓、Ios、电脑、电视Tv端在线播放
+        <br><br/>
+        请添加开发者获取影视库【备注"影视库"】
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="loadData.playVideo=false"
+          >确定</el-button
+          >
         </span>
       </template>
     </el-dialog>
@@ -314,6 +329,7 @@ import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import yao from '@/assets/images/yaoyao.png';
 import duli2 from '@/assets/images/独立2.png';
+import zhizhuxia from '@/assets/images/zhizhuxia.png';
 import loading from '@/assets/img/loading.gif';
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
 import { getToken } from '@/utils/auth';
@@ -380,6 +396,7 @@ const loadData = reactive({
   hlsPlayer:null,
   isAdmin:false,
   isMobile:false,
+  playVideo:false,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -485,6 +502,9 @@ function parseList(item) {
       pid:fid,
     });
   }
+}
+function playShow(){
+  loadData.playVideo = true;
 }
 function parseCopyLink(params) {
   loadData.routeData.push(params);
