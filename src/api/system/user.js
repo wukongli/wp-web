@@ -133,3 +133,26 @@ export function deptTreeSelect() {
     method: 'get'
   })
 }
+
+export function addWebDav(data) {
+  return request({
+    url: '/webDav',
+    method: 'post',
+    params: data
+  })
+}
+
+export function getWebDav(data) {
+  return request({
+    url: '/webDav/getDav',
+    method: 'post',
+    params: data
+  })
+}
+
+export function delWebDav(id) {
+  return request({
+    url: '/webDav/delete/' + id,
+    method: 'delete'
+  })
+}

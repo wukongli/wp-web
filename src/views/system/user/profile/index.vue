@@ -72,6 +72,9 @@
                   <el-tab-pane label="修改密码" name="resetPwd">
                      <resetPwd />
                   </el-tab-pane>
+                 <el-tab-pane label="夸克影视库" name="dav">
+                   <dav/>
+                 </el-tab-pane>
                </el-tabs>
             </el-card>
          </el-col>
@@ -83,6 +86,7 @@
 import userAvatar from "./userAvatar";
 import userInfo from "./userInfo";
 import resetPwd from "./resetPwd";
+import dav from "./dav.vue";
 import { getUserProfile } from "@/api/system/user";
 import moment from 'moment';
 
