@@ -73,7 +73,7 @@ import DisableDevtool from 'disable-devtool';
 // DisableDevtool();
 const input = ref('')
 // const selectValue = ref('https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=')
-const selectValue = ref('https://jx.zg12.xyz/?4k=true&key=06nzlBow93Dv&url=')
+const selectValue = ref('https://jx.xmflv.com/?url=')
 const videoUrl = ref();
 const myElement = ref(null);
 import {getUserProfile} from "@/api/system/user";
@@ -95,14 +95,14 @@ const codeRules = {
 };
 const options = [
   {
-    value: 'https://jx.zg12.xyz/?4k=true&key=06nzlBow93Dv&url=',
+    value: 'https://jx.xmflv.com/?url=',
     // value: 'https://play.okcdn100.top/analysis/player/?key=bekmvEHJMNORSVWZ17&url=',
     label: '默认线路',
   },
-  {
-    value: 'https://jx.xmflv.com/?url=',
-    label: '备用线路一',
-  }
+  // {
+  //   value: 'https://jx.xmflv.com/?url=',
+  //   label: '备用线路一',
+  // }
 ]
 watch(() => selectValue.value, (newValue, oldValue) => {
   if(videoUrl.value){
