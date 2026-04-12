@@ -1037,6 +1037,9 @@ async function initToken(){
             };
             parseList(params);
           }
+        }else{
+          ElMessage.error("文件资源已失效");
+          loadData.tableLoading = false;
         }
       })
       .catch(() => {
