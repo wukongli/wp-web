@@ -1,19 +1,19 @@
 <template>
   <div class="app1">
-    <header>
-      <div @click="goBack()" class="back-icon">
-        <MySvg
-            iconName="icon-fanhui"
-            width="30px"
-            height="30px"
-            size="30"
-        ></MySvg>
-        <span style="margin-left: 10px">{{ loadData.rootBackTitle }}</span>
-      </div>
-      <div :title="loadData.bread" class="back-title">
-        {{ loadData.bread }}
-      </div>
-    </header>
+<!--    <header>-->
+<!--      <div @click="goBack()" class="back-icon">-->
+<!--        <MySvg-->
+<!--            iconName="icon-fanhui"-->
+<!--            width="30px"-->
+<!--            height="30px"-->
+<!--            size="30"-->
+<!--        ></MySvg>-->
+<!--        <span style="margin-left: 10px">{{ loadData.rootBackTitle }}</span>-->
+<!--      </div>-->
+<!--&lt;!&ndash;      <div :title="loadData.bread" class="back-title">&ndash;&gt;-->
+<!--&lt;!&ndash;        {{ loadData.bread }}&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--    </header>-->
 <!--    <el-button-->
 <!--        style="margin: 10px 0"-->
 <!--        type="primary"-->
@@ -75,7 +75,10 @@
           </template>
         </el-table-column>
         <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
-        <el-table-column v-if="hasDirData" min-width="35%" label="操作">
+        <el-table-column v-if="hasDirData" min-width="35%" align="right" label="操作">
+          <template #header>
+            <div class="back" @click="goBack()">返回上一级</div>
+          </template>
           <template #default="scope">
             <el-button
                 icon="menu"
@@ -1279,15 +1282,15 @@ async function handleParse() {
     height: 40px;
     font-weight: bold;
     cursor: pointer;
-    border: 1px solid #ccc;
+    //border: 1px solid #ccc;
     margin-top:25px;
-    display: flex;
     .back-icon {
       height: 30px;
+      float: right;
       svg {
         float: left;
         margin-top: 5px;
-        margin-left: 15px;
+        //margin-left: 15px;
       }
       span {
         float: left;
@@ -1309,6 +1312,16 @@ async function handleParse() {
   }
   .wp-table{
     min-height: 200px;
+    margin-top:25px;
+    .back{
+      font-size: 15px;
+      font-weight: bold;
+      color: #000; /* 默认颜色 */
+      transition: color 0.3s ease; /* 可选：平滑过渡 */
+    }
+    .back:hover {
+      color: #67c23a; /* 滑过时变为红色，可换成任意颜色 */
+    }
   }
   .wp-table ::v-deep .el-table__body tr:hover > td {
     //background-color: #c0ffe7 !important;
