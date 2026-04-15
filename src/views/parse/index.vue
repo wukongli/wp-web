@@ -97,14 +97,14 @@
               size="small"
               >快速下载</el-button
             >
-            <el-button
-                @click="playVideo(scope.row)"
-                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"
-                :type="'success'"
-                icon="videoPlay"
-                size="small"
-            >播放</el-button
-            >
+<!--            <el-button-->
+<!--                @click="playVideo(scope.row)"-->
+<!--                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"-->
+<!--                :type="'success'"-->
+<!--                icon="videoPlay"-->
+<!--                size="small"-->
+<!--            >播放</el-button-->
+<!--            >-->
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
