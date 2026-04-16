@@ -79,7 +79,7 @@
           prop="server_mtime"
           :formatter="timestampToTime"
           min-width="20%"
-          label="修改时间"
+          label="时间"
         />
 <!--        <el-table-column prop="updated_at" label="修改时间">-->
 <!--          <template #default="{row}">-->
@@ -93,7 +93,7 @@
         <!--          }}-->
         <!--          次</el-table-column-->
         <!--        >-->
-        <el-table-column v-if="hasDirData" align="right" min-width="35%" label="操作">
+        <el-table-column align="right" min-width="35%" label="操作">
           <template #header>
             <div class="back" @click="goBack()">返回上一级</div>
           </template>

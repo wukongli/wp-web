@@ -69,13 +69,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column v-if="!hasDirData"  min-width="20%" prop="updated_at" label="修改时间">
+        <el-table-column v-if="!hasDirData"  min-width="20%" prop="updated_at" label="时间">
           <template #default="scope">
             {{ moment(parseInt(scope.row.updated_at)).format('YYYY-MM-DD HH:mm:ss') }}
           </template>
         </el-table-column>
         <el-table-column v-if="hasDirData" min-width="20%" prop="size" :formatter="getFilesize" label="大小" />
-        <el-table-column v-if="hasDirData" min-width="35%" align="right" label="操作">
+        <el-table-column min-width="35%" align="right" label="操作">
           <template #header>
             <div class="back" @click="goBack()">返回上一级</div>
           </template>
