@@ -224,7 +224,7 @@
       <img class="qr-code" :src="loadData.codeUrl" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <div class="qr-title">
-        爱看资源VIP无需验证码,不限下载次数，支持在线播放！
+        爱看资源VIP无需验证码,不限文件大小，不限下载次数，支持在线播放！
       </div>
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -394,7 +394,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: 100698669056 ,
+  fileSize: getToken() ? 100698669056 : 2147483648,
   routeData: [],
   rootBackTitle: '返回',
   vipDown: false,
@@ -594,6 +594,12 @@ const onSubmit = () => {
               isSending.value = false;
             });
         return;
+      }
+
+      if (parseInt(loadData.item.size) > loadData.fileSize) {
+        ElMessage.error('文件大于2G下载速度较慢，请需登录卡密使用快速下载！');
+        isSending.value = false;
+        return false;
       }
       userStore
         .getCodeNum(params)
