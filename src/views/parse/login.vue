@@ -6,8 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">网盘文件在线播放&加速下载</h3>
-      <h3 v-else class="title">网盘文件在线播放&加速下载(支持百度网盘,夸克网盘)</h3>
+      <h3 v-if="getToken()" class="title">自用网盘文件加速下载</h3>
+      <h3 v-else class="title">自用网盘文件加速下载</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
@@ -282,14 +282,24 @@ function handleClose() {
 </script>
 
 <style lang="scss" scoped>
+
 .login {
-  width: 98%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 84px);
-  background-image: url('../../assets/img/parseBackGround.png');
-  background-size: cover;
+  //background-image: url('../../assets/img/bg.png');
+  //background-size: cover;
+  /* 颜色加深版渐变 */
+  background: linear-gradient(to bottom, #eaf2f5, #c6e6ef);
+
+  /* 科技线条也加深一点 */
+  background-image:
+      linear-gradient(to bottom, #eaf2f5, #c6e6ef),
+      linear-gradient(45deg, rgba(50, 160, 200, 0.08) 1px, transparent 1px),
+      linear-gradient(-45deg, rgba(50, 160, 200, 0.08) 1px, transparent 1px);
+  background-size: auto, 40px 40px, 40px 40px;
   .qr-code {
     width: 180px;
     height: 180px;
@@ -382,5 +392,8 @@ function handleClose() {
 .login-code-img {
   height: 40px;
   padding-left: 12px;
+}
+.app-main {
+  background: #204f7f !important;
 }
 </style>

@@ -116,7 +116,7 @@ export const constantRoutes = [
         hidden: false,
         component: () => import('@/views/front/interview.vue'),
         meta: {
-          title: '前端面试题',
+          title: '前端学习文档',
           icon: 'documentation',
           noCache: true,
           link: null,
@@ -132,7 +132,7 @@ export const constantRoutes = [
     component: Layout,
     alwaysShow: true,
     meta: {
-      title: 'Java教程',
+      title: 'AI教程',
       icon: 'back',
       noCache: true,
       link: null,
@@ -143,7 +143,7 @@ export const constantRoutes = [
         path: 'java/list',
         hidden: false,
         meta: {
-          title: 'Java课程列表',
+          title: '后端课程列表',
           icon: 'course',
           noCache: true,
           link: null,
@@ -155,7 +155,7 @@ export const constantRoutes = [
         path: 'java/interview',
         hidden: false,
         meta: {
-          title: 'Java面试题',
+          title: '后端学习文档',
           icon: 'documentation',
           noCache: true,
           link: null,
