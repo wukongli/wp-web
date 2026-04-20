@@ -49,7 +49,13 @@
         >
           <template #default="scope">
             <div
-                style="height:75px!important;"
+                style="
+                  min-height: 70px;
+                  display: flex;
+                  align-items: center;
+                  flex-wrap: wrap;
+                  line-height: normal;
+                "
                 @click="parseList(scope.row)"
             >
               <MySvg v-if="!scope.row.big_thumbnail" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
