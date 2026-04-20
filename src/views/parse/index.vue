@@ -56,7 +56,13 @@
           <template #default="scope">
             <div
               @click="parseList(scope.row)"
-              style="height:75px!important;"
+              style="
+                  min-height: 70px;
+                  display: flex;
+                  align-items: center;
+                  flex-wrap: wrap;
+                  line-height: normal;
+                "
             >
               <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)"></MySvg>
               <el-image
