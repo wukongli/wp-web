@@ -42,7 +42,7 @@
             trigger="click"
         >
           <div class="avatar-wrapper">
-            <img :src="userStore.avatar" class="user-avatar" />
+            <img :src="user" class="user-avatar" />
             <el-icon><caret-bottom /></el-icon>
           </div>
           <template #dropdown>
@@ -80,6 +80,7 @@ import useUserStore from '@/store/modules/user';
 import useSettingsStore from '@/store/modules/settings';
 import { getToken } from '@/utils/auth';
 import {reactive, ref} from "vue";
+import user from "@/assets/logo/img.png"
 const appStore = useAppStore();
 const userStore = useUserStore();
 const settingsStore = useSettingsStore();
