@@ -75,7 +75,7 @@
                   preview-teleported
               >
               </el-image>
-              <div style="font-size: 16px;font-weight: bold;overflow:hidden;text-overflow: ellipsis;">{{
+              <div>{{
                 scope.row.server_filename
               }}</div>
             </div>

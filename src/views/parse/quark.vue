@@ -49,6 +49,7 @@
         >
           <template #default="scope">
             <div
+                @click="parseList(scope.row)"
                 style="
                   min-height: 70px;
                   display: flex;
@@ -56,7 +57,6 @@
                   flex-wrap: wrap;
                   line-height: normal;
                 "
-                @click="parseList(scope.row)"
             >
               <MySvg v-if="!scope.row.big_thumbnail" :iconName="transQuarkIcon(scope.row)" size="50"></MySvg>
               <el-image
@@ -69,7 +69,7 @@
                   preview-teleported
               >
               </el-image>
-              <div style="width:300px;font-size: 16px;font-weight: bold;white-space: nowrap;">{{
+              <div>{{
                   scope.row.file_name
                 }}</div>
             </div>
