@@ -135,92 +135,93 @@
         >
           {{ item }}
         </el-tag>
-        <div class="block">
-          <div class="nav">电视剧</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in tv" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
+<!--        <div class="block">-->
+<!--          <div class="nav">电视剧</div>-->
+<!--          <div class="content">-->
+<!--            <div class="list">-->
+<!--              <div v-for="(item, index) in tv" class="item">-->
+<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+<!--                </div>-->
+<!--                <p>{{ item.title }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="block">-->
+<!--          <div class="nav">电影</div>-->
+<!--          <div class="content">-->
+<!--            <div class="list">-->
+<!--              <div v-for="(item, index) in movie" class="item">-->
+<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+<!--                </div>-->
+<!--                <p>{{ item.title }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="block">-->
+<!--          <div class="nav">动漫</div>-->
+<!--          <div class="content">-->
+<!--            <div class="list">-->
+<!--              <div v-for="(item, index) in anime" class="item">-->
+<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+<!--                </div>-->
+<!--                <p>{{ item.title }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="block">-->
+<!--          <div class="nav">综艺</div>-->
+<!--          <div class="content">-->
+<!--            <div class="list">-->
+<!--              <div v-for="(item, index) in variety" class="item">-->
+<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+<!--                </div>-->
+<!--                <p>{{ item.title }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="block">-->
+<!--          <div class="nav">短剧</div>-->
+<!--          <div class="content">-->
+<!--            <div class="list">-->
+<!--              <div v-for="(item, index) in shortVideo" class="item">-->
+<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+<!--                </div>-->
+<!--                <p>{{ item.title }}</p>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+                <div class="tag-title">
+                  <span>近期热搜：</span>
                 </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">电影</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in movie" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">动漫</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in anime" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">综艺</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in variety" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">短剧</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in shortVideo" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--        <div class="tag-title">-->
-        <!--          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>-->
-        <!--        </div>-->
-        <!--        <el-tag-->
-        <!--            class="tag-inner"-->
-        <!--            size="large"-->
-        <!--            v-for="(item, index) in tag"-->
-        <!--            :key="item.value"-->
-        <!--            effect="dark"-->
-        <!--            :type="getTagType(index)"-->
-        <!--            round-->
-        <!--            c-->
-        <!--        >-->
-        <!--          {{ item.value }}-->
-        <!--        </el-tag>-->
+                <el-tag
+                    class="tag-inner"
+                    size="large"
+                    v-for="(item, index) in tv.concat(movie).concat(anime)"
+                    :key="item.value"
+                    effect="dark"
+                    :type="getTagType(index)"
+                    round
+                    @click="handleSearch(item.title)"
+                >
+                  {{ item.title }}
+                </el-tag>
+
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
     </div>
     <div v-if="tagShow" class="foot">
-      声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
+      声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时告知删除。
     </div>
   </div>
 </template>
@@ -467,35 +468,29 @@ function extractQuarkInfo(text) {
 function getTag() {
   userStore.getTag().then((res) => {
     if (res.code === 200) {
-      console.log(navigator.userAgent);
-      const isPC =
-        !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      let count = 5;
-      if (!isPC) {
-        count = 3;
-      }
+      // const isPC =
+      //   !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(
+      //     navigator.userAgent
+      //   );
+      // let count = 5;
+      // if (!isPC) {
+      //   count = 3;
+      // }
       movie.value = res.data.movie.data
         .slice(0, 20)
         .sort(() => Math.random() - 0.5)
-        .splice(0, count);
       tv.value = res.data.tv.data
         .slice(0, 20)
         .sort(() => Math.random() - 0.5)
-        .splice(0, count);
       anime.value = res.data.anime.data
         .slice(0, 20)
         .sort(() => Math.random() - 0.5)
-        .splice(0, count);
       variety.value = res.data.variety.data
         .slice(0, 20)
         .sort(() => Math.random() - 0.5)
-        .splice(0, count);
       shortVideo.value = res.data.shortVideo.data
         .slice(0, 20)
         .sort(() => Math.random() - 0.5)
-        .splice(0, count);
     }
   });
 }
@@ -634,7 +629,7 @@ const getTagType = (index) => {
   font-size: 18px;
   display: flex;
   flex-direction: column;
-  min-height: 110vh; /* 至少占满整个视口高度 */
+  min-height: 100vh; /* 至少占满整个视口高度 */
   overflow-x: hidden;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch; /* iOS Safari 滚动优化 */
@@ -906,18 +901,16 @@ const getTagType = (index) => {
   }
 
   .tag-title {
-    margin-top: 15px;
-    display: flex;
-    align-items: center; /* 垂直居中 */
-    justify-content: center; /* 水平居中 */
+    margin-top: 35px;
     span {
+      margin-left:28px;
       font-size: 25px;
       font-weight: bold;
     }
   }
   .tag-inner {
     margin-left: 20px;
-    margin-top: 20px;
+    margin-top: 25px;
     cursor: pointer;
     /* 基础样式 */
     border: 1px solid var(--el-border-color);
