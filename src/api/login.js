@@ -248,7 +248,7 @@ export function searchPanData(data){
 }
 export function searchTag(type) {
   return request({
-    url: '/wp/getTag',
+    url: '/wp/searchTag',
     method: 'get',
     timeout: 20000,
   });

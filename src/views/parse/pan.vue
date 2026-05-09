@@ -468,28 +468,7 @@ function extractQuarkInfo(text) {
 function getTag() {
   userStore.getTag().then((res) => {
     if (res.code === 200) {
-      // const isPC =
-      //   !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(
-      //     navigator.userAgent
-      //   );
-      // let count = 5;
-      // if (!isPC) {
-      //   count = 3;
-      // }
-      movie.value = res.data.movie.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-      tv.value = res.data.tv.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-      anime.value = res.data.anime.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-      variety.value = res.data.variety.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-      shortVideo.value = res.data.shortVideo.data
-        .slice(0, 20)
+      tv.value = res.data.searchTag.data
         .sort(() => Math.random() - 0.5)
     }
   });
