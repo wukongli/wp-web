@@ -42,6 +42,11 @@ export const constantRoutes = [
     hidden: true,
   },
   {
+    path: '/webDav/login',
+    component: () => import('@/views/webDavLogin.vue'),
+    hidden: true,
+  },
+  {
     path: '/register',
     component: () => import('@/views/register'),
     hidden: true,
@@ -286,6 +291,13 @@ export const constantRoutes = [
   //   component: () => import('@/views/parse/quark.vue'),
   //   hidden: false,
   // },
+
+  {
+    name: 'WebDav',
+    path: '/webDav',
+    hidden: true,
+    component: () => import('@/views/system/user/profile/webDav.vue'),
+  },
 
 
 

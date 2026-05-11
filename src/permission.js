@@ -16,6 +16,7 @@ const whiteList = [
   // '/login',
   '/register',
   '/vip/login',
+  '/webDav/login',
   '/back/java/list',
   '/back/java/interview',
   '/front/front/list',
@@ -34,6 +35,7 @@ const whiteList = [
   '/source/parse/bt',
   '/source/parse/index',
   '/user',
+  '/webDav',
 ];
 
 router.beforeEach((to, from, next) => {
