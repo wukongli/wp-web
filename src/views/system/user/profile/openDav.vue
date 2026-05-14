@@ -24,7 +24,7 @@
       <img style="width: 300px;height: 300px;margin: auto;display: block;" :src="getToken() ? qrCode : yao" alt="">
     </div>
     <div class="qr-title">
-      {{getToken() ? "打开夸克APP扫码确认登录" : "扫码联系管理员获取使用权限"}}
+      {{getToken() ? "打开夸克APP扫码登录后-点击生成webDav" : "扫码联系管理员获取使用权限"}}
 
     </div>
     <template #footer>

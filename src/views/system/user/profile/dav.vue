@@ -24,7 +24,7 @@
       <img style="width: 300px;height: 300px;margin: auto;display: block;" :src=qrCode alt="">
     </div>
     <div class="qr-title">
-      打开夸克APP扫码确认登录
+      打开夸克APP扫码登录后-点击生成webDav
     </div>
     <template #footer>
         <span class="dialog-footer">
