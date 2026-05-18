@@ -351,7 +351,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 2147483648,
+  fileSize: getToken() ? 100698669056 : 1073741824,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
@@ -550,7 +550,7 @@ const onSubmit = () => {
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('为维护下载速度体验，文件大于2G，需登录卡密使用快速下载！');
+        ElMessage.error('为维护下载速度体验，文件大于1G，需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
