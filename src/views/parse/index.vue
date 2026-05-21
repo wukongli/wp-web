@@ -727,7 +727,7 @@ const onSubmit = () => {
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('为维护下载速度体验，文件大于1G，需登录卡密使用快速下载！');
+        ElMessage.error('文件大于1G下载速度较慢，请需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
