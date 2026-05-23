@@ -35,7 +35,7 @@ export default defineConfig(({ mode, command }) => {
         '/dev-api': {
           // target: 'http://127.0.0.1:8081',//
           // target: 'https://aifenxiang.net.cn:8081',
-          target: 'https://api.gssource.com/',
+          target: 'https://app.china-shopping.com',
           // target: 'http://154.201.66.44:8081/',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
