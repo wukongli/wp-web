@@ -830,8 +830,8 @@ async function sendToMotrix(item) {
         [loadData.url],
         {
           'user-agent': loadData.ua,
-          'max-connection-per-server': '64',
-          'split': '64'
+          'max-connection-per-server': '256',
+          'split': '256'
         }
       ]
     })
