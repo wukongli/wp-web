@@ -385,7 +385,7 @@ const loadData = reactive({
   maxNum:false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 1073741824,
+  fileSize: getToken() ? 100698669056 : 5368709120,
   routeData: [],
   rootBackTitle: '返回',
   vipDown: false,
@@ -668,7 +668,7 @@ const onSubmit = () => {
         return;
       }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于1G下载速度较慢，请需登录卡密使用快速下载！');
+        ElMessage.error('文件大于5G下载速度较慢，请需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
@@ -940,8 +940,8 @@ async function sendToMotrix(data,id) {
             `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/3.0.2 Chrome/100.0.4896.160 Electron/18.3.5.12-a038f7b798 Safari/537.36 Channel/pckk_clouddrive_share_ch`,
             `Cookie: ${id}` // Cookie 必须包含在 header 里
           ],
-          'max-connection-per-server': '64',
-          'split': '64',
+          'max-connection-per-server': '256',
+          'split': '256',
         }
       ]
     })

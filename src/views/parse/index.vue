@@ -400,7 +400,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 1073741824,
+  fileSize: getToken() ? 100698669056 : 5368709120,
   routeData: [],
   rootBackTitle: '返回',
   vipDown: false,
@@ -603,7 +603,7 @@ const onSubmit = () => {
       }
 
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于1G下载速度较慢，请需登录卡密使用快速下载！');
+        ElMessage.error('文件大于5G下载速度较慢，请需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
@@ -707,8 +707,8 @@ async function sendToMotrix(item) {
         [loadData.url],
         {
           'user-agent': loadData.ua,
-          'max-connection-per-server': '64',
-          'split': '64'
+          'max-connection-per-server': '256',
+          'split': '256'
         }
       ]
     })
