@@ -235,7 +235,7 @@
 <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://vip.gssource.com" target="_blank">点击开通VIP</a></el-button>
+          <el-button type="primary"><a href="https://vip.ainsource.com" target="_blank">点击开通VIP</a></el-button>
 <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
@@ -707,8 +707,8 @@ async function sendToMotrix(item) {
         [loadData.url],
         {
           'user-agent': loadData.ua,
-          'max-connection-per-server': '256',
-          'split': '256'
+          'max-connection-per-server': '255',
+          'split': '255'
         }
       ]
     })
