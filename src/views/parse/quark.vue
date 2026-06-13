@@ -208,9 +208,7 @@
     <el-dialog class = "dia-code" height="300px" title="提示" v-model="loadData.playVideo">
       <img class="qr-code" :src="zhizhuxia" alt="" />
       <div class="qr-hint">
-        以上资源均可在安卓、Ios、电脑、电视Tv端在线播放
-        <br><br/>
-        请添加获取观看方式【备注"影视库"】
+        请添加获取观看方式【备注"在线观看"】
       </div>
       <template #footer>
         <span class="dialog-footer">
