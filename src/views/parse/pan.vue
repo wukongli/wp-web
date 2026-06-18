@@ -4,11 +4,11 @@
       <div class="logo">
         <a class="share-login" href="/vip/login">
           <el-button
-            v-if="!loginData.login"
-            style="margin: 10px 0"
-            type="primary"
-            icon="user"
-            >登录</el-button
+              v-if="!loginData.login"
+              style="margin: 10px 0"
+              type="primary"
+              icon="user"
+          >登录</el-button
           ></a
         >
         <a class="logo-title">
@@ -38,40 +38,40 @@
 
       <div class="header-search">
         <el-input
-          class="header-input"
-          v-model="searchValue"
-          placeholder="请输入关键词或者磁力链接"
+            class="header-input"
+            v-model="searchValue"
+            placeholder="请输入关键词或者磁力链接"
         />
         <el-button
-          type="primary"
-          icon="Search"
-          style="width: 70px; height: 50px; margin-left: 10px"
-          @click="handleSearch()"
-          >搜索</el-button
+            type="primary"
+            icon="Search"
+            style="width: 70px; height: 50px; margin-left: 10px"
+            @click="handleSearch()"
+        >搜索</el-button
         >
         <el-button
-          style="width: 80px; height: 50px; margin-left: 10px"
-          icon="Refresh"
-          type="danger"
-          @click="resetQuery"
-          >重置</el-button
+            style="width: 80px; height: 50px; margin-left: 10px"
+            icon="Refresh"
+            type="danger"
+            @click="resetQuery"
+        >重置</el-button
         >
       </div>
       <el-table
-        class="wp-table"
-        :row-style="{ height: '50px' }"
-        v-if="tableShow"
-        element-loading-text="数据正在加载中..."
-        v-loading="loading"
-        :data="tableData"
+          class="wp-table"
+          :row-style="{ height: '50px' }"
+          v-if="tableShow"
+          element-loading-text="数据正在加载中..."
+          v-loading="loading"
+          :data="tableData"
       >
         <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="scope">
             <div @click="goParse(scope.row)">
               <MySvg
-                style="float: left; margin-top: 10px"
-                :iconName="'icon-wenjianjia'"
-                size="40"
+                  style="float: left; margin-top: 10px"
+                  :iconName="'icon-wenjianjia'"
+                  size="40"
               ></MySvg>
               <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
               <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
@@ -79,7 +79,7 @@
               <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
 
               <div
-                style="
+                  style="
                   min-height: 70px;
                   display: flex;
                   align-items: center;
@@ -88,16 +88,16 @@
                 "
               >
                 <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('quark')"
-                  type="success"
-                  >夸克资源</el-tag
+                    style="margin-left: 10px"
+                    v-if="scope.row.url.includes('quark')"
+                    type="success"
+                >下载极快</el-tag
                 >
                 <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('baidu')"
-                  type="danger"
-                  >百度资源</el-tag
+                    style="margin-left: 10px"
+                    v-if="scope.row.url.includes('baidu')"
+                    type="danger"
+                >下载很快</el-tag
                 >
                 <span style="margin-left: 10px">
                   {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
@@ -113,114 +113,115 @@
         </el-table-column>
       </el-table>
       <el-pagination
-        v-if="tableShow"
-        layout="prev, pager, next"
-        :total="100"
-        v-model:current-page="queryParams.pageNum"
-        v-model:page-size="queryParams.pageSize"
-        background
-        size="large"
-        @size-change="getList"
-        @current-change="getList"
-        class="custom-pagination"
+          v-if="tableShow"
+          layout="prev, pager, next"
+          :total="100"
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          background
+          size="large"
+          @size-change="getList"
+          @current-change="getList"
+          class="custom-pagination"
       />
       <div v-if="tagShow" class="tag">
         <el-tag
-          class="tag-header"
-          size="small"
-          v-for="(item, index) in tagHeader"
-          :key="item"
-          effect="dark"
-          @click="handleSearch(item)"
+            class="tag-header"
+            size="small"
+            v-for="(item, index) in tagHeader"
+            :key="item"
+            effect="dark"
+            @click="handleSearch(item)"
         >
           {{ item }}
         </el-tag>
-        <div class="block">
-          <div class="nav">电视剧</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in tv" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">电影</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in movie" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">动漫</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in anime" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">综艺</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in variety" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="block">
-          <div class="nav">短剧</div>
-          <div class="content">
-            <div class="list">
-              <div v-for="(item, index) in shortVideo" class="item">
-                <div @click="handleSearch(item.title)" :key="index" class="img">
-                  <img :src="item.src.replace('http://', 'https://')" alt="" />
-                </div>
-                <p>{{ item.title }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--        <div class="tag-title">-->
-        <!--          <span>最近热搜：<span style="color: red;">{{tag.length}}</span> 条</span>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">电视剧</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in tv" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
         <!--        </div>-->
-        <!--        <el-tag-->
-        <!--            class="tag-inner"-->
-        <!--            size="large"-->
-        <!--            v-for="(item, index) in tag"-->
-        <!--            :key="item.value"-->
-        <!--            effect="dark"-->
-        <!--            :type="getTagType(index)"-->
-        <!--            round-->
-        <!--            c-->
-        <!--        >-->
-        <!--          {{ item.value }}-->
-        <!--        </el-tag>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">电影</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in movie" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">动漫</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in anime" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">综艺</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in variety" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">短剧</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in shortVideo" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <div class="tag-title">
+          <span>近期热搜：</span>
+        </div>
+        <el-tag
+            class="tag-inner"
+            size="large"
+            v-for="(item, index) in tv.concat(movie).concat(anime)"
+            :key="item.value"
+            effect="dark"
+            :type="getTagType(index)"
+            round
+            @click="handleSearch(item.title)"
+        >
+          {{ item.title }}
+        </el-tag>
+
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
     </div>
     <div v-if="tagShow" class="foot">
-      声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时留言告知删除。
+      声明：本站磁力链接、bt种子内容由网络搜索获取、本站不储存、复制任何文件、仅作个人使用学习、如有侵权，请及时告知删除。
     </div>
   </div>
 </template>
@@ -303,11 +304,10 @@ const { isLightTheme } = useTheme();
 const { queryParams } = toRefs(data);
 // 在pan.vue中添加所有生命周期日志
 onMounted(() => {
-  searchValue.value = localStorage.getItem("searchName");
   const cache = sessionStorage.getItem('tableData');
   if (
-    route.path === '/source/parse/bt' ||
-    route.path === '/source/parse/index'
+      route.path === '/source/parse/bt' ||
+      route.path === '/source/parse/index'
   ) {
     tableData.value = JSON.parse(cache);
     return;
@@ -326,19 +326,19 @@ onMounted(() => {
   }
 });
 watch(
-  () => route.path,
-  (newPath, oldPath) => {
-    if (oldPath === '/source/parse/bt' || oldPath === '/source/parse/index') {
-      tableShow.value = true;
-    } else {
-      tableShow.value = false;
-      tagShow.value = false;
-    }
-    // if(newPath === "/source/parse/quark" || newPath === "/source/parse/index"){
-    //
-    // }
-  },
-  { immediate: true }
+    () => route.path,
+    (newPath, oldPath) => {
+      if (oldPath === '/source/parse/bt' || oldPath === '/source/parse/index') {
+        tableShow.value = true;
+      } else {
+        tableShow.value = false;
+        tagShow.value = false;
+      }
+      // if(newPath === "/source/parse/quark" || newPath === "/source/parse/index"){
+      //
+      // }
+    },
+    { immediate: true }
 );
 
 function getLogin() {
@@ -354,45 +354,41 @@ function logout() {
     cancelButtonText: '取消',
     type: 'warning',
   })
-    .then(() => {
-      userStore.logOut().then(() => {
-        localStorage.removeItem('role');
-        location.href = '/source';
-      });
-    })
-    .catch(() => {});
+      .then(() => {
+        userStore.logOut().then(() => {
+          localStorage.removeItem('role');
+          location.href = '/source';
+        });
+      })
+      .catch(() => {});
 }
 getLogin();
 function handleSearch(value) {
-  if (value) {
-    searchValue.value = value;
-  }
-  if(!searchValue.value){
-    ElMessage.error('请输入关键词搜索！');
-    return;
-  }
   loading.value = true;
   tableShow.value = true;
   tagShow.value = false;
   showComponent.value = false;
+  if (value) {
+    searchValue.value = value;
+  }
   localStorage.setItem('searchName', searchValue.value);
   userStore
-    .search({
-      keyword: value ? value : searchValue.value,
-      ...queryParams.value,
-    })
-    .then((res) => {
-      if (res.code === 200) {
-        const uniqueArray = Array.from(
-          new Set(res.data.map((item) => JSON.stringify(item)))
-        ).map((item) => JSON.parse(item));
-        tableData.value = uniqueArray;
-        sessionStorage.setItem('tableData', JSON.stringify(uniqueArray));
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
-      // total.value = res.data.Memory_get_usage;
-      loading.value = false;
-    });
+      .search({
+        keyword: value ? value : searchValue.value,
+        ...queryParams.value,
+      })
+      .then((res) => {
+        if (res.code === 200) {
+          const uniqueArray = Array.from(
+              new Set(res.data.map((item) => JSON.stringify(item)))
+          ).map((item) => JSON.parse(item));
+          tableData.value = uniqueArray;
+          sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+        // total.value = res.data.Memory_get_usage;
+        loading.value = false;
+      });
 }
 function getList() {
   if (!searchValue.value) {
@@ -401,11 +397,11 @@ function getList() {
   }
   loading.value = true;
   userStore
-    .search({ keyword: searchValue.value, ...queryParams.value })
-    .then((res) => {
-      tableData.value = res.data;
-      loading.value = false;
-    });
+      .search({ keyword: searchValue.value, ...queryParams.value })
+      .then((res) => {
+        tableData.value = res.data;
+        loading.value = false;
+      });
 }
 
 function goParse(row) {
@@ -472,35 +468,8 @@ function extractQuarkInfo(text) {
 function getTag() {
   userStore.getTag().then((res) => {
     if (res.code === 200) {
-      console.log(navigator.userAgent);
-      const isPC =
-        !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-      let count = 5;
-      if (!isPC) {
-        count = 3;
-      }
-      movie.value = res.data.movie.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-        .splice(0, count);
-      tv.value = res.data.tv.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-        .splice(0, count);
-      anime.value = res.data.anime.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-        .splice(0, count);
-      variety.value = res.data.variety.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-        .splice(0, count);
-      shortVideo.value = res.data.shortVideo.data
-        .slice(0, 20)
-        .sort(() => Math.random() - 0.5)
-        .splice(0, count);
+      tv.value = res.data.searchTag.data
+          .sort(() => Math.random() - 0.5)
     }
   });
 }
@@ -639,7 +608,7 @@ const getTagType = (index) => {
   font-size: 18px;
   display: flex;
   flex-direction: column;
-  min-height: 110vh; /* 至少占满整个视口高度 */
+  min-height: 100vh; /* 至少占满整个视口高度 */
   overflow-x: hidden;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch; /* iOS Safari 滚动优化 */
@@ -669,12 +638,12 @@ const getTagType = (index) => {
           overflow: hidden; /* 隐藏溢出内容 */
           text-overflow: ellipsis; /* 溢出显示省略号... */
           background: linear-gradient(
-            90deg,
-            #33cc33,
-            #ff9900,
-            #ff0000,
-            #3399ff,
-            #cc33ff
+                  90deg,
+                  #33cc33,
+                  #ff9900,
+                  #ff0000,
+                  #3399ff,
+                  #cc33ff
           );
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -911,18 +880,16 @@ const getTagType = (index) => {
   }
 
   .tag-title {
-    margin-top: 15px;
-    display: flex;
-    align-items: center; /* 垂直居中 */
-    justify-content: center; /* 水平居中 */
+    margin-top: 35px;
     span {
+      margin-left:28px;
       font-size: 25px;
       font-weight: bold;
     }
   }
   .tag-inner {
     margin-left: 20px;
-    margin-top: 20px;
+    margin-top: 25px;
     cursor: pointer;
     /* 基础样式 */
     border: 1px solid var(--el-border-color);
