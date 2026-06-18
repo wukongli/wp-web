@@ -6,30 +6,39 @@
     <div class="bg-glow bg-glow-2"></div>
 
     <div class="page-content">
-      <a class="share-login" href="/webDav/login">
-        <el-button
-            v-if="!loginData.login"
-            style="margin: 10px 0"
-            type="primary"
-            icon="user"
-        >登录</el-button
-        ></a>
-      <div v-if="loginData.login" class="avatar-container">
-        <el-dropdown class="right-menu-item hover-effect" trigger="click">
-          <div class="avatar-wrapper">
-            <img :src="userLogo" class="user-avatar" />
-          </div>
-          <template #dropdown>
-            <el-dropdown-menu>
+      <div class="top-bar">
+        <div class="share-login">
+          <el-button
+              style="margin: 10px 20px"
+              type="success"
+              @click="$router.push('/source')"
+          >网盘资源</el-button>
+          <a href="/webDav/login">
+            <el-button
+                v-if="!loginData.login"
+                style="margin: 10px 0"
+                type="primary"
+                icon="user"
+            >登录</el-button
+            ></a>
+        </div>
+        <div v-if="loginData.login" class="avatar-container">
+          <el-dropdown class="right-menu-item hover-effect" trigger="click">
+            <div class="avatar-wrapper">
+              <img :src="userLogo" class="user-avatar" />
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
 <!--              <router-link to="/user">-->
 <!--                <el-dropdown-item>个人中心</el-dropdown-item>-->
 <!--              </router-link>-->
-              <el-dropdown-item @click="logout">
-                <span>退出登录</span>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+                <el-dropdown-item @click="logout">
+                  <span>退出登录</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </div>
       <!-- 顶部标题区 -->
       <div class="hero-header">
@@ -128,10 +137,20 @@ getUser();
   background: #f0f4f8;
   overflow-x: hidden;
 
-    .avatar-container {
+    .top-bar {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       margin-bottom: 10px;
+    }
+
+    .share-login {
+      margin-bottom: 0;
+    }
+
+    .avatar-container {
+      display: flex;
+      align-items: center;
 
       .avatar-wrapper {
         position: relative;
