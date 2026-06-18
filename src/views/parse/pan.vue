@@ -13,7 +13,7 @@
         >
         <a class="logo-title">
           <img :src="logo" alt="" />
-          <span>爱看资源 - 云端资源搜索专家</span>
+          <span>网盘资源一键转存平台</span>
         </a>
         <div class="user">
           <div v-if="loginData.login" class="avatar-container">

@@ -117,7 +117,7 @@ export function parseLinkReq(data) {
 }
 export function videoAddReq(data) {
   return request({
-    url: '/wp/changeVideo',
+    url: '/wp/addVideo',
     method: 'post',
     timeout: 20000,
     data: data,
@@ -231,7 +231,7 @@ export function quarkTransfer(data){
 
 export function addVideo(data){
   return request({
-    url: '/quark/change',
+    url: '/quark/addVideo',
     method: 'post',
     timeout: 20000,
     data: data,
@@ -248,7 +248,7 @@ export function searchPanData(data){
 }
 export function searchTag(type) {
   return request({
-    url: '/wp/getTag',
+    url: '/wp/searchTag',
     method: 'get',
     timeout: 20000,
   });
