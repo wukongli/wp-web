@@ -705,8 +705,10 @@ async function sendToMotrix(item) {
         [loadData.url],
         {
           'user-agent': loadData.ua,
-          'max-connection-per-server': '255',
-          'split': '255'
+          'max-connection-per-server': '256',    // aria2 硬上限，写 255 无效！
+          'split': '256',                        // 分块数拉到 Motrix 上限
+          'min-split-size': '1M',              // 每块至少 1MB，减少碎片
+          'disk-cache': '512M'                 // 务必加这条，避免磁盘卡顿
         }
       ]
     })
