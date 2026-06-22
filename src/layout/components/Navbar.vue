@@ -35,6 +35,9 @@
 <!--          <size-select id="size-select" class="right-menu-item hover-effect" />-->
 <!--        </el-tooltip>-->
 <!--      </template>-->
+      <router-link v-if="!loginData.login" to="/vip/login" class="login-btn-link">
+        <el-button type="primary" size="small" round>卡密登录</el-button>
+      </router-link>
       <div v-if="loginData.login" class="avatar-container">
         <el-dropdown
             @command="handleCommand"
@@ -192,6 +195,13 @@ getLogin();
           background: rgba(0, 0, 0, 0.025);
         }
       }
+    }
+
+    .login-btn-link {
+      display: inline-flex;
+      align-items: center;
+      height: 100%;
+      margin-right: 8px;
     }
 
     .avatar-container {

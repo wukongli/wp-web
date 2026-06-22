@@ -76,11 +76,6 @@
           <span v-if="!loading">提 取</span>
           <span v-else>提 取 中...</span>
         </el-button>
-        <div style="float: right" v-if="register">
-          <router-link class="link-type" :to="'/vip/login'"
-          >使用卡密登录</router-link
-          >
-        </div>
       </el-form-item>
     </el-form>
     <!--  底部  -->

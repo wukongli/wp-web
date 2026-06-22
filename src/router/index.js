@@ -254,7 +254,7 @@ export const constantRoutes = [
     component: Layout,
     alwaysShow: true,
     meta: {
-      title: '视频SVIP',
+      title: '资源库',
       icon: 'tree',
       noCache: true,
       link: null,
@@ -280,7 +280,7 @@ export const constantRoutes = [
         hidden: false,
         component: () => import('@/views/video/out.vue'),
         meta: {
-          title: '影视资源',
+          title: '全网资源',
           icon: 'redis-list',
           noCache: false,
           link: null,

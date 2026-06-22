@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <a href="https://gssource.com">点击获取4k臻彩影视资源...</a>
+    <a href="https://gssource.com">点击获取万能资源库...</a>
 <!--    <div class="video-header">-->
 <!--      <input v-model="input" placeholder="请输入视频播放链接" />-->
 <!--      <div @click="playVideo" class="play">播放</div>-->
