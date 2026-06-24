@@ -393,8 +393,8 @@ const loadData = reactive({
 });
 const downOrPlay = ref(true); //t
 onMounted(() => {
-  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = randomItem;
+  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
+  qrCode.value = xiaochengxu;
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);

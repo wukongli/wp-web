@@ -6,8 +6,8 @@
         :rules="loginRules"
         class="login-form"
     >
-      <h3 v-if="getToken()" class="title">自用网盘文件加速下载</h3>
-      <h3 v-else class="title">自用网盘文件加速下载</h3>
+      <h3 v-if="getToken()" class="title">自用(夸克百度)网盘文件加速下载</h3>
+      <h3 v-else class="title">自用(夸克百度)网盘文件加速下载</h3>
 <!--      <div v-if="hint.show" class="hint-box">-->
 <!--        <el-tag class="hint" type="danger" effect="dark" round>-->
 <!--          下载解析限速中管理员正在修复请稍后再试...-->
