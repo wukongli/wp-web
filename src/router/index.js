@@ -246,49 +246,49 @@ export const constantRoutes = [
   //     // refresh:true
   //   },
   // },
-  {
-    name: 'Video',
-    path: '/video',
-    hidden: false,
-    redirect: 'noRedirect',
-    component: Layout,
-    alwaysShow: true,
-    meta: {
-      title: '资源库',
-      icon: 'tree',
-      noCache: true,
-      link: null,
-      refresh:true
-    },
-    children: [
-      // {
-      //   name: 'List',
-      //   path: 'list',
-      //   hidden: false,
-      //   // component: () => import('@/views/video/list.vue'),
-      //   meta: {
-      //     title: '在线观看',
-      //     icon: 'redis-list',
-      //     noCache: false,
-      //     link: 'https://gssource.com',
-      //     refresh:true
-      //   },
-      // },
-      {
-        name: 'Out',
-        path: 'out',
-        hidden: false,
-        component: () => import('@/views/video/out.vue'),
-        meta: {
-          title: '全网资源',
-          icon: 'redis-list',
-          noCache: false,
-          link: null,
-          refresh:true
-        },
-      },
-    ],
-  },
+  // {
+  //   name: 'Video',
+  //   path: '/video',
+  //   hidden: false,
+  //   redirect: 'noRedirect',
+  //   component: Layout,
+  //   alwaysShow: true,
+  //   meta: {
+  //     title: '资源库',
+  //     icon: 'tree',
+  //     noCache: true,
+  //     link: null,
+  //     refresh:true
+  //   },
+  //   children: [
+  //     // {
+  //     //   name: 'List',
+  //     //   path: 'list',
+  //     //   hidden: false,
+  //     //   // component: () => import('@/views/video/list.vue'),
+  //     //   meta: {
+  //     //     title: '在线观看',
+  //     //     icon: 'redis-list',
+  //     //     noCache: false,
+  //     //     link: 'https://gssource.com',
+  //     //     refresh:true
+  //     //   },
+  //     // },
+  //     {
+  //       name: 'Out',
+  //       path: 'out',
+  //       hidden: false,
+  //       component: () => import('@/views/video/out.vue'),
+  //       meta: {
+  //         title: '全网资源',
+  //         icon: 'redis-list',
+  //         noCache: false,
+  //         link: null,
+  //         refresh:true
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/video/vip',
     component: () => import('@/views/video/index.vue'),

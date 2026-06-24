@@ -36,7 +36,7 @@ export default defineConfig(({ mode, command }) => {
           target: 'https://vv1.ainsource.com',
           // target: 'https://aifenxiang.net.cn:8081',
           // target: 'https://api.gssource.com/',
-          // target: 'http://154.201.66.44:8081/',
+          // target: 'http://127.0.0.1:8089/',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ''),
         },
