@@ -51,11 +51,15 @@ const classObj = computed(() => ({
 const { width, height } = useWindowSize();
 const WIDTH = 992; // refer to Bootstrap's responsive design
 
-watchEffect(() => {
-  if (device.value === 'mobile' && sidebar.value.opened) {
-    useAppStore().closeSideBar({ withoutAnimation: false });
-  }
-  if (width.value - 1 < WIDTH) {
+// 初始化时处理移动端状态
+if (width.value - 1 < WIDTH) {
+  useAppStore().toggleDevice('mobile');
+  useAppStore().closeSideBar({ withoutAnimation: true });
+}
+
+// 窗口大小变化时切换设备类型
+watch(width, (newWidth) => {
+  if (newWidth - 1 < WIDTH) {
     useAppStore().toggleDevice('mobile');
     useAppStore().closeSideBar({ withoutAnimation: true });
   } else {
