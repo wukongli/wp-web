@@ -27,6 +27,7 @@ import {
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
 import {checkQuarkLoginStatus, generateQuarkLoginQR} from "@/api/quark";
+import {checkBaiduLoginStatus, generateBaiduLoginQR} from "@/api/baidu";
 
 const useUserStore = defineStore('user', {
   state: () => ({
@@ -378,6 +379,28 @@ const useUserStore = defineStore('user', {
       checkQuarkStatus(data){
           return new Promise((resolve, reject) => {
               checkQuarkLoginStatus(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      generateBaidu(data){
+          return new Promise((resolve, reject) => {
+              generateBaiduLoginQR(data)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
+      checkBaiduStatus(data){
+          return new Promise((resolve, reject) => {
+              checkBaiduLoginStatus(data)
                   .then((res) => {
                       resolve(res);
                   })

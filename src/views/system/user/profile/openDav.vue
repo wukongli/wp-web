@@ -19,7 +19,7 @@
       <el-button type="primary" @click="generateCode()">扫码生成</el-button>
     </el-form-item>
   </el-form>
-  <el-dialog title="提示" v-model="quarkShow" width="40%" :append-to-body="true" @close="handleDialogClose">
+  <el-dialog title="提示" class="qr-dialog" v-model="quarkShow" :append-to-body="true" @close="handleDialogClose">
     <div class="qr-container">
       <img style="width: 300px;height: 300px;margin: auto;display: block;" :src="getToken() ? qrCode : yao" alt="">
     </div>
@@ -291,8 +291,8 @@ function generatePath(){
 <style scoped lang="scss">
 .qr-container {
   display: flex;
-  justify-content: center;  /* 水平居中 */
-  align-items: center;      /* 垂直居中（可选） */
+  justify-content: center;
+  align-items: center;
   width: 100%;
 }
 .qr-title {
@@ -300,5 +300,15 @@ function generatePath(){
   text-align: center;
   font-size: 20px;
   font-weight: bold;
+}
+</style>
+<style lang="scss">
+.qr-dialog {
+  --el-dialog-width: 400px;
+}
+@media (max-width: 767px) {
+  .qr-dialog {
+    --el-dialog-width: 90%;
+  }
 }
 </style>

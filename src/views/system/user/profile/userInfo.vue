@@ -6,11 +6,14 @@
       <el-form-item label="百度CK" prop="phonenumber">
          <el-input v-model="user.phonenumber" />
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="generateBaiduCode()">百度扫码登录</el-button>
+      </el-form-item>
       <el-form-item label="夸克CK" prop="email">
          <el-input v-model="user.email" />
       </el-form-item>
      <el-form-item>
-       <el-button type="primary" @click="generateQuarkCode()">扫码登录</el-button>
+       <el-button type="primary" @click="generateQuarkCode()">夸克扫码登录</el-button>
      </el-form-item>
      <el-form-item label="性别">
          <el-radio-group v-model="user.sex">
@@ -23,9 +26,9 @@
       <el-button type="danger" @click="close">关闭</el-button>
       </el-form-item>
    </el-form>
-  <el-dialog title="提示" v-model="quarkShow" width="40%"  @close="handleDialogClose">
+  <el-dialog title="提示" v-model="quarkShow" :key="quarkKey" class="qr-dialog" @close="handleQuarkDialogClose">
     <div class="qr-container">
-      <vue-qrcode style="margin: auto;" v-if="qrValue"  :value="qrValue" :options="{ width: 200 }">
+      <vue-qrcode style="max-width: 100%; height: auto;" v-if="qrValue"  :value="qrValue" :options="{ width: 200 }">
       </vue-qrcode>
     </div>
     <div class="qr-title">
@@ -34,7 +37,23 @@
     <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"
-                     @click="handleDialogClose"
+                     @click="handleQuarkDialogClose"
+          >确定</el-button
+          >
+        </span>
+    </template>
+  </el-dialog>
+  <el-dialog title="提示" v-model="baiduShow" :key="baiduKey" class="qr-dialog" @close="handleBaiduDialogClose">
+    <div class="qr-container">
+      <img v-if="baiduQrValue" :src="baiduQrValue" class="qr-image" />
+    </div>
+    <div class="qr-title">
+      打开百度网盘APP扫码获取Cookie
+    </div>
+    <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary"
+                     @click="handleBaiduDialogClose"
           >确定</el-button
           >
         </span>
@@ -43,14 +62,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 
-import { updateUserProfile } from "@/api/system/user";
+import { getUserProfile, updateUserProfile } from "@/api/system/user";
 import useUserStore from "@/store/modules/user";
-import {checkQuarkLoginStatus} from "@/api/quark";
-import {userKey} from "@/utils/wp";
-const intervalId = ref(null)
+import {getBaiduQRImage} from "@/api/baidu";
+const quarkIntervalId = ref(null)
+const baiduIntervalId = ref(null)
 const userStore = useUserStore();
+const quarkKey = ref(0);
+const baiduKey = ref(0);
 const props = defineProps({
   user: {
     type: Object
@@ -58,6 +79,10 @@ const props = defineProps({
 });
 const qrValue = ref("");
 const quarkShow = ref(false);
+const baiduQrValue = ref("");
+const baiduShow = ref(false);
+watch(quarkShow, (val) => { if (val) quarkKey.value++; });
+watch(baiduShow, (val) => { if (val) baiduKey.value++; });
 const { proxy } = getCurrentInstance();
 
 const rules = ref({
@@ -86,22 +111,22 @@ function generateQuarkCode(){
           const qrUrl = `https://su.quark.cn/4_eMHBJ?token=${encodeURIComponent(res.data)}&client_id=532&ssb=weblogin&uc_param_str=&uc_biz_str=${encodeURIComponent('S:custom|OPT:SAREA@0|OPT:IMMERSIVE@1|OPT:BACK_BTN_STYLE@0')}`;
           qrValue.value = qrUrl;
           quarkShow.value = true;
-          if (intervalId.value) {
-            clearInterval(intervalId.value)
+          if (quarkIntervalId.value) {
+            clearInterval(quarkIntervalId.value)
           }
-          intervalId.value = setInterval(()=>{
+          quarkIntervalId.value = setInterval(()=>{
             const params = {
               loginToken: res.data,
             };
             userStore.checkQuarkStatus(params).then(result=>{
               if(result.code === 200 && result.data != null){
                 props.user.email = result.data;
-                updateUserProfile(props.user).then(response => {
+                updateUserProfile(props.user).then(() => {
                   quarkShow.value = false;
                   proxy.$modal.msgSuccess("扫码成功");
                 });
-                clearInterval(intervalId.value)
-                intervalId.value = null;
+                clearInterval(quarkIntervalId.value)
+                quarkIntervalId.value = null;
               }
              }
             )
@@ -110,24 +135,87 @@ function generateQuarkCode(){
       })
 }
 
+function generateBaiduCode(){
+  userStore.generateBaidu(props.user.userId)
+      .then(async res=>{
+        if(res.code === 200 && res.data){
+          const sessionId = res.data.id;
+          baiduQrValue.value = await getBaiduQRImage(sessionId);
+          baiduShow.value = true;
+          if (baiduIntervalId.value) {
+            clearInterval(baiduIntervalId.value)
+          }
+          baiduIntervalId.value = setInterval(()=>{
+            userStore.checkBaiduStatus(sessionId).then(result=>{
+              if(result.code === 200 && result.data){
+                if(result.data.logged_in){
+                  baiduShow.value = false;
+                  clearInterval(baiduIntervalId.value)
+                  baiduIntervalId.value = null;
+                  getUserProfile().then(response => {
+                    props.user.phonenumber = response.data.phonenumber;
+                    proxy.$modal.msgSuccess("扫码成功");
+                  });
+                } else if(result.data.status === 'expired'){
+                  proxy.$modal.msgError("二维码已过期，请重新获取");
+                  clearInterval(baiduIntervalId.value)
+                  baiduIntervalId.value = null;
+                  baiduShow.value = false;
+                } else if(result.data.status === 'error'){
+                  proxy.$modal.msgError("扫码失败：" + result.data.message);
+                  clearInterval(baiduIntervalId.value)
+                  baiduIntervalId.value = null;
+                  baiduShow.value = false;
+                }
+              }
+             }
+            )
+          },2000)
+        }
+      })
+}
 
-function handleDialogClose(){
-  clearInterval(intervalId.value);
-  intervalId.value = null;
+function handleQuarkDialogClose(){
+  clearInterval(quarkIntervalId.value);
+  quarkIntervalId.value = null;
   quarkShow.value = false;
+}
+
+function handleBaiduDialogClose(){
+  clearInterval(baiduIntervalId.value);
+  baiduIntervalId.value = null;
+  if (baiduQrValue.value) {
+    URL.revokeObjectURL(baiduQrValue.value);
+    baiduQrValue.value = "";
+  }
+  baiduShow.value = false;
 }
 </script>
 <style scoped lang="scss">
 .qr-container {
   display: flex;
-  justify-content: center;  /* 水平居中 */
-  align-items: center;      /* 垂直居中（可选） */
+  justify-content: center;
+  align-items: center;
   width: 100%;
+}
+.qr-image {
+  max-width: 100%;
+  height: auto;
 }
 .qr-title {
   margin-top: 20px;
   text-align: center;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
+}
+</style>
+<style lang="scss">
+.qr-dialog {
+  --el-dialog-width: 400px;
+}
+@media (max-width: 767px) {
+  .qr-dialog {
+    --el-dialog-width: 90%;
+  }
 }
 </style>
