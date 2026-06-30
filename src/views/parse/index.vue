@@ -349,9 +349,13 @@ import front from '@/assets/images/前端.png';
 import duli from '@/assets/images/独立开发者.png';
 import duli2 from '@/assets/images/独立2.png';
 import yao from '@/assets/images/yaoyao.png';
-const qrCodeList = ref([front,duli,yao,duli2,iron]);
 const qrCode = ref('');
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import kuaituQrCode from '@/assets/qrCode/kuaitu.png';
+import ucQrCode from '@/assets/qrCode/uc.png';
+import xunleiQrCode from '@/assets/qrCode/xunlei.png';
+import baiduQrCode from '@/assets/qrCode/baidu.png';
+import quarkQrCode from '@/assets/qrCode/quark.png';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
@@ -359,6 +363,7 @@ import infuse from "@/assets/logo/infuse.png";
 import mobilePlayer from "@/assets/logo/mxplayer.png";
 import vlc from "@/assets/logo/vlc.png";
 import pot from "@/assets/logo/potplayer.png";
+const qrCodeList = ref([kuaituQrCode,ucQrCode,xunleiQrCode,baiduQrCode,quarkQrCode]);
 import Artplayer from "artplayer"
 const { proxy } = getCurrentInstance();
 const route = useRoute();
@@ -416,6 +421,7 @@ const loadData = reactive({
   diaHit:"此资源只能点击下面按钮在播放器内播放！",
   videoUrl:"",
   isMobild:false,
+  downType:null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -428,7 +434,7 @@ const hasDirData = computed(() => {
 });
 onMounted(() => {
   // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = xiaochengxu;
+  // qrCode.value = xiaochengxu;
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -529,7 +535,7 @@ function openUrl(url){
   document.body.removeChild(a);
 }
 
-function downLoad(item) {
+async function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
   downOrPlay.value = false;
@@ -537,8 +543,16 @@ function downLoad(item) {
   if (getToken()) {
     loadData.noLimit = true;
   } else {
-    loadData.WeCharVisible = true;
-    form.code = '';
+    //后端生成用户唯一下载token
+    const token = localStorage.getItem('token');
+    const res = await userStore.getDownType(token);
+    if (res.code === 200) {
+      localStorage.setItem('token', res.data.token);
+      loadData.downType = res.data.type;
+      qrCode.value = qrCodeList.value[loadData.downType];
+      loadData.WeCharVisible = true;
+      form.code = '';
+    }
   }
 }
 
