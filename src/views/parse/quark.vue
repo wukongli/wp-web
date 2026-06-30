@@ -309,6 +309,11 @@ import infuse from '@/assets/logo/infuse.png';
 import vlc from '@/assets/logo/vlc.png';
 import pot from "@/assets/logo/potplayer.png";
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import kuaituQrCode from '@/assets/qrCode/kuaitu.png';
+import ucQrCode from '@/assets/qrCode/uc.png';
+import xunleiQrCode from '@/assets/qrCode/xunlei.png';
+import baiduQrCode from '@/assets/qrCode/baidu.png';
+import quarkQrCode from '@/assets/qrCode/quark.png';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import {onMounted} from 'vue';
@@ -325,7 +330,7 @@ const fsIds = ref([]);
 const fTokenId = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([iron,front,duli,duli2,yao]);
+const qrCodeList = ref([kuaituQrCode,ucQrCode,xunleiQrCode,baiduQrCode,quarkQrCode]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
@@ -360,12 +365,13 @@ const loadData = reactive({
   player: null,
   ckId: null,
   isMobile:false,
+  downType: null,
+  qrTitle:'',
 });
 const downOrPlay = ref(true);//true 播放，false 下载
 
 onMounted(() => {
-  const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  qrCode.value = randomItem;
+  // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -478,7 +484,7 @@ function parseCopyLink(params) {
       });
 }
 
-function downLoad(item) {
+async function downLoad(item) {
   loadData.item = item;
   isSending.value = false;
   downOrPlay.value = false;
@@ -486,8 +492,16 @@ function downLoad(item) {
   if (getToken()) {
     loadData.noLimit = true;
   } else {
-    loadData.WeCharVisible = true;
-    form.code = '';
+    //后端生成用户唯一下载token
+    const token = localStorage.getItem('token');
+    const res = await userStore.getDownType(token);
+    if (res.code === 200) {
+      localStorage.setItem('token', res.data.token);
+      loadData.downType = res.data.type;
+      qrCode.value = qrCodeList.value[loadData.downType];
+      loadData.WeCharVisible = true;
+      form.code = '';
+    }
   }
 }
 
@@ -507,12 +521,12 @@ const onSubmit = () => {
   proxy.$refs.codeRef.validate(async (valid) => {
     if (valid) {
       isSending.value = true;
-      const params = {
-        code: form.code,
-        userKey: userKey,
-        fsId: loadData.item.fid,
-        version: '1.0.9',
-      };
+      // const params = {
+      //   code: form.code,
+      //   userKey: userKey,
+      //   fsId: loadData.item.fid,
+      //   version: '1.0.9',
+      // };
       if(!downOrPlay.value){
         const result = loadData.isMobile ? await testGopeed() : await testMotrix();
         if (!result) {
@@ -522,62 +536,63 @@ const onSubmit = () => {
         }
       }
 
-      if(downOrPlay.value){
-        userStore
-            .getCodeNum(params)
-            .then((res) => {
-              if (res.code === 200) {
-                if (res.data.data == 100) {
-                  confirmVideo(loadData.item);
-                }  else if (res.data.data == 60) {
-                  setTimeout(() => {
-                    isSending.value = false;
-                    ElMessage.error('今日播放次数已达上限，请明天再来！');
-                  }, 1000);
-                } else if (res.data.data == 50) {
-                  setTimeout(() => {
-                    isSending.value = false;
-                    ElMessage.error(
-                        '验证码错误,一个验证码只能播放一个文件,请重新获取!'
-                    );
-                  }, 1000);
-                }
-              }
-            })
-            .catch(() => {
-              isSending.value = false;
-            });
-        return;
-      }
+      // if(downOrPlay.value){
+      //   userStore
+      //       .getCodeNum(params)
+      //       .then((res) => {
+      //         if (res.code === 200) {
+      //           if (res.data.data == 100) {
+      //             confirmVideo(loadData.item);
+      //           }  else if (res.data.data == 60) {
+      //             setTimeout(() => {
+      //               isSending.value = false;
+      //               ElMessage.error('今日播放次数已达上限，请明天再来！');
+      //             }, 1000);
+      //           } else if (res.data.data == 50) {
+      //             setTimeout(() => {
+      //               isSending.value = false;
+      //               ElMessage.error(
+      //                   '验证码错误,一个验证码只能播放一个文件,请重新获取!'
+      //               );
+      //             }, 1000);
+      //           }
+      //         }
+      //       })
+      //       .catch(() => {
+      //         isSending.value = false;
+      //       });
+      //   return;
+      // }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
         ElMessage.error('文件大于2G下载速度较慢，请需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
-      userStore
-          .getCodeNum(params)
-          .then((res) => {
-            if (res.code === 200) {
-              if (res.data.data == 100) {
-                confirm(loadData.item);
-              }  else if (res.data.data == 60) {
-                setTimeout(() => {
-                  isSending.value = false;
-                  ElMessage.error('今日解析次数已达上限，请明天再来！');
-                }, 2000);
-              } else if (res.data.data == 50) {
-                setTimeout(() => {
-                  isSending.value = false;
-                  ElMessage.error(
-                      '验证码错误,一个验证码只能下载一个文件,请重新获取!'
-                  );
-                }, 2000);
-              }
-            }
-          })
-          .catch(() => {
-            isSending.value = false;
-          });
+      confirm(loadData.item);
+      // userStore
+      //     .getCodeNum(params)
+      //     .then((res) => {
+      //       if (res.code === 200) {
+      //         if (res.data.data == 100) {
+      //           confirm(loadData.item);
+      //         }  else if (res.data.data == 60) {
+      //           setTimeout(() => {
+      //             isSending.value = false;
+      //             ElMessage.error('今日解析次数已达上限，请明天再来！');
+      //           }, 2000);
+      //         } else if (res.data.data == 50) {
+      //           setTimeout(() => {
+      //             isSending.value = false;
+      //             ElMessage.error(
+      //                 '验证码错误,一个验证码只能下载一个文件,请重新获取!'
+      //             );
+      //           }, 2000);
+      //         }
+      //       }
+      //     })
+      //     .catch(() => {
+      //       isSending.value = false;
+      //     });
     }
   });
 };
@@ -590,7 +605,9 @@ async function confirm(item) {
     pwd_id: route.query.shorturl,
     fid_list:[fid],
     stoken:loadData.stoken,
-    // fid_token_list:[share_fid_token]
+    code: form.code,
+    type:loadData.downType,
+    token:localStorage.getItem('token'),
   };
   userStore
       .quarkTransfer(params)

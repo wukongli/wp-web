@@ -253,5 +253,14 @@ export function videoAddReq(data) {
   });
 }
 
+export function getDownType(token) {
+  return request({
+    url: '/quark/getDownType',
+    method: 'get',
+    timeout: 20000,
+    params: { token },
+  });
+}
+
 
 
