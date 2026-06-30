@@ -22,7 +22,7 @@ import {
     getXdUrls,
     videoAddReq,
     addVideo,
-    getImgUrl, getPlayUrl
+    getImgUrl, getPlayUrl, getDownType
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
@@ -363,7 +363,17 @@ const useUserStore = defineStore('user', {
                   });
           });
       },
-
+      getDownType(token) {
+          return new Promise((resolve, reject) => {
+              getDownType(token)
+                  .then((res) => {
+                      resolve(res);
+                  })
+                  .catch((error) => {
+                      reject(error);
+                  });
+          });
+      },
 
 
   },

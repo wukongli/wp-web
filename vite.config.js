@@ -33,8 +33,8 @@ export default defineConfig(({ mode, command }) => {
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
-          target: 'https://vv1.ainsource.com/',//
-          // target: 'http://127.0.0.1:8089',
+          // target: 'https://vv1.ainsource.com/',//
+          target: 'http://127.0.0.1:8089',
           // target: 'https://api.gssource.com/',
           // target: 'http://154.201.66.44:8081/',
           changeOrigin: true,
