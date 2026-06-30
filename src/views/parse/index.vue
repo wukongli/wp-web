@@ -541,7 +541,7 @@ async function downLoad(item) {
     if (res.code === 200) {
       localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
-      qrCode.value = qrCodeList.value[loadData.downType];
+      qrCode.value = res.data.qrCodeUrl;
       loadData.WeCharVisible = true;
       form.code = '';
     }
