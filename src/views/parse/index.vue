@@ -14,23 +14,23 @@
         {{ loadData.bread }}
       </div>
     </header>
-<!--    <el-button-->
-<!--      style="margin: 10px 0"-->
-<!--      type="primary"-->
-<!--      plain-->
-<!--      icon="UploadFilled"-->
-<!--      :disabled="multiple"-->
-<!--      @click="handleParse"-->
-<!--      >批量解析</el-button-->
-<!--    >-->
-<!--    <el-button-->
-<!--        v-if="getToken()"-->
-<!--        type="primary"-->
-<!--        plain-->
-<!--        icon="Promotion"-->
-<!--    ><a href="https://vip.gssource.com" target="_blank">快速下载</a></el-button>-->
-<!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
-<!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
+    <!--    <el-button-->
+    <!--      style="margin: 10px 0"-->
+    <!--      type="primary"-->
+    <!--      plain-->
+    <!--      icon="UploadFilled"-->
+    <!--      :disabled="multiple"-->
+    <!--      @click="handleParse"-->
+    <!--      >批量解析</el-button-->
+    <!--    >-->
+    <!--    <el-button-->
+    <!--        v-if="getToken()"-->
+    <!--        type="primary"-->
+    <!--        plain-->
+    <!--        icon="Promotion"-->
+    <!--    ><a href="https://vip.gssource.com" target="_blank">快速下载</a></el-button>-->
+    <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
+    <!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
     <div id="content">
       <el-table
         v-loading="loadData.tableLoading"
@@ -41,7 +41,7 @@
         class="wp-table"
         @selection-change="handleSelectionChange"
       >
-<!--        <el-table-column type="selection" width="50" align="center" />-->
+        <!--        <el-table-column type="selection" width="50" align="center" />-->
         <el-table-column
           min-width="280px"
           prop="server_filename"
@@ -53,15 +53,19 @@
               @click="parseList(scope.row)"
               style="display: flex; align-items: center"
             >
-              <MySvg v-if="!scope.row.thumbs" :iconName="getIconClass(scope.row)" size="40"></MySvg>
+              <MySvg
+                v-if="!scope.row.thumbs"
+                :iconName="getIconClass(scope.row)"
+                size="40"
+              ></MySvg>
               <el-image
-                  style="width:120px;height: 50px"
-                  v-if="scope.row.thumbs"
-                  :src="scope.row.thumbs.url3"
-                  fit="cover"
-                  :preview-src-list="[scope.row.thumbs.url3]"
-                  hide-on-click-modal
-                  preview-teleported
+                style="width: 120px; height: 50px"
+                v-if="scope.row.thumbs"
+                :src="scope.row.thumbs.url3"
+                fit="cover"
+                :preview-src-list="[scope.row.thumbs.url3]"
+                hide-on-click-modal
+                preview-teleported
               >
               </el-image>
               <span style="margin-left: 10px">{{
@@ -75,11 +79,11 @@
           :formatter="timestampToTime"
           label="修改时间"
         />
-<!--        <el-table-column prop="updated_at" label="修改时间">-->
-<!--          <template #default="{row}">-->
-<!--            {{ timestampToTime(row.server_mtime) }}-->
-<!--          </template>-->
-<!--        </el-table-column>-->
+        <!--        <el-table-column prop="updated_at" label="修改时间">-->
+        <!--          <template #default="{row}">-->
+        <!--            {{ timestampToTime(row.server_mtime) }}-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column prop="size" :formatter="getFilesize" label="大小" />
         <!--        <el-table-column label="剩余下载次数"-->
         <!--          >{{-->
@@ -97,14 +101,14 @@
               size="small"
               >快速下载</el-button
             >
-<!--            <el-button-->
-<!--                @click="playVideo(scope.row)"-->
-<!--                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"-->
-<!--                :type="'success'"-->
-<!--                icon="videoPlay"-->
-<!--                size="small"-->
-<!--            >播放</el-button-->
-<!--            >-->
+            <!--            <el-button-->
+            <!--                @click="playVideo(scope.row)"-->
+            <!--                v-if="!parseInt(scope.row.isdir)&& baiduShowPlay(scope.row)"-->
+            <!--                :type="'success'"-->
+            <!--                icon="videoPlay"-->
+            <!--                size="small"-->
+            <!--            >播放</el-button-->
+            <!--            >-->
             <el-button
               v-if="!parseInt(scope.row.isdir)"
               :type="scope.row.status == 2 ? 'danger' : 'primary'"
@@ -114,7 +118,9 @@
               icon="download"
               size="small"
             >
-              <span v-if="scope.row.status === 0">{{getToken() ? "快速下载" : "下 载"}}</span>
+              <span v-if="scope.row.status === 0">{{
+                getToken() ? '快速下载' : '下 载'
+              }}</span>
               <span v-if="scope.row.status === 1">下载中</span>
               <span v-if="scope.row.status === 2">已下载</span>
             </el-button>
@@ -124,21 +130,22 @@
     </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
-      <div class="down-title">
-        下载器已更新，请安装下载器并配置好端口！！
-      </div>
+      <div class="down-title">下载器已更新，请安装下载器并配置好端口！！</div>
       <div class="down-address">
         <span>配置说明：</span>
-        <a href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1" target="_blank">
+        <a
+          href="https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1"
+          target="_blank"
+        >
           https://docs.qq.com/doc/DWmNnb3ZIekdnWHJi?no_promotion=1</a
         >
       </div>
-<!--      <div class="down-address">-->
-<!--        <span>下载地址：</span>-->
-<!--        <a href="https://pc-lec.pages.dev/400110.cn.html?link=U2FsdGVkX196rlE9IpdHLhd3f5kKwVsiL54wrDZMfTltqVfkzQOw0cSsQ4F3ExfjQVZi5z7nywQnB%2BEj2dcYCQ%3D%3D" target="_blank">-->
-<!--          点击下载</a-->
-<!--        >-->
-<!--      </div>-->
+      <!--      <div class="down-address">-->
+      <!--        <span>下载地址：</span>-->
+      <!--        <a href="https://pc-lec.pages.dev/400110.cn.html?link=U2FsdGVkX196rlE9IpdHLhd3f5kKwVsiL54wrDZMfTltqVfkzQOw0cSsQ4F3ExfjQVZi5z7nywQnB%2BEj2dcYCQ%3D%3D" target="_blank">-->
+      <!--          点击下载</a-->
+      <!--        >-->
+      <!--      </div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" @click="loadData.dialogVisible = false"
@@ -148,26 +155,31 @@
       </template>
     </el-dialog>
     <!-- 扫描获取验证码弹窗 -->
-    <el-dialog class="dia-code" height="300px" title="提示" v-model="loadData.WeCharVisible">
+    <el-dialog
+      class="dia-code"
+      height="300px"
+      title="提示"
+      v-model="loadData.WeCharVisible"
+    >
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
-      <el-form
-        ref="codeRef"
-        :model="form"
-        :rules="codeRules"
-      >
-        <el-form-item style="width: 80%;margin: 10px auto 0;" prop="code" label="请输入验证码">
+      <el-form ref="codeRef" :model="form" :rules="codeRules">
+        <el-form-item
+          style="width: 80%; margin: 10px auto 0"
+          prop="code"
+          label="请输入验证码"
+        >
           <el-input v-model="form.code" auto-complete="off" />
         </el-form-item>
       </el-form>
-      <div class="qr-hint">微信扫一扫上方二维码获取验证码</div>
-<!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
-<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
+      <div class="qr-hint">{{ loadData.qrTitle }}</div>
+      <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
+      <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" :loading="isSending" @click="onSubmit"
-            >{{downOrPlay ? "播 放": "下 载"}}</el-button
-          >
+          <el-button type="primary" :loading="isSending" @click="onSubmit">{{
+            downOrPlay ? '播 放' : '下 载'
+          }}</el-button>
           <!--          <el-button v-else type="danger"-->
           <!--                     @click="trySend"-->
           <!--          >重 试</el-button>-->
@@ -196,11 +208,15 @@
       <div class="qr-title">
         快速下载无需验证码，不限文件大小，不限次数，自由下载！
       </div>
-<!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
+      <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary"><a href="https://vip.ainsource.com" target="_blank">点击开通快速下载</a></el-button>
-<!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
+          <el-button type="primary"
+            ><a href="https://vip.ainsource.com" target="_blank"
+              >点击开通快速下载</a
+            ></el-button
+          >
+          <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -219,19 +235,19 @@
     </el-dialog>
     <!-- 到达每天下载次数弹窗 -->
     <el-dialog
-        :close-on-click-modal="false"
-        class="play_dia"
-        :style="{
-    miHeight: '550px',
-  }"
-        :before-close="handleBeforeClose"
-        :title="loadData.title"
-        v-model="loadData.maxNum"
+      :close-on-click-modal="false"
+      class="play_dia"
+      :style="{
+        miHeight: '550px',
+      }"
+      :before-close="handleBeforeClose"
+      :title="loadData.title"
+      v-model="loadData.maxNum"
     >
       <div
-          class="loading-content"
-          v-loading="loadData.loading"
-          element-loading-text="视频加载中..."
+        class="loading-content"
+        v-loading="loadData.loading"
+        element-loading-text="视频加载中..."
       >
         <div class="video_player" id="video-player"></div>
         <!--        <iframe-->
@@ -244,20 +260,20 @@
         <!--        </iframe>-->
       </div>
       <el-button
-          type="danger"
-          size="small"
-          icon="Warning"
-          style="margin-top: 5px"
-      >{{loadData.diaHit}}</el-button
+        type="danger"
+        size="small"
+        icon="Warning"
+        style="margin-top: 5px"
+        >{{ loadData.diaHit }}</el-button
       >
       <!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
       <div class="mobile_player" :close-on-click-modal="false">
         <div @click="openUrl(loadData.infuseUrl)">
           <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="苹果infuse播放器"
-              placement="top-start"
+            class="box-item"
+            effect="dark"
+            content="苹果infuse播放器"
+            placement="top-start"
           >
             <img :src="infuse" alt="" />
           </el-tooltip>
@@ -274,30 +290,30 @@
         <!--        </div>-->
         <div @click="openUrl(loadData.vlcUrl)">
           <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="vlc播放器"
-              placement="top-start"
+            class="box-item"
+            effect="dark"
+            content="vlc播放器"
+            placement="top-start"
           >
             <img :src="vlc" alt="" />
           </el-tooltip>
         </div>
         <div @click="openUrl(loadData.maxUrl)">
           <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="安卓mx播放器"
-              placement="top-start"
+            class="box-item"
+            effect="dark"
+            content="安卓mx播放器"
+            placement="top-start"
           >
             <img :src="mobilePlayer" alt="" />
           </el-tooltip>
         </div>
         <span>
           <el-link
-              href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1"
-              target="_blank"
-              type="success"
-          >播放器使用说明</el-link
+            href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1"
+            target="_blank"
+            type="success"
+            >播放器使用说明</el-link
           >
         </span>
       </div>
@@ -323,7 +339,7 @@ import pot from '@/assets/logo/potplayer.png';
 import Artplayer from 'artplayer';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
-import {onMounted} from 'vue';
+import { onMounted } from 'vue';
 import {
   generateRandomLetters,
   getFilesize,
@@ -331,7 +347,7 @@ import {
   timestampToTime,
   userKey,
   formatToYMD,
-  baiduShowPlay
+  baiduShowPlay,
 } from '@/utils/wp';
 import { setDownLoadRecord, shareUrl } from '@/api/system/vip';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
@@ -348,7 +364,7 @@ import baiduQrCode from '@/assets/qrCode/baidu.png';
 import quarkQrCode from '@/assets/qrCode/quark.png';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
-import {generateDeviceFingerprint} from "@/utils/fingerprint";
+import { generateDeviceFingerprint } from '@/utils/fingerprint';
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -361,7 +377,13 @@ const multiple = ref(true);
 const fsIds = ref([]);
 const selectItem = ref([]);
 const pathList = ref([]);
-const qrCodeList = ref([kuaituQrCode,ucQrCode,xunleiQrCode,baiduQrCode,quarkQrCode]);
+const qrCodeList = ref([
+  kuaituQrCode,
+  ucQrCode,
+  xunleiQrCode,
+  baiduQrCode,
+  quarkQrCode,
+]);
 const qrCode = ref('');
 const loadData = reactive({
   bread: '',
@@ -395,7 +417,7 @@ const loadData = reactive({
   ckId: null,
   player: null,
   diaHit: '此资源只能点击下面按钮在播放器内播放！',
-  isMobile:false,
+  isMobile: false,
   downType: null,
 });
 const downOrPlay = ref(true); //t
@@ -404,12 +426,15 @@ onMounted(() => {
   // qrCode.value = randomItem;
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isMobileUserAgent =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+        userAgent
+      );
     // const isMobileScreen = window.innerWidth <= 768;
     return isMobileUserAgent;
   };
   loadData.isMobile = isMobile();
-})
+});
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
   proxy.$tab.closeOpenPage();
@@ -487,7 +512,6 @@ function parseCopyLink(params) {
     });
 }
 
-
 function playVideo(item) {
   // console.log(item);
   // loadData.item = item;
@@ -514,8 +538,7 @@ function handleBeforeClose() {
   loadData.maxUrl = 'javascript:void(0)';
   loadData.vlcUrl = 'javascript:void(0)';
   // loadData.potUrl = "javascript:void(0)";
-  if (loadData.player && loadData.player.video)
-    loadData.player.video.src = '';
+  if (loadData.player && loadData.player.video) loadData.player.video.src = '';
   loadData.player?.destroy();
 }
 function openUrl(url) {
@@ -543,8 +566,17 @@ async function downLoad(item) {
       // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
       qrCode.value = res.data.qrCodeUrl;
-      loadData.WeCharVisible = true;
       form.code = '';
+      if (loadData.downType === 0) {
+        loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
+      } else if (loadData.downType === 1) {
+        loadData.qrTitle = '迅雷APP扫码保存后即可获取';
+      } else if (loadData.downType === 2) {
+        loadData.qrTitle = '百度网盘扫码保存后即可获取';
+      } else if (loadData.downType === 3) {
+        loadData.qrTitle = '夸克APP扫码保存后即可获取';
+      }
+      loadData.WeCharVisible = true;
     }
   }
 }
@@ -573,116 +605,115 @@ async function confirmVideo(item) {
     fileName: loadData.item.server_filename,
   };
   userStore
-      .videoAdd(params)
-      .then((res) => {
-        if (res.code === 200) {
-          if (!res.data.fileName) {
-            ElMessage.error('视频播放失败,请更换资源或者下载后观看');
-            loadData.loading = false;
-            loadData.maxNum = false;
-            return;
-          }
-          let path =
-              'http://154.201.66.14:5244/d/videob/' +
-              encodeURI('我的资源/' + res.data.fileName);
-          loadData.videoUrl =
-              'https://play.gssource.com/dd/videob/' +
-              encodeURI('我的资源/' + res.data.fileName);
-          const signUrl = path;
-          loadData.infuseUrl = 'infuse://x-callback-url/play?url=' + signUrl;
-          loadData.maxUrl =
-              'intent:' +
-              signUrl +
-              '#Intent;package=com.mxtech.videoplayer.ad;S.title=' +
-              res.data.fileName +
-              ';end';
-          loadData.vlcUrl = 'vlc://' + signUrl;
-          // loadData.potUrl = "potplayer://"+signUrl;
-          // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    .videoAdd(params)
+    .then((res) => {
+      if (res.code === 200) {
+        if (!res.data.fileName) {
+          ElMessage.error('视频播放失败,请更换资源或者下载后观看');
           loadData.loading = false;
-          const option = {
-            id: '/baidu/我的资源/' + res.data.fileName,
-            container: '#video-player',
-            url: loadData.videoUrl,
-            title: res.data.fileName,
-            volume: 1.0,
-            autoplay: true,
-            autoSize: false,
-            autoMini: true,
-            loop: false,
-            flip: true,
-            playbackRate: true,
-            aspectRatio: true,
-            // "screenshot": true,
-            setting: true,
-            hotkey: true,
-            // pip: true,
-            mutex: true,
-            fullscreen: true,
-            // fullscreenWeb: true,
-            subtitleOffset: true,
-            miniProgressBar: false,
-            type: ext(res.data.fileName).toLowerCase().replace('.', ''),
-            playsInline: true,
-            theme: '#1890ff',
-            quality: [],
-            whitelist: [],
-            settings: [],
-            moreVideoAttr: {
-              'webkit-playsinline': true,
-              playsInline: true,
-              crossOrigin: 'anonymous',
-            },
-            customType: {
-              // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
-              m3u8: function (video, url) {
-                if (Hls.isSupported()) {
-                  const hls = new Hls();
-                  hls.loadSource(url);
-                  hls.attachMedia(video);
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                  video.src = url;
-                }
-              },
-            },
-            lang: 'zh-cn',
-            i18n: {
-              'zh-cn': {
-                'Video load error': '此资源只能点击下面按钮在播放器内播放！',
-              },
-            },
-            lock: true,
-            fastForward: true,
-            // autoPlayback: true,
-            autoOrientation: true,
-            airplay: true,
-          };
-
-          const player = new Artplayer(option);
-          loadData.player = player;
-          loadData.player.on('ready', () => {});
-          loadData.player.on('video:ended', () => {});
-          loadData.player.on('error', () => {
-            loadData.player.notice.show =
-                '此资源只能点击下面按钮在播放器内播放！';
-            if (player.video.crossOrigin) {
-              console.log(
-                  'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.'
-              );
-              loadData.player.video.crossOrigin = null;
-            }
-          });
+          loadData.maxNum = false;
+          return;
         }
-      })
-      .catch(() => {
+        let path =
+          'http://154.201.66.14:5244/d/videob/' +
+          encodeURI('我的资源/' + res.data.fileName);
+        loadData.videoUrl =
+          'https://play.gssource.com/dd/videob/' +
+          encodeURI('我的资源/' + res.data.fileName);
+        const signUrl = path;
+        loadData.infuseUrl = 'infuse://x-callback-url/play?url=' + signUrl;
+        loadData.maxUrl =
+          'intent:' +
+          signUrl +
+          '#Intent;package=com.mxtech.videoplayer.ad;S.title=' +
+          res.data.fileName +
+          ';end';
+        loadData.vlcUrl = 'vlc://' + signUrl;
+        // loadData.potUrl = "potplayer://"+signUrl;
+        // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         loadData.loading = false;
-        loadData.maxNum = false;
-      });
+        const option = {
+          id: '/baidu/我的资源/' + res.data.fileName,
+          container: '#video-player',
+          url: loadData.videoUrl,
+          title: res.data.fileName,
+          volume: 1.0,
+          autoplay: true,
+          autoSize: false,
+          autoMini: true,
+          loop: false,
+          flip: true,
+          playbackRate: true,
+          aspectRatio: true,
+          // "screenshot": true,
+          setting: true,
+          hotkey: true,
+          // pip: true,
+          mutex: true,
+          fullscreen: true,
+          // fullscreenWeb: true,
+          subtitleOffset: true,
+          miniProgressBar: false,
+          type: ext(res.data.fileName).toLowerCase().replace('.', ''),
+          playsInline: true,
+          theme: '#1890ff',
+          quality: [],
+          whitelist: [],
+          settings: [],
+          moreVideoAttr: {
+            'webkit-playsinline': true,
+            playsInline: true,
+            crossOrigin: 'anonymous',
+          },
+          customType: {
+            // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
+            m3u8: function (video, url) {
+              if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+              } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+              }
+            },
+          },
+          lang: 'zh-cn',
+          i18n: {
+            'zh-cn': {
+              'Video load error': '此资源只能点击下面按钮在播放器内播放！',
+            },
+          },
+          lock: true,
+          fastForward: true,
+          // autoPlayback: true,
+          autoOrientation: true,
+          airplay: true,
+        };
+
+        const player = new Artplayer(option);
+        loadData.player = player;
+        loadData.player.on('ready', () => {});
+        loadData.player.on('video:ended', () => {});
+        loadData.player.on('error', () => {
+          loadData.player.notice.show =
+            '此资源只能点击下面按钮在播放器内播放！';
+          if (player.video.crossOrigin) {
+            console.log(
+              'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.'
+            );
+            loadData.player.video.crossOrigin = null;
+          }
+        });
+      }
+    })
+    .catch(() => {
+      loadData.loading = false;
+      loadData.maxNum = false;
+    });
 }
 function ext(path) {
   return path.split('.').pop() ?? '';
 }
-
 
 async function noLimit() {
   //直接下载文件
@@ -707,7 +738,9 @@ const onSubmit = () => {
       //   version: '1.0.9',
       // };
       if (!downOrPlay.value) {
-        const result =  loadData.isMobile ? await testGopeed() : await testMotrix();
+        const result = loadData.isMobile
+          ? await testGopeed()
+          : await testMotrix();
         if (!result) {
           loadData.dialogVisible = true;
           isSending.value = false;
@@ -794,53 +827,52 @@ async function confirm(item) {
     dir: loadData.parseLinkParams.dir,
     fileName: item.server_filename,
     code: form.code,
-    type:loadData.downType,
-    token:await generateDeviceFingerprint(),
+    type: loadData.downType,
+    token: await generateDeviceFingerprint(),
   };
   // const token = getToken();
-    userStore
-        .parseLink(params)
-        .then((res) => {
-          if (res.code === 200) {
-            isSending.value = false;
-            item.status = 0;
-            item.loading = false;
-            item.disable = false;
-            if (res.data.error_code === 31066) {
-              item.status = 0;
-              ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
-              return;
-            }
-            if(res.data.vip){
-              loadData.url = res.data.data.dlink;
-              loadData.ua = res.data.data.ua;
-            }else{
-              loadData.url = res.data.data.urls[0].url;
-              loadData.ua = res.data.data.ua;
-            }
-            loadData.isMobile ?  sendToGopeed(item) :  sendToMotrix(item);
-
-          } else {
-            item.status = 0;
-            item.disable = false;
-            item.loading = false;
-            // loadData.limitSpeedVisible = true;
-          }
-        })
-        .catch(() => {
+  userStore
+    .parseLink(params)
+    .then((res) => {
+      if (res.code === 200) {
+        isSending.value = false;
+        item.status = 0;
+        item.loading = false;
+        item.disable = false;
+        if (res.data.error_code === 31066) {
           item.status = 0;
-          item.disable = false;
-          item.loading = false;
-          isSending.value = false;
-          // loadData.errorDia = true;
-        });
+          ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
+          return;
+        }
+        if (res.data.vip) {
+          loadData.url = res.data.data.dlink;
+          loadData.ua = res.data.data.ua;
+        } else {
+          loadData.url = res.data.data.urls[0].url;
+          loadData.ua = res.data.data.ua;
+        }
+        loadData.isMobile ? sendToGopeed(item) : sendToMotrix(item);
+      } else {
+        item.status = 0;
+        item.disable = false;
+        item.loading = false;
+        // loadData.limitSpeedVisible = true;
+      }
+    })
+    .catch(() => {
+      item.status = 0;
+      item.disable = false;
+      item.loading = false;
+      isSending.value = false;
+      // loadData.errorDia = true;
+    });
 }
 
 async function sendToMotrix(item) {
   // 发送到下载器
   fetch('http://127.0.0.1:16800/jsonrpc', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       jsonrpc: '2.0',
       id: 'test1',
@@ -849,22 +881,22 @@ async function sendToMotrix(item) {
         [loadData.url],
         {
           'user-agent': loadData.ua,
-          'max-connection-per-server': '256',    // aria2 硬上限，写 255 无效！
-          'split': '256',                        // 分块数拉到 Motrix 上限
-          'min-split-size': '1M',              // 每块至少 1MB，减少碎片
-          'disk-cache': '512M'                 // 务必加这条，避免磁盘卡顿
-        }
-      ]
-    })
+          'max-connection-per-server': '256', // aria2 硬上限，写 255 无效！
+          split: '256', // 分块数拉到 Motrix 上限
+          'min-split-size': '1M', // 每块至少 1MB，减少碎片
+          'disk-cache': '512M', // 务必加这条，避免磁盘卡顿
+        },
+      ],
+    }),
   })
-      .then(r => r.json())
-      .then(()=>{
-        item.status = 2;
-        ElMessage({
-          message: `${item.server_filename}开始下载！`,
-          type: 'success',
-        });
+    .then((r) => r.json())
+    .then(() => {
+      item.status = 2;
+      ElMessage({
+        message: `${item.server_filename}开始下载！`,
+        type: 'success',
       });
+    });
 }
 
 async function sendToGopeed(item) {
@@ -872,46 +904,45 @@ async function sendToGopeed(item) {
   fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({req:
-          {
-            url:loadData.url,
-            extra:{
-              header:{
-                "User-Agent":loadData.ua,
-                "Accept": "*/*",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Connection": "keep-alive"
-              }
-            }
+    body: JSON.stringify({
+      req: {
+        url: loadData.url,
+        extra: {
+          header: {
+            'User-Agent': loadData.ua,
+            Accept: '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            Connection: 'keep-alive',
           },
-      opt:{
+        },
+      },
+      opt: {
         // HTTP协议专属配置
         http: {
           // 并发连接数，这就是你想要的"maxConnsPerHost"的API版本
           connections: 256,
           chunkSize: 8388608,
           keepAlive: true,
-          compression: true
+          compression: true,
         },
         // 如果需要设置超时时间
         timeout: 120,
-        maxRetries: 5
-      }
+        maxRetries: 5,
+      },
     }),
-  }).then((resp) => resp.json())
-      .then((res) => {
-        item.status = 2;
-        ElMessage({
-          message: `${item.server_filename}开始下载！`,
-          type: 'success',
-        });
-      }).catch(e=>{
   })
+    .then((resp) => resp.json())
+    .then((res) => {
+      item.status = 2;
+      ElMessage({
+        message: `${item.server_filename}开始下载！`,
+        type: 'success',
+      });
+    })
+    .catch((e) => {});
 }
-
-
 
 function goBack() {
   if (loadData.routeData.length === 1) {
@@ -958,45 +989,42 @@ async function testMotrix() {
   return fetch('http://127.0.0.1:16800/jsonrpc', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
       id: 'test',
       method: 'aria2.getVersion',
-      params: []
-    })
+      params: [],
+    }),
   })
-      .then((resp) => resp.json())
-      .then((res) => {
-        // 检查是否返回成功（没有error字段）
-        if (res && !res.error) {
-          return true;
-        }
-        return false;
-      }).catch(e => {
-        return false;
-      });
-
+    .then((resp) => resp.json())
+    .then((res) => {
+      // 检查是否返回成功（没有error字段）
+      if (res && !res.error) {
+        return true;
+      }
+      return false;
+    })
+    .catch((e) => {
+      return false;
+    });
 }
 async function testGopeed() {
   return fetch('http://127.0.0.1:16800/api/v1/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
   })
-      .then((resp) => resp.json())
-      .then((res) => {
-        return true;
-      }).catch(e=>{
-        return false;
-      })
+    .then((resp) => resp.json())
+    .then((res) => {
+      return true;
+    })
+    .catch((e) => {
+      return false;
+    });
 }
-
-
-
-
 
 function vipDownLoad(item) {
   loadData.item = item;
@@ -1006,7 +1034,6 @@ function vipDownLoad(item) {
 function vipDownClick() {
   ElMessage.error('请扫码联系管理员开通权限！');
 }
-
 
 function handleSelectionChange(selection) {
   if (selection.length === 1 && parseInt(selection[0].isdir) === 1) {
@@ -1024,7 +1051,7 @@ async function handleParse() {
     ElMessage.error('批量解析请开通快速下载！');
     return false;
   }
-  const result =  loadData.isMobile ? await testGopeed() : await testMotrix();
+  const result = loadData.isMobile ? await testGopeed() : await testMotrix();
   if (!result) {
     loadData.dialogVisible = true;
     return;
@@ -1040,74 +1067,73 @@ async function handleParse() {
       uk: loadData.parseLinkParams.uk,
       randsk: loadData.parseLinkParams.seckey,
       sekey: loadData.parseLinkParams.seckey,
-      userKey:"main",
+      userKey: 'main',
       fsId: fsIds.value[i],
       fs_ids: [fsIds.value[i]],
       path: pathList.value[i],
-      size:selectItem.value[i].size,
+      size: selectItem.value[i].size,
       pwd: loadData.query.pwd,
       surl: loadData.query.shorturl,
       url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
       dir: loadData.parseLinkParams.dir,
     };
     userStore
-        .parseLink(params)
-        .then((res) => {
-          if (res.code === 200) {
-            if(i+1 === selectItem.value.length){
-              loadData.tableLoading = false;
-            }
-            loadData.tableData.forEach((e) => {
-              if (fsIds.value.includes(e.fs_id)) {
-                e.status = 2;
-                e.disable = true;
-              }
-            });
-            if(res.data.vip){
-              loadData.url = res.data.data.dlink;
-              loadData.ua = res.data.data.ua;
-            }else{
-              loadData.url = res.data.data.urls[0].url;
-              loadData.ua = res.data.data.ua;
-            }
-            fetch('http://127.0.0.1:16800/api/v1/tasks', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                    req:
-                        {
-                          url:loadData.url,
-                          extra:{
-                            header:{
-                              "User-Agent":loadData.ua,
-                            }
-                          }
-                        },
-                    opt:{
-                      extra:{
-                        connections:256,
-                      }
-                    }
-                  },
-              ),
-            }).then((resp) => resp.json())
-                .then((res) => {
-                  ElMessage({
-                    message: `${selectItem.value[i].server_filename}开始下载！`,
-                    type: 'success',
-                  });
-                }).catch(e=>{
-            })
-          }
-        }).catch((res)=>{
-          if(i+1 === selectItem.value.length){
+      .parseLink(params)
+      .then((res) => {
+        if (res.code === 200) {
+          if (i + 1 === selectItem.value.length) {
             loadData.tableLoading = false;
           }
-        })
+          loadData.tableData.forEach((e) => {
+            if (fsIds.value.includes(e.fs_id)) {
+              e.status = 2;
+              e.disable = true;
+            }
+          });
+          if (res.data.vip) {
+            loadData.url = res.data.data.dlink;
+            loadData.ua = res.data.data.ua;
+          } else {
+            loadData.url = res.data.data.urls[0].url;
+            loadData.ua = res.data.data.ua;
+          }
+          fetch('http://127.0.0.1:16800/api/v1/tasks', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              req: {
+                url: loadData.url,
+                extra: {
+                  header: {
+                    'User-Agent': loadData.ua,
+                  },
+                },
+              },
+              opt: {
+                extra: {
+                  connections: 256,
+                },
+              },
+            }),
+          })
+            .then((resp) => resp.json())
+            .then((res) => {
+              ElMessage({
+                message: `${selectItem.value[i].server_filename}开始下载！`,
+                type: 'success',
+              });
+            })
+            .catch((e) => {});
+        }
+      })
+      .catch((res) => {
+        if (i + 1 === selectItem.value.length) {
+          loadData.tableLoading = false;
+        }
+      });
   }
-
 }
 </script>
 
