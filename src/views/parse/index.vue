@@ -357,6 +357,7 @@ import xunleiQrCode from '@/assets/qrCode/xunlei.png';
 import baiduQrCode from '@/assets/qrCode/baidu.png';
 import quarkQrCode from '@/assets/qrCode/quark.png';
 import { getToken } from '@/utils/auth';
+import { generateDeviceFingerprint } from '@/utils/fingerprint';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from "@/assets/img/deep.jpg";
 import infuse from "@/assets/logo/infuse.png";
@@ -543,13 +544,13 @@ async function downLoad(item) {
   if (getToken()) {
     loadData.noLimit = true;
   } else {
-    //后端生成用户唯一下载token
-    const token = localStorage.getItem('token');
+    //前端生成用户唯一下载token
+    const token = await generateDeviceFingerprint();
     const res = await userStore.getDownType(token);
     if (res.code === 200) {
-      localStorage.setItem('token', res.data.token);
+      // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
-      qrCode.value = qrCodeList.value[loadData.downType];
+      qrCode.value = res.data.qrCodeUrl;
       loadData.WeCharVisible = true;
       form.code = '';
     }
@@ -670,7 +671,7 @@ async function confirm(item) {
     fileName: loadData.item.server_filename,
     code: form.code,
     type:loadData.downType,
-    token:localStorage.getItem('token'),
+    token: await generateDeviceFingerprint(),
   };
   // const token = getToken();
     userStore
