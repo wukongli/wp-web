@@ -317,6 +317,7 @@ import quarkQrCode from '@/assets/qrCode/quark.png';
 import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import {onMounted} from 'vue';
+import {generateDeviceFingerprint} from "@/utils/fingerprint";
 const { proxy } = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
@@ -356,7 +357,7 @@ const loadData = reactive({
   errorDia: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 2147483648,
+  fileSize: getToken() ? 100698669056 : 10737418240,
   routeData: [],
   rootBackTitle: '全部文件',
   vipDown: false,
@@ -493,10 +494,10 @@ async function downLoad(item) {
     loadData.noLimit = true;
   } else {
     //后端生成用户唯一下载token
-    const token = localStorage.getItem('token');
+    const token = await generateDeviceFingerprint();
     const res = await userStore.getDownType(token);
     if (res.code === 200) {
-      localStorage.setItem('token', res.data.token);
+      // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
       qrCode.value = res.data.qrCodeUrl;
       loadData.WeCharVisible = true;
@@ -564,7 +565,7 @@ const onSubmit = () => {
       //   return;
       // }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于2G下载速度较慢，请需登录卡密使用快速下载！');
+        ElMessage.error('文件大于10G下载速度较慢，请需登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
@@ -607,7 +608,7 @@ async function confirm(item) {
     stoken:loadData.stoken,
     code: form.code,
     type:loadData.downType,
-    token:localStorage.getItem('token'),
+    token:await generateDeviceFingerprint(),
   };
   userStore
       .quarkTransfer(params)
