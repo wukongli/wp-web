@@ -428,7 +428,7 @@ onMounted(() => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileUserAgent =
       /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-        userAgent
+        userAgent,
       );
     // const isMobileScreen = window.innerWidth <= 768;
     return isMobileUserAgent;
@@ -570,9 +570,9 @@ async function downLoad(item) {
       if (loadData.downType === 0) {
         loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
       } else if (loadData.downType === 1) {
-        loadData.qrTitle = '迅雷APP扫码保存后即可获取';
+        loadData.qrTitle = '微信扫码保存后即可获取';
       } else if (loadData.downType === 2) {
-        loadData.qrTitle = '百度网盘扫码保存后即可获取';
+        loadData.qrTitle = '微信扫码保存后即可获取';
       } else if (loadData.downType === 3) {
         loadData.qrTitle = '夸克APP扫码保存后即可获取';
       }
@@ -699,7 +699,7 @@ async function confirmVideo(item) {
             '此资源只能点击下面按钮在播放器内播放！';
           if (player.video.crossOrigin) {
             console.log(
-              'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.'
+              'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.',
             );
             loadData.player.video.crossOrigin = null;
           }
