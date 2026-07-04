@@ -430,8 +430,8 @@ onMounted(() => {
       /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
         userAgent,
       );
-    // const isMobileScreen = window.innerWidth <= 768;
-    return isMobileUserAgent;
+    const isMobileScreen = window.innerWidth <= 768;
+    return isMobileUserAgent || isMobileScreen;
   };
   loadData.isMobile = isMobile();
 });

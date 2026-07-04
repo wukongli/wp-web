@@ -2,11 +2,7 @@
   <div class="app-container">
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
+        <el-button type="primary" plain icon="Plus" @click="handleAdd"
           >新增</el-button
         >
       </el-col>
@@ -17,21 +13,35 @@
       ></right-toolbar>
     </el-row>
     <div>
-      <span class = "code-down">免费下载次数：</span>
-      <el-input v-model="downNum" style="width: 240px" placeholder="请输入下载次数" />
-      <el-button style="margin-left: 20px;" @click="setDownLoad"  type="primary">保存</el-button>
+      <span class="code-down">免费下载次数：</span>
+      <el-input
+        v-model="downNum"
+        style="width: 240px"
+        placeholder="请输入下载次数"
+      />
+      <el-button style="margin-left: 20px" @click="setDownLoad" type="primary"
+        >保存</el-button
+      >
     </div>
-    <div style="margin-top:20px; ">
-      <span class = "code-down">赞助下载次数：</span>
-      <el-input v-model="vipDownNum" style="width: 240px" placeholder="请输入下载次数" />
-      <el-button style="margin-left: 20px;" @click="setVipDownLoad"  type="primary">保存</el-button>
+    <div style="margin-top: 20px">
+      <span class="code-down">赞助下载次数：</span>
+      <el-input
+        v-model="vipDownNum"
+        style="width: 240px"
+        placeholder="请输入下载次数"
+      />
+      <el-button
+        style="margin-left: 20px"
+        @click="setVipDownLoad"
+        type="primary"
+        >保存</el-button
+      >
     </div>
 
-
-<!--    <span>开启油猴插件稳定下载：</span-->
-<!--    ><el-switch @change="startDown" v-model="value1" />-->
-<!--    <span>开启PC网页版稳定下载：</span-->
-<!--    ><el-switch @change="startPcDown" v-model="pcDown" />-->
+    <!--    <span>开启油猴插件稳定下载：</span-->
+    <!--    ><el-switch @change="startDown" v-model="value1" />-->
+    <!--    <span>开启PC网页版稳定下载：</span-->
+    <!--    ><el-switch @change="startPcDown" v-model="pcDown" />-->
     <el-table
       v-loading="loading"
       :data="postList"
@@ -51,8 +61,18 @@
         </template>
       </el-table-column>
       <el-table-column label="解析次数" align="center" prop="count" />
-      <el-table-column label="解析大小" align="center" prop="size" :formatter="parseFilesize" />
-      <el-table-column :show-overflow-tooltip="true" label="错误信息" align="center" prop="errMessage" />
+      <el-table-column
+        label="解析大小"
+        align="center"
+        prop="size"
+        :formatter="parseFilesize"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        label="错误信息"
+        align="center"
+        prop="errMessage"
+      />
       <el-table-column
         label="创建时间"
         align="center"
@@ -64,10 +84,10 @@
         </template>
       </el-table-column>
       <el-table-column
-          label="修改时间"
-          align="center"
-          prop="createTime"
-          width="180"
+        label="修改时间"
+        align="center"
+        prop="createTime"
+        width="180"
       >
         <template #default="scope">
           <span>{{ parseTime(scope.row.updateTime) }}</span>
@@ -80,13 +100,13 @@
         class-name="small-padding fixed-width"
       >
         <template #default="scope">
-                    <el-button
-                      link
-                      type="primary"
-                      icon="Edit"
-                      @click="handleUpdate(scope.row)"
-                      >修改</el-button
-                    >
+          <el-button
+            link
+            type="primary"
+            icon="Edit"
+            @click="handleUpdate(scope.row)"
+            >修改</el-button
+          >
           <el-button
             link
             type="primary"
@@ -144,16 +164,21 @@ import {
   addPost,
   deleteVip,
   getMessage,
-  sendMessage, putPost, pcStableDown, getPcStableDown, getDownLoadNum, setDownLoadNum,
+  sendMessage,
+  putPost,
+  pcStableDown,
+  getPcStableDown,
+  getDownLoadNum,
+  setDownLoadNum,
   geVipDownLoadNum,
-  setVipDownLoadNum
+  setVipDownLoadNum,
 } from '@/api/system/vip';
 import { ElMessage } from 'element-plus';
-import {getUser} from "@/api/system/user";
-import {getFilesize, parseFilesize, userKey} from "@/utils/wp";
+import { getUser } from '@/api/system/user';
+import { getFilesize, parseFilesize, userKey } from '@/utils/wp';
 
 const { proxy } = getCurrentInstance();
-const { sys_vip_type ,pan_type} = proxy.useDict('sys_vip_type','pan_type');
+const { sys_vip_type, pan_type } = proxy.useDict('sys_vip_type', 'pan_type');
 
 const postList = ref([]);
 const open = ref(false);
@@ -166,8 +191,8 @@ const total = ref(0);
 const title = ref('');
 const value1 = ref(false);
 const pcDown = ref(false);
-const downNum = ref('')
-const vipDownNum = ref('')
+const downNum = ref('');
+const vipDownNum = ref('');
 const data = reactive({
   form: {},
   queryParams: {
@@ -183,12 +208,12 @@ const data = reactive({
 const { queryParams, form, rules } = toRefs(data);
 
 function startDown(value) {
-  const param = { startDown: value};
+  const param = { startDown: value };
   sendMessage(param).then(() => {});
 }
 
-function startPcDown(value){
-  const param = { startDown: value};
+function startPcDown(value) {
+  const param = { startDown: value };
   pcStableDown(param).then(() => {});
 }
 
@@ -211,7 +236,7 @@ function reset() {
   form.value = {
     cookie: undefined,
     name: undefined,
-    status:undefined,
+    status: undefined,
   };
   proxy.resetForm('postRef');
 }
@@ -230,30 +255,29 @@ function handleAdd() {
 }
 
 function handleUpdate(row) {
-    open.value = true;
-    title.value = "修改信息";
-    form.value = {
-      cookie: row.cookie,
-      name: row.name,
-      status:row.status,
-      id:row.id,
-      panType:row.panType
-    };
-
+  open.value = true;
+  title.value = '修改信息';
+  form.value = {
+    cookie: row.cookie,
+    name: row.name,
+    status: row.status,
+    id: row.id,
+    panType: row.panType,
+  };
 }
 
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs['postRef'].validate((valid) => {
     if (valid) {
-      if(title.value === "修改信息"){
+      if (title.value === '修改信息') {
         putPost(form.value).then((response) => {
           proxy.$modal.msgSuccess('修改成功');
           reset();
           open.value = false;
           getList();
         });
-      }else if(title.value === "新增vip"){
+      } else if (title.value === '新增vip') {
         addPost(form.value).then((response) => {
           proxy.$modal.msgSuccess('新增成功');
           reset();
@@ -261,7 +285,6 @@ function submitForm() {
           getList();
         });
       }
-
     }
   });
 }
@@ -290,40 +313,40 @@ function getMessageStatus() {
 }
 // getMessageStatus();
 
-function getDownLoad(){
-  getDownLoadNum({userKey:userKey}).then(res=>{
-    if(res.code === 200){
+function getDownLoad() {
+  getDownLoadNum({ userKey: userKey }).then((res) => {
+    if (res.code === 200) {
       downNum.value = res.data;
     }
-  })
+  });
 }
-function setDownLoad(){
-  const data= {
-    downLoadNum:downNum.value,
-    userKey:userKey
-  }
-  setDownLoadNum(data).then(res=>{
-    ElMessage.success("设置成功")
-  })
+function setDownLoad() {
+  const data = {
+    downLoadNum: downNum.value,
+    userKey: userKey,
+  };
+  setDownLoadNum(data).then((res) => {
+    ElMessage.success('设置成功');
+  });
 }
 
-function getVipDownLoad(){
-  geVipDownLoadNum({userKey:userKey}).then(res=>{
-    if(res.code === 200){
+function getVipDownLoad() {
+  geVipDownLoadNum({ userKey: userKey }).then((res) => {
+    if (res.code === 200) {
       vipDownNum.value = res.data;
     }
-  })
+  });
 }
-function setVipDownLoad(){
-  const data= {
-    downLoadNum:vipDownNum.value,
-    userKey:userKey
-  }
-  setVipDownLoadNum(data).then(res=>{
-    ElMessage.success("设置成功")
-  })
+function setVipDownLoad() {
+  const data = {
+    downLoadNum: vipDownNum.value,
+    userKey: userKey,
+  };
+  setVipDownLoadNum(data).then((res) => {
+    ElMessage.success('设置成功');
+  });
 }
 getDownLoad();
-getVipDownLoad()
+getVipDownLoad();
 getList();
 </script>
