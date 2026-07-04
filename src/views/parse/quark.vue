@@ -513,7 +513,12 @@ onMounted(() => {
       /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
         userAgent,
       );
-    return isMobileUserAgent;
+    // 兜底检测：UA 被伪装为 PC 时，通过触屏 + 屏幕尺寸判断
+    const hasTouch =
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches;
+    const isSmallScreen = window.innerWidth <= 1024;
+    return isMobileUserAgent || (hasTouch && isSmallScreen);
   };
   loadData.isMobile = isMobile();
 });
