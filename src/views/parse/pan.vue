@@ -90,14 +90,14 @@
                 <el-tag
                   style="margin-left: 10px"
                   v-if="scope.row.url.includes('quark')"
-                  type="success"
-                  >下载极快</el-tag
+                  type="danger"
+                  >下载很快</el-tag
                 >
                 <el-tag
                   style="margin-left: 10px"
                   v-if="scope.row.url.includes('baidu')"
-                  type="danger"
-                  >下载很快</el-tag
+                  type="success"
+                  >下载极快</el-tag
                 >
                 <span style="margin-left: 10px">
                   {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
@@ -135,87 +135,86 @@
         >
           {{ item }}
         </el-tag>
-<!--        <div class="block">-->
-<!--          <div class="nav">电视剧</div>-->
-<!--          <div class="content">-->
-<!--            <div class="list">-->
-<!--              <div v-for="(item, index) in tv" class="item">-->
-<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
-<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
-<!--                </div>-->
-<!--                <p>{{ item.title }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="block">-->
-<!--          <div class="nav">电影</div>-->
-<!--          <div class="content">-->
-<!--            <div class="list">-->
-<!--              <div v-for="(item, index) in movie" class="item">-->
-<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
-<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
-<!--                </div>-->
-<!--                <p>{{ item.title }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="block">-->
-<!--          <div class="nav">动漫</div>-->
-<!--          <div class="content">-->
-<!--            <div class="list">-->
-<!--              <div v-for="(item, index) in anime" class="item">-->
-<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
-<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
-<!--                </div>-->
-<!--                <p>{{ item.title }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="block">-->
-<!--          <div class="nav">综艺</div>-->
-<!--          <div class="content">-->
-<!--            <div class="list">-->
-<!--              <div v-for="(item, index) in variety" class="item">-->
-<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
-<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
-<!--                </div>-->
-<!--                <p>{{ item.title }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="block">-->
-<!--          <div class="nav">短剧</div>-->
-<!--          <div class="content">-->
-<!--            <div class="list">-->
-<!--              <div v-for="(item, index) in shortVideo" class="item">-->
-<!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
-<!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
-<!--                </div>-->
-<!--                <p>{{ item.title }}</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-                <div class="tag-title">
-                  <span>近期热搜：</span>
-                </div>
-                <el-tag
-                    class="tag-inner"
-                    size="large"
-                    v-for="(item, index) in tv.concat(movie).concat(anime)"
-                    :key="item.value"
-                    effect="dark"
-                    :type="getTagType(index)"
-                    round
-                    @click="handleSearch(item.title)"
-                >
-                  {{ item.title }}
-                </el-tag>
-
+        <!--        <div class="block">-->
+        <!--          <div class="nav">电视剧</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in tv" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">电影</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in movie" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">动漫</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in anime" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">综艺</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in variety" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        <div class="block">-->
+        <!--          <div class="nav">短剧</div>-->
+        <!--          <div class="content">-->
+        <!--            <div class="list">-->
+        <!--              <div v-for="(item, index) in shortVideo" class="item">-->
+        <!--                <div @click="handleSearch(item.title)" :key="index" class="img">-->
+        <!--                  <img :src="item.src.replace('http://', 'https://')" alt="" />-->
+        <!--                </div>-->
+        <!--                <p>{{ item.title }}</p>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <div class="tag-title">
+          <span>近期热搜：</span>
+        </div>
+        <el-tag
+          class="tag-inner"
+          size="large"
+          v-for="(item, index) in tv.concat(movie).concat(anime)"
+          :key="item.value"
+          effect="dark"
+          :type="getTagType(index)"
+          round
+          @click="handleSearch(item.title)"
+        >
+          {{ item.title }}
+        </el-tag>
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
@@ -338,7 +337,7 @@ watch(
     //
     // }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 function getLogin() {
@@ -380,7 +379,7 @@ function handleSearch(value) {
     .then((res) => {
       if (res.code === 200) {
         const uniqueArray = Array.from(
-          new Set(res.data.map((item) => JSON.stringify(item)))
+          new Set(res.data.map((item) => JSON.stringify(item))),
         ).map((item) => JSON.parse(item));
         tableData.value = uniqueArray;
         sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
@@ -468,8 +467,7 @@ function extractQuarkInfo(text) {
 function getTag() {
   userStore.getTag().then((res) => {
     if (res.code === 200) {
-      tv.value = res.data.searchTag.data
-        .sort(() => Math.random() - 0.5)
+      tv.value = res.data.searchTag.data.sort(() => Math.random() - 0.5);
     }
   });
 }
@@ -577,7 +575,9 @@ const getTagType = (index) => {
   line-height: 50px !important;
 }
 :deep(.header-input) {
-  box-shadow: 0 0 0 1px #409eff, 0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
+  box-shadow:
+    0 0 0 1px #409eff,
+    0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
   transition: box-shadow 0.3s ease;
   border-radius: 4.5px;
 }
@@ -587,7 +587,9 @@ const getTagType = (index) => {
 //}
 
 :deep(.header-input .el-select:hover) {
-  box-shadow: 0 0 0 2px #0773e2, 0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
+  box-shadow:
+    0 0 0 2px #0773e2,
+    0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
 }
 :deep(.wp-table .el-table__body tr:hover > td) {
   width: auto !important;
@@ -882,7 +884,7 @@ const getTagType = (index) => {
   .tag-title {
     margin-top: 35px;
     span {
-      margin-left:28px;
+      margin-left: 28px;
       font-size: 25px;
       font-weight: bold;
     }
