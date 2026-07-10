@@ -206,6 +206,15 @@
       v-model="loadData.WeCharVisible"
     >
       <img class="qr-code" :src="qrCode" alt="" />
+      <div v-if="loadData.shareUrl" style="text-align: center">
+        <a
+          :href="loadData.shareUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ loadData.shareUrl }}</a
+        >
+      </div>
+
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <el-form ref="codeRef" :model="form" :rules="codeRules">
         <el-form-item
@@ -503,6 +512,8 @@ const loadData = reactive({
   videoUrl: '',
   isMobild: false,
   downType: null,
+  qrTitle: null,
+  shareUrl: null,
 });
 // 路由离开时的操作
 onBeforeRouteLeave((to, from) => {
@@ -637,17 +648,19 @@ async function downLoad(item) {
     if (res.code === 200) {
       // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
+      loadData.qrTitle = res.data.qrTitle;
+      loadData.shareUrl = res.data.shareUrl;
       qrCode.value = res.data.qrCodeUrl;
       form.code = '';
-      if (loadData.downType === 0) {
-        loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
-      } else if (loadData.downType === 1) {
-        loadData.qrTitle = '微信扫码保存后即可获取';
-      } else if (loadData.downType === 2) {
-        loadData.qrTitle = '微信扫码保存后即可获取';
-      } else if (loadData.downType === 3) {
-        loadData.qrTitle = '夸克APP扫码保存后即可获取';
-      }
+      // if (loadData.downType === 0) {
+      //   loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
+      // } else if (loadData.downType === 1) {
+      //   loadData.qrTitle = '微信扫码保存后即可获取验证码';
+      // } else if (loadData.downType === 2) {
+      //   loadData.qrTitle = '微信扫码保存后即可获取';
+      // } else if (loadData.downType === 3) {
+      //   loadData.qrTitle = '微信扫码保存后即可获取';
+      // }
       loadData.WeCharVisible = true;
     }
   }
