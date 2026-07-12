@@ -162,6 +162,14 @@
       v-model="loadData.WeCharVisible"
     >
       <img class="qr-code" :src="qrCode" alt="" />
+      <div v-if="loadData.shareUrl" style="text-align: center">
+        <a
+          :href="loadData.shareUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ loadData.shareUrl }}</a
+        >
+      </div>
       <div class="file-name">文件名：{{ loadData.item.server_filename }}</div>
       <el-form ref="codeRef" :model="form" :rules="codeRules">
         <el-form-item
@@ -419,6 +427,8 @@ const loadData = reactive({
   diaHit: '此资源只能点击下面按钮在播放器内播放！',
   isMobile: false,
   downType: null,
+  qrTitle: null,
+  shareUrl: null,
 });
 const downOrPlay = ref(true); //t
 onMounted(() => {
@@ -570,16 +580,9 @@ async function downLoad(item) {
       // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
       qrCode.value = res.data.qrCodeUrl;
+      loadData.qrTitle = res.data.qrTitle;
+      loadData.shareUrl = res.data.shareUrl;
       form.code = '';
-      if (loadData.downType === 0) {
-        loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
-      } else if (loadData.downType === 1) {
-        loadData.qrTitle = '微信扫码保存后即可获取';
-      } else if (loadData.downType === 2) {
-        loadData.qrTitle = '微信扫码保存后即可获取';
-      } else if (loadData.downType === 3) {
-        loadData.qrTitle = '夸克APP扫码保存后即可获取';
-      }
       loadData.WeCharVisible = true;
     }
   }
