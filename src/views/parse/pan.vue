@@ -4,11 +4,11 @@
       <div class="logo">
         <a class="share-login" href="/vip/login">
           <el-button
-              v-if="!loginData.login"
-              style="margin: 10px 0"
-              type="primary"
-              icon="user"
-          >登录</el-button
+            v-if="!loginData.login"
+            style="margin: 10px 0"
+            type="primary"
+            icon="user"
+            >登录</el-button
           ></a
         >
         <a class="logo-title">
@@ -38,40 +38,40 @@
 
       <div class="header-search">
         <el-input
-            class="header-input"
-            v-model="searchValue"
-            placeholder="请输入关键词或者磁力链接"
+          class="header-input"
+          v-model="searchValue"
+          placeholder="请输入关键词或者磁力链接"
         />
         <el-button
-            type="primary"
-            icon="Search"
-            style="width: 70px; height: 50px; margin-left: 10px"
-            @click="handleSearch()"
-        >搜索</el-button
+          type="primary"
+          icon="Search"
+          style="width: 70px; height: 50px; margin-left: 10px"
+          @click="handleSearch()"
+          >搜索</el-button
         >
         <el-button
-            style="width: 80px; height: 50px; margin-left: 10px"
-            icon="Refresh"
-            type="danger"
-            @click="resetQuery"
-        >重置</el-button
+          style="width: 80px; height: 50px; margin-left: 10px"
+          icon="Refresh"
+          type="danger"
+          @click="resetQuery"
+          >重置</el-button
         >
       </div>
       <el-table
-          class="wp-table"
-          :row-style="{ height: '50px' }"
-          v-if="tableShow"
-          element-loading-text="数据正在加载中..."
-          v-loading="loading"
-          :data="tableData"
+        class="wp-table"
+        :row-style="{ height: '50px' }"
+        v-if="tableShow"
+        element-loading-text="数据正在加载中..."
+        v-loading="loading"
+        :data="tableData"
       >
         <el-table-column prop="name" show-overflow-tooltip label="名字">
           <template #default="scope">
             <div @click="goParse(scope.row)">
               <MySvg
-                  style="float: left; margin-top: 10px"
-                  :iconName="'icon-wenjianjia'"
-                  size="40"
+                style="float: left; margin-top: 10px"
+                :iconName="'icon-wenjianjia'"
+                size="40"
               ></MySvg>
               <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
               <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
@@ -79,7 +79,7 @@
               <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
 
               <div
-                  style="
+                style="
                   min-height: 70px;
                   display: flex;
                   align-items: center;
@@ -88,16 +88,16 @@
                 "
               >
                 <el-tag
-                    style="margin-left: 10px"
-                    v-if="scope.row.url.includes('quark')"
-                    type="success"
-                >下载极快</el-tag
+                  style="margin-left: 10px"
+                  v-if="scope.row.url.includes('quark')"
+                  type="success"
+                  >夸克网盘</el-tag
                 >
                 <el-tag
-                    style="margin-left: 10px"
-                    v-if="scope.row.url.includes('baidu')"
-                    type="danger"
-                >下载很快</el-tag
+                  style="margin-left: 10px"
+                  v-if="scope.row.url.includes('baidu')"
+                  type="danger"
+                  >百度网盘</el-tag
                 >
                 <span style="margin-left: 10px">
                   {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
@@ -113,25 +113,25 @@
         </el-table-column>
       </el-table>
       <el-pagination
-          v-if="tableShow"
-          layout="prev, pager, next"
-          :total="100"
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          background
-          size="large"
-          @size-change="getList"
-          @current-change="getList"
-          class="custom-pagination"
+        v-if="tableShow"
+        layout="prev, pager, next"
+        :total="100"
+        v-model:current-page="queryParams.pageNum"
+        v-model:page-size="queryParams.pageSize"
+        background
+        size="large"
+        @size-change="getList"
+        @current-change="getList"
+        class="custom-pagination"
       />
       <div v-if="tagShow" class="tag">
         <el-tag
-            class="tag-header"
-            size="small"
-            v-for="(item, index) in tagHeader"
-            :key="item"
-            effect="dark"
-            @click="handleSearch(item)"
+          class="tag-header"
+          size="small"
+          v-for="(item, index) in tagHeader"
+          :key="item"
+          effect="dark"
+          @click="handleSearch(item)"
         >
           {{ item }}
         </el-tag>
@@ -204,18 +204,17 @@
           <span>近期热搜：</span>
         </div>
         <el-tag
-            class="tag-inner"
-            size="large"
-            v-for="(item, index) in tv.concat(movie).concat(anime)"
-            :key="item.value"
-            effect="dark"
-            :type="getTagType(index)"
-            round
-            @click="handleSearch(item.title)"
+          class="tag-inner"
+          size="large"
+          v-for="(item, index) in tv.concat(movie).concat(anime)"
+          :key="item.value"
+          effect="dark"
+          :type="getTagType(index)"
+          round
+          @click="handleSearch(item.title)"
         >
           {{ item.title }}
         </el-tag>
-
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
@@ -306,8 +305,8 @@ const { queryParams } = toRefs(data);
 onMounted(() => {
   const cache = sessionStorage.getItem('tableData');
   if (
-      route.path === '/source/parse/bt' ||
-      route.path === '/source/parse/index'
+    route.path === '/source/parse/bt' ||
+    route.path === '/source/parse/index'
   ) {
     tableData.value = JSON.parse(cache);
     return;
@@ -326,19 +325,19 @@ onMounted(() => {
   }
 });
 watch(
-    () => route.path,
-    (newPath, oldPath) => {
-      if (oldPath === '/source/parse/bt' || oldPath === '/source/parse/index') {
-        tableShow.value = true;
-      } else {
-        tableShow.value = false;
-        tagShow.value = false;
-      }
-      // if(newPath === "/source/parse/quark" || newPath === "/source/parse/index"){
-      //
-      // }
-    },
-    { immediate: true }
+  () => route.path,
+  (newPath, oldPath) => {
+    if (oldPath === '/source/parse/bt' || oldPath === '/source/parse/index') {
+      tableShow.value = true;
+    } else {
+      tableShow.value = false;
+      tagShow.value = false;
+    }
+    // if(newPath === "/source/parse/quark" || newPath === "/source/parse/index"){
+    //
+    // }
+  },
+  { immediate: true },
 );
 
 function getLogin() {
@@ -354,13 +353,13 @@ function logout() {
     cancelButtonText: '取消',
     type: 'warning',
   })
-      .then(() => {
-        userStore.logOut().then(() => {
-          localStorage.removeItem('role');
-          location.href = '/source';
-        });
-      })
-      .catch(() => {});
+    .then(() => {
+      userStore.logOut().then(() => {
+        localStorage.removeItem('role');
+        location.href = '/source';
+      });
+    })
+    .catch(() => {});
 }
 getLogin();
 function handleSearch(value) {
@@ -373,22 +372,22 @@ function handleSearch(value) {
   }
   localStorage.setItem('searchName', searchValue.value);
   userStore
-      .search({
-        keyword: value ? value : searchValue.value,
-        ...queryParams.value,
-      })
-      .then((res) => {
-        if (res.code === 200) {
-          const uniqueArray = Array.from(
-              new Set(res.data.map((item) => JSON.stringify(item)))
-          ).map((item) => JSON.parse(item));
-          tableData.value = uniqueArray;
-          sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
-          window.scrollTo({ top: 0, behavior: 'instant' });
-        }
-        // total.value = res.data.Memory_get_usage;
-        loading.value = false;
-      });
+    .search({
+      keyword: value ? value : searchValue.value,
+      ...queryParams.value,
+    })
+    .then((res) => {
+      if (res.code === 200) {
+        const uniqueArray = Array.from(
+          new Set(res.data.map((item) => JSON.stringify(item))),
+        ).map((item) => JSON.parse(item));
+        tableData.value = uniqueArray;
+        sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      // total.value = res.data.Memory_get_usage;
+      loading.value = false;
+    });
 }
 function getList() {
   if (!searchValue.value) {
@@ -397,11 +396,11 @@ function getList() {
   }
   loading.value = true;
   userStore
-      .search({ keyword: searchValue.value, ...queryParams.value })
-      .then((res) => {
-        tableData.value = res.data;
-        loading.value = false;
-      });
+    .search({ keyword: searchValue.value, ...queryParams.value })
+    .then((res) => {
+      tableData.value = res.data;
+      loading.value = false;
+    });
 }
 
 function goParse(row) {
@@ -468,8 +467,7 @@ function extractQuarkInfo(text) {
 function getTag() {
   userStore.getTag().then((res) => {
     if (res.code === 200) {
-      tv.value = res.data.searchTag.data
-          .sort(() => Math.random() - 0.5)
+      tv.value = res.data.searchTag.data.sort(() => Math.random() - 0.5);
     }
   });
 }
@@ -577,7 +575,9 @@ const getTagType = (index) => {
   line-height: 50px !important;
 }
 :deep(.header-input) {
-  box-shadow: 0 0 0 1px #409eff, 0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
+  box-shadow:
+    0 0 0 1px #409eff,
+    0 2px 4px 0 rgba(0, 0, 0, 0.12) !important;
   transition: box-shadow 0.3s ease;
   border-radius: 4.5px;
 }
@@ -587,7 +587,9 @@ const getTagType = (index) => {
 //}
 
 :deep(.header-input .el-select:hover) {
-  box-shadow: 0 0 0 2px #0773e2, 0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
+  box-shadow:
+    0 0 0 2px #0773e2,
+    0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
 }
 :deep(.wp-table .el-table__body tr:hover > td) {
   width: auto !important;
@@ -638,12 +640,12 @@ const getTagType = (index) => {
           overflow: hidden; /* 隐藏溢出内容 */
           text-overflow: ellipsis; /* 溢出显示省略号... */
           background: linear-gradient(
-                  90deg,
-                  #33cc33,
-                  #ff9900,
-                  #ff0000,
-                  #3399ff,
-                  #cc33ff
+            90deg,
+            #33cc33,
+            #ff9900,
+            #ff0000,
+            #3399ff,
+            #cc33ff
           );
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -882,7 +884,7 @@ const getTagType = (index) => {
   .tag-title {
     margin-top: 35px;
     span {
-      margin-left:28px;
+      margin-left: 28px;
       font-size: 25px;
       font-weight: bold;
     }
