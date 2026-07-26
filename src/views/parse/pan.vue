@@ -111,6 +111,22 @@
             {{ scope.row.time }}
           </template>
         </el-table-column>
+        <el-table-column align="center" min-width="35%" label="操作">
+          <template #default="scope">
+            <el-button
+              @click="addAllToDisk(scope.row)"
+              :type="scope.row.status == 2 ? 'danger' : 'primary'"
+              icon="videoPlay"
+              size="small"
+              style="margin-top: 5px"
+              :loading="scope.row.loading"
+            >
+              <span v-if="scope.row.status === 0">添加到网盘</span>
+              <span v-if="scope.row.status === 1">添加中</span>
+              <span v-if="scope.row.status === 2">已添加</span>
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <el-pagination
         v-if="tableShow"
@@ -233,6 +249,7 @@ import {
   getIconClass,
   SubmitLink,
   timestampToTime,
+  userKey,
 } from '@/utils/wp';
 import { onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -381,6 +398,9 @@ function handleSearch(value) {
         const uniqueArray = Array.from(
           new Set(res.data.map((item) => JSON.stringify(item))),
         ).map((item) => JSON.parse(item));
+        uniqueArray.forEach((item) => {
+          item.status = 0;
+        });
         tableData.value = uniqueArray;
         sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -433,22 +453,6 @@ function goParse(row) {
       },
     });
   }
-  // else if(row.url.includes("/s/")){
-  //   userStore.getXdUrl({"link":row.url}).then(res => {
-  //     if(res.code === 200){
-  //       const { url, pwd } = SubmitLink(res.data);
-  //       router.push({
-  //         path: '/source/parse/index',
-  //         query: {
-  //           shorturl: url,
-  //           pwd: pwd,
-  //           dir: '1',
-  //           root: '1'
-  //         },
-  //       })
-  //     }
-  //   })
-  // }
 }
 
 function extractQuarkInfo(text) {
@@ -471,15 +475,6 @@ function getTag() {
     }
   });
 }
-// function onkeydown(e){
-//   if( e.target.value.length <=1){
-//     tagShow.value = true;
-//     tableShow.value = false;
-//   }
-// }
-// function handleBlur(e){
-//   searchValue.value = e.target.value;
-// }
 
 async function handleFocus() {
   // 确保输入框保持可输入状态
@@ -489,15 +484,6 @@ async function handleFocus() {
     input.focus();
   }
 }
-
-// const handleVisibleChange = async (visible) => {
-//   if (!visible) {
-//     await nextTick()
-//     const input = selectRef.value?.$el?.querySelector('.el-input__inner')
-//     input?.focus();
-//     input.removeAttribute('readonly');
-//   }
-// }
 
 const remoteMethod = (query) => {
   if (query) {
@@ -541,12 +527,6 @@ function fixJsonString(str) {
 }
 
 function resetQuery() {
-  // searchValue.value = "";
-  // tagShow.value  = true;
-  // tableShow.value = false;
-  // sessionStorage.removeItem("tableData");
-  // getTag();
-  // router.push({ path: '/source' });
   localStorage.removeItem('searchName');
   sessionStorage.removeItem('tableData');
   window.location.href = '/source';
@@ -556,6 +536,132 @@ const getTagType = (index) => {
   const types = ['', 'success', 'warning', 'danger', 'info'];
   return types[index % types.length];
 };
+
+async function addAllToDisk(row) {
+  // 校验登录状态
+  if (!loginData.login) {
+    ElMessage.error('请登录后再添加');
+    return;
+  }
+
+  row.loading = true;
+  row.status = 1;
+  const searchName = localStorage.getItem('searchName') || '';
+
+  try {
+    if (row.url.includes('quark')) {
+      // ========== 夸克网盘转存 ==========
+      const info = extractQuarkInfo(row.url);
+      const match = row.url.match(/\/s\/(\w+)/);
+      const pwdId = match ? match[1] : null;
+      if (!pwdId) {
+        ElMessage.error('夸克网盘链接解析失败');
+        row.loading = false;
+        row.status = 0;
+        return;
+      }
+
+      // 获取 token
+      const tokenRes = await userStore.getToken({
+        pwd_id: pwdId,
+        passcode: info.password,
+      });
+
+      if (tokenRes.code !== 200) {
+        ElMessage.error('获取夸克 token 失败');
+        row.loading = false;
+        row.status = 0;
+        return;
+      }
+
+      const stoken = tokenRes.data.sToken;
+      const list = tokenRes.data.data.list;
+      const firstFile = list[0];
+
+      // 一次性转存所有文件
+      const fidList = list.map((item) => item.fid);
+      const addRes = await userStore.quarkAdd({
+        pwd_id: pwdId,
+        fid_list: fidList,
+        stoken,
+        fileName: searchName + row.name,
+        duration: firstFile.duration || 0,
+        size: firstFile.size || 0,
+      });
+
+      if (addRes.code === 200) {
+        row.status = 2;
+        ElMessage.success('夸克转存成功');
+      } else {
+        row.status = 0;
+        ElMessage.error('夸克转存失败');
+      }
+    } else if (row.url.includes('baidu')) {
+      // ========== 百度网盘转存 ==========
+      const linkInfo = SubmitLink(row.url);
+      if (!linkInfo || !linkInfo.url) {
+        ElMessage.error('百度网盘链接解析失败');
+        row.loading = false;
+        row.status = 0;
+        return;
+      }
+      const { url: shorturl, pwd } = linkInfo;
+
+      // 调用 parseCopyLink 获取文件列表和认证参数
+      const res = await userStore.parseCopyLink({
+        dir: '/',
+        root: '1',
+        shorturl,
+        pwd,
+      });
+
+      if (res.code !== 200 || parseInt(res.data.errno) !== 0) {
+        ElMessage.error('解析百度链接失败');
+        row.loading = false;
+        row.status = 0;
+        return;
+      }
+
+      const { list, seckey, shareid, uk } = res.data.data;
+      const firstFile = list[0];
+
+      const addRes = await userStore.baiduAdd({
+        shareid,
+        uk,
+        randsk: seckey,
+        sekey: seckey,
+        fsId: firstFile.fs_id,
+        fs_ids: [firstFile.fs_id],
+        path: firstFile.server_filename,
+        userKey,
+        size: firstFile.size,
+        pwd,
+        surl: shorturl,
+        url: `https://pan.baidu.com/s/${shorturl}`,
+        dir: '/',
+        fileNewName: searchName + row.name,
+        fileName: row.name,
+      });
+
+      if (addRes.code === 200) {
+        row.status = 2;
+        ElMessage.success('百度转存成功');
+      } else {
+        row.status = 0;
+        ElMessage.error('百度转存失败');
+      }
+    } else {
+      ElMessage.error('不支持的网盘类型');
+      row.loading = false;
+      row.status = 0;
+    }
+  } catch (err) {
+    row.status = 0;
+    ElMessage.error('转存失败：' + (err.message || '未知错误'));
+  } finally {
+    row.loading = false;
+  }
+}
 </script>
 
 <style scoped lang="scss">

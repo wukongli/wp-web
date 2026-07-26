@@ -1,33 +1,34 @@
 import {
-    adminLogin,
-    logout,
-    getInfo,
-    parseCopyLink as parse,
-    parseLinkReq,
-    getSignReq,
-    getVip,
-    getCode,
-    loginNoPwd,
-    getCourseByType,
-    delCode,
-    getInfoByUserKey,
-    tryDownUrl,
-    parseLinkVisit,
-    getSToken,
-    getQuarkFileList,
-    quarkTransfer,
-    searchPanData,
-    searchTag,
-    searchNames,
-    getXdUrls,
-    videoAddReq,
-    addVideo,
-    getImgUrl, getPlayUrl
+  adminLogin,
+  logout,
+  getInfo,
+  parseCopyLink as parse,
+  parseLinkReq,
+  getSignReq,
+  getVip,
+  getCode,
+  loginNoPwd,
+  getCourseByType,
+  delCode,
+  getInfoByUserKey,
+  tryDownUrl,
+  parseLinkVisit,
+  getSToken,
+  getQuarkFileList,
+  quarkTransfer,
+  searchPanData,
+  searchTag,
+  searchNames,
+  getXdUrls,
+  baiduAddReq,
+  quarkAddReq,
+  getImgUrl,
+  getPlayUrl,
 } from '@/api/login';
 import { getToken, setToken, removeToken } from '@/utils/auth';
 import defAva from '@/assets/images/profile.png';
-import {checkQuarkLoginStatus, generateQuarkLoginQR} from "@/api/quark";
-import {checkBaiduLoginStatus, generateBaiduLoginQR} from "@/api/baidu";
+import { checkQuarkLoginStatus, generateQuarkLoginQR } from '@/api/quark';
+import { checkBaiduLoginStatus, generateBaiduLoginQR } from '@/api/baidu';
 
 const useUserStore = defineStore('user', {
   state: () => ({
@@ -56,19 +57,19 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-  // loginNoPwd(){
-  //     return new Promise((resolve, reject) => {
-  //         loginNoPwd()
-  //             .then((res) => {
-  //                 setToken(res.token);
-  //                 this.token = res.token;
-  //                 resolve(res);
-  //             })
-  //             .catch((error) => {
-  //                 reject(error);
-  //             });
-  //     });
-  // },
+    // loginNoPwd(){
+    //     return new Promise((resolve, reject) => {
+    //         loginNoPwd()
+    //             .then((res) => {
+    //                 setToken(res.token);
+    //                 this.token = res.token;
+    //                 resolve(res);
+    //             })
+    //             .catch((error) => {
+    //                 reject(error);
+    //             });
+    //     });
+    // },
     parseCopyLink(params) {
       return new Promise((resolve, reject) => {
         parse(params)
@@ -80,17 +81,17 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-      getImg(params) {
-          return new Promise((resolve, reject) => {
-              getImgUrl(params)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+    getImg(params) {
+      return new Promise((resolve, reject) => {
+        getImgUrl(params)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
+      });
+    },
 
     parseLink(parseLink) {
       return new Promise((resolve, reject) => {
@@ -102,41 +103,41 @@ const useUserStore = defineStore('user', {
             reject(error);
           });
       });
-   },
+    },
 
-      videoAdd(parseLink) {
-          return new Promise((resolve, reject) => {
-              videoAddReq(parseLink)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
-          });
-      },
-      getPlayUrl(parseLink) {
-          return new Promise((resolve, reject) => {
-              getPlayUrl(parseLink)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
-          });
-      },
-  parseLinkVisit(parseLink) {
+    baiduAdd(parseLink) {
       return new Promise((resolve, reject) => {
-          parseLinkVisit(parseLink)
-              .then((res) => {
-                  resolve(res);
-              })
-              .catch((error) => {
-                  reject(error);
-              });
+        baiduAddReq(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       });
-  },
+    },
+    getPlayUrl(parseLink) {
+      return new Promise((resolve, reject) => {
+        getPlayUrl(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    parseLinkVisit(parseLink) {
+      return new Promise((resolve, reject) => {
+        parseLinkVisit(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
     getSignData(params) {
       return new Promise((resolve, reject) => {
         getSignReq(params)
@@ -157,9 +158,9 @@ const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         adminLogin(username, password, code, uuid)
           .then((res) => {
-              setToken(res.token);
-              this.token = res.token;
-              resolve(res);
+            setToken(res.token);
+            this.token = res.token;
+            resolve(res);
           })
           .catch((error) => {
             reject(error);
@@ -219,198 +220,196 @@ const useUserStore = defineStore('user', {
           });
       });
     },
-    getCodeNum(data){
+    getCodeNum(data) {
       return new Promise((resolve, reject) => {
         getCode(data)
-            .then((res) => {
-              resolve(res);
-            })
-            .catch((error) => {
-              reject(error);
-            });
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
       });
     },
 
-      delCodeNum(data){
-          return new Promise((resolve, reject) => {
-              delCode(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+    delCodeNum(data) {
+      return new Promise((resolve, reject) => {
+        delCode(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getCourse(type){
-          return new Promise((resolve, reject) => {
-              getCourseByType(type)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getCourse(type) {
+      return new Promise((resolve, reject) => {
+        getCourseByType(type)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getUserInfo(data){
-          return new Promise((resolve, reject) => {
-              getInfoByUserKey(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getUserInfo(data) {
+      return new Promise((resolve, reject) => {
+        getInfoByUserKey(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      tryDown(data){
-          return new Promise((resolve, reject) => {
-              tryDownUrl(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    tryDown(data) {
+      return new Promise((resolve, reject) => {
+        tryDownUrl(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getToken(data){
-          return new Promise((resolve, reject) => {
-              getSToken(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getToken(data) {
+      return new Promise((resolve, reject) => {
+        getSToken(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getQuarkList(data){
-          return new Promise((resolve, reject) => {
-              getQuarkFileList(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getQuarkList(data) {
+      return new Promise((resolve, reject) => {
+        getQuarkFileList(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      quarkTransfer(data){
-          return new Promise((resolve, reject) => {
-              quarkTransfer(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    quarkTransfer(data) {
+      return new Promise((resolve, reject) => {
+        quarkTransfer(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
+      });
+    },
 
-      addVideo(data){
-          return new Promise((resolve, reject) => {
-              addVideo(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+    quarkAdd(data) {
+      return new Promise((resolve, reject) => {
+        quarkAddReq(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
+      });
+    },
 
-      search(data){
-          return new Promise((resolve, reject) => {
-              searchPanData(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+    search(data) {
+      return new Promise((resolve, reject) => {
+        searchPanData(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getTag(data){
-          return new Promise((resolve, reject) => {
-              searchTag(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getTag(data) {
+      return new Promise((resolve, reject) => {
+        searchTag(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      searchName(data){
-          return new Promise((resolve, reject) => {
-              searchNames(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    searchName(data) {
+      return new Promise((resolve, reject) => {
+        searchNames(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      getXdUrl(data){
-          return new Promise((resolve, reject) => {
-              getXdUrls(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    getXdUrl(data) {
+      return new Promise((resolve, reject) => {
+        getXdUrls(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      generateQuark(data){
-          return new Promise((resolve, reject) => {
-              generateQuarkLoginQR(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    generateQuark(data) {
+      return new Promise((resolve, reject) => {
+        generateQuarkLoginQR(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      checkQuarkStatus(data){
-          return new Promise((resolve, reject) => {
-              checkQuarkLoginStatus(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    checkQuarkStatus(data) {
+      return new Promise((resolve, reject) => {
+        checkQuarkLoginStatus(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      generateBaidu(data){
-          return new Promise((resolve, reject) => {
-              generateBaiduLoginQR(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    generateBaidu(data) {
+      return new Promise((resolve, reject) => {
+        generateBaiduLoginQR(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-      checkBaiduStatus(data){
-          return new Promise((resolve, reject) => {
-              checkBaiduLoginStatus(data)
-                  .then((res) => {
-                      resolve(res);
-                  })
-                  .catch((error) => {
-                      reject(error);
-                  });
+      });
+    },
+    checkBaiduStatus(data) {
+      return new Promise((resolve, reject) => {
+        checkBaiduLoginStatus(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
           });
-      },
-
-
+      });
+    },
   },
 });
 

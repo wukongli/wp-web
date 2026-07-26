@@ -104,7 +104,6 @@ export function getImgUrl(data) {
   });
 }
 
-
 export function parseLinkReq(data) {
   return request({
     // url: '/wp/dlink',
@@ -115,7 +114,7 @@ export function parseLinkReq(data) {
     data: data,
   });
 }
-export function videoAddReq(data) {
+export function baiduAddReq(data) {
   return request({
     url: '/wp/changeVideo',
     method: 'post',
@@ -202,7 +201,7 @@ export function getCourseByType(type) {
   });
 }
 
-export function getSToken(data){
+export function getSToken(data) {
   return request({
     url: '/quark/getToken',
     method: 'post',
@@ -211,7 +210,7 @@ export function getSToken(data){
   });
 }
 
-export function getQuarkFileList(data){
+export function getQuarkFileList(data) {
   return request({
     url: '/quark/getList',
     method: 'post',
@@ -220,7 +219,7 @@ export function getQuarkFileList(data){
   });
 }
 
-export function quarkTransfer(data){
+export function quarkTransfer(data) {
   return request({
     url: '/quark/source/transfer',
     method: 'post',
@@ -229,7 +228,7 @@ export function quarkTransfer(data){
   });
 }
 
-export function addVideo(data){
+export function quarkAddReq(data) {
   return request({
     url: '/quark/change',
     method: 'post',
@@ -238,7 +237,7 @@ export function addVideo(data){
   });
 }
 
-export function searchPanData(data){
+export function searchPanData(data) {
   return request({
     url: '/wp/search',
     method: 'post',
@@ -254,7 +253,7 @@ export function searchTag(type) {
   });
 }
 
-export function searchNames(data){
+export function searchNames(data) {
   return request({
     url: '/wp/getName',
     method: 'post',
@@ -263,7 +262,7 @@ export function searchNames(data){
   });
 }
 
-export function getXdUrls(data){
+export function getXdUrls(data) {
   return request({
     url: '/wp/getXdUrl',
     method: 'post',
@@ -271,7 +270,3 @@ export function getXdUrls(data){
     data: data,
   });
 }
-
-
-
-
