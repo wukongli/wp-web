@@ -3,56 +3,58 @@
     <div class="logo">
       <a class="share-login" href="/webDav">
         <el-button
-            style="position:fixed;top:5%;right:5%;"
-            type="primary"
-            icon="user"
-        >首页</el-button></a>
+          style="position: fixed; top: 5%; right: 5%"
+          type="primary"
+          icon="user"
+          >首页</el-button
+        ></a
+      >
     </div>
     <el-form
-        ref="loginRef"
-        :model="loginForm"
-        :rules="loginRules"
-        class="login-form"
+      ref="loginRef"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
     >
       <h3 class="title">webDav平台</h3>
       <el-form-item prop="username">
         <el-input
-            v-model="loginForm.username"
-            type="text"
-            size="large"
-            auto-complete="off"
-            placeholder="请输入账号"
+          v-model="loginForm.username"
+          type="text"
+          size="large"
+          auto-complete="off"
+          placeholder="请输入账号"
         >
           <template #prefix
-          ><svg-icon icon-class="user" class="el-input__icon input-icon"
+            ><svg-icon icon-class="user" class="el-input__icon input-icon"
           /></template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-            v-model="loginForm.password"
-            type="password"
-            size="large"
-            auto-complete="off"
-            placeholder="密码"
-            @keyup.enter="handleLogin"
+          v-model="loginForm.password"
+          type="password"
+          size="large"
+          auto-complete="off"
+          placeholder="密码"
+          @keyup.enter="handleLogin"
         >
           <template #prefix
-          ><svg-icon icon-class="password" class="el-input__icon input-icon"
+            ><svg-icon icon-class="password" class="el-input__icon input-icon"
           /></template>
         </el-input>
       </el-form-item>
       <el-form-item prop="code" v-if="captchaEnabled">
         <el-input
-            v-model="loginForm.code"
-            size="large"
-            auto-complete="off"
-            placeholder="验证码"
-            style="width: 63%"
-            @keyup.enter="handleLogin"
+          v-model="loginForm.code"
+          size="large"
+          auto-complete="off"
+          placeholder="验证码"
+          style="width: 63%"
+          @keyup.enter="handleLogin"
         >
           <template #prefix
-          ><svg-icon icon-class="validCode" class="el-input__icon input-icon"
+            ><svg-icon icon-class="validCode" class="el-input__icon input-icon"
           /></template>
         </el-input>
         <div class="login-code">
@@ -60,24 +62,24 @@
         </div>
       </el-form-item>
       <el-checkbox
-          v-model="loginForm.rememberMe"
-          style="margin: 0px 0px 25px 0px"
-      >记住密码</el-checkbox
+        v-model="loginForm.rememberMe"
+        style="margin: 0px 0px 25px 0px"
+        >记住密码</el-checkbox
       >
       <el-form-item style="width: 100%">
         <el-button
-            :loading="loading"
-            size="large"
-            type="primary"
-            style="width: 100%"
-            @click.prevent="handleLogin"
+          :loading="loading"
+          size="large"
+          type="primary"
+          style="width: 100%"
+          @click.prevent="handleLogin"
         >
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
         <div style="float: right" v-if="register">
           <router-link class="link-type" :to="'/register'"
-          >立即注册</router-link
+            >立即注册</router-link
           >
         </div>
       </el-form-item>
@@ -95,14 +97,14 @@ import Cookies from 'js-cookie';
 import { encrypt, decrypt } from '@/utils/jsencrypt';
 import useUserStore from '@/store/modules/user';
 import { ElMessage } from 'element-plus';
-import { h } from 'vue'
-import { ElNotification } from 'element-plus'
+import { h } from 'vue';
+import { ElNotification } from 'element-plus';
 const userStore = useUserStore();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
-import {createBy} from "@/utils/wp";
-import logo from "@/assets/img/deep.jpg";
-import userLogo from "@/assets/logo/img.png";
+import { createBy } from '@/utils/wp';
+import logo from '@/assets/img/deep.jpg';
+import userLogo from '@/assets/logo/img.png';
 const loginForm = ref({
   username: Cookies.get('username') ? Cookies.get('username') : '',
   password: Cookies.get('password') ? Cookies.get('password') : '',
@@ -122,7 +124,7 @@ const loading = ref(false);
 // 验证码开关
 const captchaEnabled = ref(true);
 // 注册开关
-const register = ref(false);
+const register = ref(true);
 const redirect = ref(undefined);
 
 function handleLogin() {
@@ -144,45 +146,44 @@ function handleLogin() {
       }
       // 调用action的登录方法
       userStore
-          .adminLogin(loginForm.value)
-          .then((data) => {
-            useUserStore()
-                .getInfo()
-                .then((res) => {
-                  if(res.code === 200){
-                    router.push({ path: '/webDav'});
-                    // if(res.user.createBy === createBy){
-                    //   router.push({ path: '/parse/login'});
-                    // }else{
-                    //   loading.value = false;
-                    //   ElMessage.error("登录错误,无权限！")
-                    // }
-                  }else{
-                    ElMessage.error("登录错误！")
-                  }
-                })
-            // if(data.token === "会员已到期"){
-            //   loading.value = false;
-            //   ElMessage.error('会员已到期请联系管理员')
-            //   return;
-            // }
+        .adminLogin(loginForm.value)
+        .then((data) => {
+          useUserStore()
+            .getInfo()
+            .then((res) => {
+              if (res.code === 200) {
+                router.push({ path: '/webDav' });
+                // if(res.user.createBy === createBy){
+                //   router.push({ path: '/parse/login'});
+                // }else{
+                //   loading.value = false;
+                //   ElMessage.error("登录错误,无权限！")
+                // }
+              } else {
+                ElMessage.error('登录错误！');
+              }
+            });
+          // if(data.token === "会员已到期"){
+          //   loading.value = false;
+          //   ElMessage.error('会员已到期请联系管理员')
+          //   return;
+          // }
 
-            // userStore.getInfo().then((res)=>{
-            //   if(res.code === 200){
-            //     router.push({ path: '/parse/login',query:{
-            //       userKey:res.user.vipCode,
-            //       } });
-            //   }
-            // })
-
-          })
-          .catch(() => {
-            loading.value = false;
-            //重新获取验证码;
-            if (captchaEnabled.value) {
-              getCode();
-            }
-          });
+          // userStore.getInfo().then((res)=>{
+          //   if(res.code === 200){
+          //     router.push({ path: '/parse/login',query:{
+          //       userKey:res.user.vipCode,
+          //       } });
+          //   }
+          // })
+        })
+        .catch(() => {
+          loading.value = false;
+          //重新获取验证码;
+          if (captchaEnabled.value) {
+            getCode();
+          }
+        });
     }
   });
 }
@@ -190,7 +191,7 @@ function handleLogin() {
 function getCode() {
   getCodeImg().then((res) => {
     captchaEnabled.value =
-        res.captchaEnabled === undefined ? true : res.captchaEnabled;
+      res.captchaEnabled === undefined ? true : res.captchaEnabled;
     if (captchaEnabled.value) {
       codeUrl.value = 'data:image/gif;base64,' + res.img;
       loginForm.value.uuid = res.uuid;

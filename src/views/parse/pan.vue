@@ -2,15 +2,22 @@
   <div class="app-container home">
     <div class="content">
       <div class="logo">
-        <a class="share-login" href="/vip/login">
+        <div class="share-login" href="">
           <el-button
+            style="margin: 10px 20px"
+            type="success"
+            @click="$router.push('/webDav')"
+            >webDav</el-button
+          >
+          <el-button
+            @click="$router.push('/vip/login')"
             v-if="!loginData.login"
             style="margin: 10px 0"
             type="primary"
             icon="user"
             >登录</el-button
-          ></a
-        >
+          >
+        </div>
         <a class="logo-title">
           <img :src="logo" alt="" />
           <span>网盘资源一键转存平台</span>
@@ -594,7 +601,7 @@ async function addAllToDisk(row) {
         ElMessage.success('夸克转存成功');
       } else {
         row.status = 0;
-        ElMessage.error('夸克转存失败');
+        // ElMessage.error('夸克转存失败');
       }
     } else if (row.url.includes('baidu')) {
       // ========== 百度网盘转存 ==========
@@ -648,7 +655,7 @@ async function addAllToDisk(row) {
         ElMessage.success('百度转存成功');
       } else {
         row.status = 0;
-        ElMessage.error('百度转存失败');
+        // ElMessage.error('百度转存失败');
       }
     } else {
       ElMessage.error('不支持的网盘类型');
@@ -789,8 +796,8 @@ async function addAllToDisk(row) {
       }
       .share-login {
         position: absolute;
-        right: 0;
-        top: -20px;
+        right: 40px;
+        top: -15px;
         font-size: 18px;
       }
     }

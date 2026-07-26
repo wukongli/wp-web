@@ -3,10 +3,12 @@
     <div class="logo">
       <a class="share-login" href="/index">
         <el-button
-            style="position:fixed;top:5%;right:5%;"
-            type="primary"
-            icon="user"
-        >首页</el-button></a>
+          style="position: fixed; top: 5%; right: 5%"
+          type="primary"
+          icon="user"
+          >首页</el-button
+        ></a
+      >
     </div>
     <el-form
       ref="loginRef"
@@ -14,7 +16,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">爱看资源平台</h3>
+      <h3 class="title">网盘资源转存平台</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -95,14 +97,14 @@ import Cookies from 'js-cookie';
 import { encrypt, decrypt } from '@/utils/jsencrypt';
 import useUserStore from '@/store/modules/user';
 import { ElMessage } from 'element-plus';
-import { h } from 'vue'
-import { ElNotification } from 'element-plus'
+import { h } from 'vue';
+import { ElNotification } from 'element-plus';
 const userStore = useUserStore();
 const router = useRouter();
 const { proxy } = getCurrentInstance();
-import {createBy} from "@/utils/wp";
-import logo from "@/assets/img/deep.jpg";
-import userLogo from "@/assets/logo/img.png";
+import { createBy } from '@/utils/wp';
+import logo from '@/assets/img/deep.jpg';
+import userLogo from '@/assets/logo/img.png';
 const loginForm = ref({
   username: Cookies.get('username') ? Cookies.get('username') : '',
   password: Cookies.get('password') ? Cookies.get('password') : '',
@@ -122,7 +124,7 @@ const loading = ref(false);
 // 验证码开关
 const captchaEnabled = ref(true);
 // 注册开关
-const register = ref(false);
+const register = ref(true);
 const redirect = ref(undefined);
 
 function handleLogin() {
@@ -147,21 +149,21 @@ function handleLogin() {
         .adminLogin(loginForm.value)
         .then((data) => {
           useUserStore()
-              .getInfo()
-              .then((res) => {
-                if(res.code === 200){
-                  router.push({ path: '/source'});
-                  localStorage.setItem("role",res.roles[0]);
-                  // if(res.user.createBy === createBy){
-                  //   router.push({ path: '/parse/login'});
-                  // }else{
-                  //   loading.value = false;
-                  //   ElMessage.error("登录错误,无权限！")
-                  // }
-                }else{
-                  ElMessage.error("登录错误！")
-                }
-              })
+            .getInfo()
+            .then((res) => {
+              if (res.code === 200) {
+                router.push({ path: '/source' });
+                localStorage.setItem('role', res.roles[0]);
+                // if(res.user.createBy === createBy){
+                //   router.push({ path: '/parse/login'});
+                // }else{
+                //   loading.value = false;
+                //   ElMessage.error("登录错误,无权限！")
+                // }
+              } else {
+                ElMessage.error('登录错误！');
+              }
+            });
           // if(data.token === "会员已到期"){
           //   loading.value = false;
           //   ElMessage.error('会员已到期请联系管理员')
@@ -175,7 +177,6 @@ function handleLogin() {
           //       } });
           //   }
           // })
-
         })
         .catch(() => {
           loading.value = false;
