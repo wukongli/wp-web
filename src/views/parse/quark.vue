@@ -125,7 +125,7 @@
             @click="vipDownLoad(scope.row)"
             v-if="!scope.row.dir"
             :type="'warning'"
-            >&nbsp;VIP</el-button
+            >快速下载</el-button
           >
           <el-button
             size="small"
@@ -243,7 +243,7 @@
       <img class="qr-code" :src="qrCode" alt="" />
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
-        爱看资源VIP无需验证码,不限文件大小，不限下载次数，支持在线播放！
+        快速下载无需验证码,不限文件大小，不限下载次数！
       </div>
       <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
@@ -476,7 +476,7 @@ const loadData = reactive({
   maxNum: false,
   // codeNum: '',
   tableLoading: true,
-  fileSize: getToken() ? 100698669056 : 5368709120,
+  fileSize: getToken() ? 100698669056 : 10737418240,
   routeData: [],
   rootBackTitle: '返回',
   vipDown: false,
@@ -786,7 +786,7 @@ const onSubmit = () => {
       //   return;
       // }
       if (parseInt(loadData.item.size) > loadData.fileSize) {
-        ElMessage.error('文件大于5G下载速度较慢，请需登录卡密使用快速下载！');
+        ElMessage.error('文件大于10G下载速度较慢，请登录卡密使用快速下载！');
         isSending.value = false;
         return false;
       }
