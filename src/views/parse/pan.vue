@@ -48,6 +48,7 @@
           class="header-input"
           v-model="searchValue"
           placeholder="请输入关键词或者磁力链接"
+          @keyup.enter="handleSearch()"
         />
         <el-button
           type="primary"
