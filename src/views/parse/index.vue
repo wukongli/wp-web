@@ -613,7 +613,7 @@ function parseCopyLink(params) {
           }
           loadData.tableLoading = false;
         } else {
-          loadData.limitSpeedVisible = true;
+          loadData.tableLoading = false;
           return;
         }
       }
