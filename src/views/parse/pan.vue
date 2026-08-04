@@ -41,6 +41,7 @@
           class="header-input"
           v-model="searchValue"
           placeholder="请输入关键词或者磁力链接"
+          @keyup.enter="handleSearch()"
         />
         <el-button
           type="primary"
@@ -917,6 +918,8 @@ const getTagType = (index) => {
   margin-top: 25px;
 }
 .el-pagination {
+  display: flex;
+  justify-content: center;
   margin: 35px auto 30px;
 }
 .foot {
