@@ -65,77 +65,78 @@
           >重置</el-button
         >
       </div>
-      <el-table
-        class="wp-table"
-        :row-style="{ height: '50px' }"
-        v-if="tableShow"
-        element-loading-text="数据正在加载中..."
-        v-loading="loading"
-        :data="tableData"
-      >
-        <el-table-column prop="name" show-overflow-tooltip label="名字">
-          <template #default="scope">
-            <div @click="goParse(scope.row)">
-              <MySvg
-                style="float: left; margin-top: 10px"
-                :iconName="'icon-wenjianjia'"
-                size="40"
-              ></MySvg>
-              <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
-              <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
-              <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
-              <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
+      <div class="table-wrapper" v-if="tableShow">
+        <el-table
+          class="wp-table"
+          :row-style="{ height: '50px' }"
+          element-loading-text="数据正在加载中..."
+          v-loading="loading"
+          :data="tableData"
+        >
+          <el-table-column prop="name" show-overflow-tooltip label="名字">
+            <template #default="scope">
+              <div @click="goParse(scope.row)">
+                <MySvg
+                  style="float: left; margin-top: 10px"
+                  :iconName="'icon-wenjianjia'"
+                  size="40"
+                ></MySvg>
+                <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
+                <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
+                <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
+                <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
 
-              <div
-                style="
-                  min-height: 70px;
-                  display: flex;
-                  align-items: center;
-                  flex-wrap: wrap;
-                  line-height: normal;
-                "
-              >
-                <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('quark')"
-                  type="success"
-                  >夸克网盘</el-tag
+                <div
+                  style="
+                    min-height: 70px;
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    line-height: normal;
+                  "
                 >
-                <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('baidu')"
-                  type="danger"
-                  >百度网盘</el-tag
-                >
-                <span style="margin-left: 10px">
-                  {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
-                </span>
+                  <el-tag
+                    style="margin-left: 10px"
+                    v-if="scope.row.url.includes('quark')"
+                    type="success"
+                    >夸克网盘</el-tag
+                  >
+                  <el-tag
+                    style="margin-left: 10px"
+                    v-if="scope.row.url.includes('baidu')"
+                    type="danger"
+                    >百度网盘</el-tag
+                  >
+                  <span style="margin-left: 10px">
+                    {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
+                  </span>
+                </div>
               </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column width="110px" prop="time" label="更新时间">
-          <template #default="scope">
-            {{ scope.row.time }}
-          </template>
-        </el-table-column>
-        <el-table-column align="center" min-width="35%" label="操作">
-          <template #default="scope">
-            <el-button
-              @click="addAllToDisk(scope.row)"
-              :type="scope.row.status == 2 ? 'danger' : 'primary'"
-              icon="videoPlay"
-              size="small"
-              style="margin-top: 5px"
-              :loading="scope.row.loading"
-            >
-              <span v-if="scope.row.status === 0">添加到网盘</span>
-              <span v-if="scope.row.status === 1">添加中</span>
-              <span v-if="scope.row.status === 2">已添加</span>
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+            </template>
+          </el-table-column>
+          <el-table-column width="90px" prop="time" label="更新时间">
+            <template #default="scope">
+              {{ scope.row.time }}
+            </template>
+          </el-table-column>
+          <el-table-column align="center" min-width="30%" label="操作">
+            <template #default="scope">
+              <el-button
+                @click="addAllToDisk(scope.row)"
+                :type="scope.row.status == 2 ? 'danger' : 'primary'"
+                icon="videoPlay"
+                size="small"
+                style="margin-top: 5px"
+                :loading="scope.row.loading"
+              >
+                <span v-if="scope.row.status === 0">添加到网盘</span>
+                <span v-if="scope.row.status === 1">添加中</span>
+                <span v-if="scope.row.status === 2">已添加</span>
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <el-pagination
         v-if="tableShow"
         layout="prev, pager, next"
@@ -797,8 +798,8 @@ async function addAllToDisk(row) {
       }
       .share-login {
         position: absolute;
-        right: 40px;
-        top: -15px;
+        right: 20px;
+        top: -22px;
         font-size: 18px;
       }
     }
@@ -811,6 +812,21 @@ async function addAllToDisk(row) {
   }
   :deep(.el-table .cell.el-tooltip) {
     white-space: wrap;
+  }
+  // 移动端表格水平滚动
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  :deep(.wp-table) {
+    min-width: 520px;
+    font-size: 13px;
+  }
+  // 移动端操作列按钮优化
+  :deep(.el-table .el-button--small) {
+    padding: 5px 6px;
+    font-size: 11px;
+    min-height: 28px;
   }
   .tag {
     .tag-header {

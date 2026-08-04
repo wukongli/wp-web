@@ -462,6 +462,8 @@ async function initToken() {
             fid: data.data.data.list[0].fid,
           };
           parseList(params);
+        } else {
+          loadData.tableLoading = false;
         }
       } else {
         ElMessage.error('文件资源已失效');

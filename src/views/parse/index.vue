@@ -550,6 +550,7 @@ function parseCopyLink(params) {
           }
           loadData.tableLoading = false;
         } else {
+          loadData.tableLoading = false;
           loadData.limitSpeedVisible = true;
           return;
         }
