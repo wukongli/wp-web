@@ -847,6 +847,7 @@ async function confirm(item) {
         item.loading = false;
         item.disable = false;
         loadData.WeCharVisible = false;
+        loadData.noLimit = false;
         if (res.data.error_code === 31066) {
           item.status = 0;
           ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');

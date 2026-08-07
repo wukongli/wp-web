@@ -688,6 +688,7 @@ async function confirm(item) {
         item.loading = false;
         item.disable = false;
         loadData.WeCharVisible = false;
+        loadData.noLimit = false;
         res.data.data.data.forEach((data) => {
           loadData.isMobile
             ? sendToGopeed(data, res.data.id)
