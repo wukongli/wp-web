@@ -145,11 +145,13 @@
             >快速下载</el-button
           >
           <el-button
-            @click="playShow(scope.row)"
+            @click="playVideo(scope.row)"
             v-if="!parseInt(scope.row.isdir) && baiduShowPlay(scope.row)"
             :type="'success'"
             icon="videoPlay"
             size="small"
+            :loading="scope.row.playLoading"
+            :disabled="scope.row.playLoading"
             style="margin-top: 5px"
             >播放</el-button
           >
@@ -228,16 +230,11 @@
       <div class="qr-hint">
         {{ loadData.qrTitle }}
       </div>
-      <!--      <div class="qr-title">高峰期有时下载速度会变慢，建议上午或者晚上12点后批量下载，或者使用快速下载！</div>-->
-      <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary" :loading="isSending" @click="onSubmit">{{
             downOrPlay ? '播 放' : '下 载'
           }}</el-button>
-          <!--          <el-button v-else type="danger"-->
-          <!--                     @click="trySend"-->
-          <!--          >重 试</el-button>-->
         </span>
       </template>
     </el-dialog>
@@ -310,98 +307,91 @@
     <el-dialog
       :close-on-click-modal="false"
       class="play_dia"
-      :style="{
-        miHeight: '550px',
-      }"
+      :style="{ minHeight: '550px' }"
       :before-close="handleBeforeClose"
       :title="loadData.title"
       v-model="loadData.maxNum"
     >
-      <div
-        class="loading-content"
-        v-loading="loadData.loading"
-        element-loading-text="视频加载中..."
-      >
-        <div class="video_player" id="video-player"></div>
-        <!--        <iframe-->
-        <!--            ref="iframeRef"-->
-        <!--            allowfullscreen-->
-        <!--            webkitallowfullscreen-->
-        <!--            mozallowfullscreen-->
-        <!--            frameborder="0"-->
-        <!--            :src="loadData.videoUrl">-->
-        <!--        </iframe>-->
-      </div>
-      <el-button
-        type="danger"
-        size="small"
-        icon="Warning"
-        style="margin-top: 5px"
-        >{{ loadData.diaHit }}</el-button
-      >
-      <!--      <el-button type="danger" style="position: relative;left:3px;bottom: 40px;">此资源只能在播放器内播放,请点击下方按钮播放</el-button>-->
-      <div class="mobile_player" :close-on-click-modal="false">
-        <div @click="openUrl(loadData.infuseUrl)">
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="苹果infuse播放器"
-            placement="top-start"
-          >
-            <img :src="infuse" alt="" />
-          </el-tooltip>
+      <div class="play-body">
+        <!-- 顶部警示 -->
+        <div class="play-tip">
+          <el-icon class="play-tip-icon"><WarningFilled /></el-icon>
+          <span>{{ loadData.diaHit }}</span>
         </div>
-        <!--        <div @click="openUrl(loadData.potUrl)">-->
-        <!--          <el-tooltip-->
-        <!--              class="box-item"-->
-        <!--              effect="dark"-->
-        <!--              content="potplayer播放器"-->
-        <!--              placement="top-start"-->
-        <!--          >-->
-        <!--            <img :src="pot" alt="">-->
-        <!--          </el-tooltip>-->
-        <!--        </div>-->
-        <div @click="openUrl(loadData.vlcUrl)">
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="vlc播放器"
-            placement="top-start"
-          >
-            <img :src="vlc" alt="" />
-          </el-tooltip>
-        </div>
-        <div @click="openUrl(loadData.maxUrl)">
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="安卓mx播放器"
-            placement="top-start"
-          >
-            <img :src="mobilePlayer" alt="" />
-          </el-tooltip>
-        </div>
-        <span>
+
+        <!-- 使用帮助 -->
+        <div class="play-help">
           <el-link
+            class="play-help-link"
             href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1"
             target="_blank"
             type="success"
-            >播放器使用说明</el-link
           >
-          <br />
-          <el-link
+            <span>播放器使用说明</span>
+            <el-icon class="play-help-arrow"><ArrowRight /></el-icon>
+          </el-link>
+          <!-- <el-link
+            class="play-help-link"
             href="https://pan.quark.cn/s/c32f0125e825"
             target="_blank"
             type="success"
-            >PC客户端下载地址</el-link
           >
-        </span>
+            <span>PC客户端下载地址</span>
+            <el-icon class="play-help-arrow"><ArrowRight /></el-icon>
+          </el-link> -->
+        </div>
+
+        <!-- 选择播放器 -->
+        <div class="play-mobile-title">点击发送到播放器内播放</div>
+        <div class="mobile_player">
+          <div
+            v-if="loadData.isIos || loadData.isMac"
+            class="player-item"
+            @click="openUrl(loadData.infuseUrl)"
+          >
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="苹果infuse播放器"
+              placement="top"
+            >
+              <img :src="infuse" alt="infuse" />
+            </el-tooltip>
+            <span class="player-name">Infuse</span>
+          </div>
+          <div
+            v-if="loadData.isWindows"
+            class="player-item"
+            @click="openUrl(loadData.potUrl)"
+          >
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="potplayer播放器"
+              placement="top"
+            >
+              <img :src="pot" alt="PotPlayer" />
+            </el-tooltip>
+            <span class="player-name">PotPlayer</span>
+          </div>
+          <div
+            v-if="loadData.isAndroid"
+            class="player-item"
+            @click="openUrl(loadData.maxUrl)"
+          >
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="安卓mx播放器"
+              placement="top"
+            >
+              <img :src="mobilePlayer" alt="MX Player" />
+            </el-tooltip>
+            <span class="player-name">MX Player</span>
+          </div>
+        </div>
       </div>
     </el-dialog>
-    <!--    <div class="we-chart">-->
-    <!--      <img :src="wechar" alt="" />-->
-    <!--      <p class="con">有问题联系管理员</p>-->
-    <!--    </div>-->
   </div>
 </template>
 
@@ -445,7 +435,6 @@ import { decrypt } from '@/utils/jsencrypt';
 import logo from '@/assets/img/deep.jpg';
 import infuse from '@/assets/logo/infuse.png';
 import mobilePlayer from '@/assets/logo/mxplayer.png';
-import vlc from '@/assets/logo/vlc.png';
 import pot from '@/assets/logo/potplayer.png';
 const qrCodeList = ref([
   kuaituQrCode,
@@ -504,11 +493,14 @@ const loadData = reactive({
   maxNum: false,
   infuseUrl: 'javascript:void(0)',
   maxUrl: 'javascript:void(0)',
-  vlcUrl: 'javascript:void(0)',
-  // potUrl:'javascript:void(0)',
+  potUrl: 'javascript:void(0)',
+  isWindows: false,
+  isMac: false,
+  isIos: false,
+  isAndroid: false,
   player: null,
   hlsPlayer: null,
-  diaHit: '此资源只能点击下面按钮在播放器内播放！',
+  diaHit: '请安装播放器后在播放器内播放！',
   videoUrl: '',
   isMobild: false,
   downType: null,
@@ -540,6 +532,14 @@ onMounted(() => {
     return isMobileUserAgent || (hasTouch && isSmallScreen);
   };
   loadData.isMobile = isMobile();
+  // 平台识别：决定播放弹窗展示哪个播放器（Infuse / PotPlayer / MX Player）
+  const ua = navigator.userAgent.toLowerCase();
+  loadData.isWindows = /windows|win32|win64|wow64/i.test(ua);
+  loadData.isMac =
+    /macintosh|mac os x|macintel|macppc/i.test(ua) &&
+    !/iphone|ipad|ipod/i.test(ua);
+  loadData.isIos = /iphone|ipad|ipod/i.test(ua);
+  loadData.isAndroid = /android/i.test(ua);
 });
 function getList() {
   // const userCode = Cookies.get('code');
@@ -682,12 +682,11 @@ const onSubmit = () => {
   proxy.$refs.codeRef.validate(async (valid) => {
     if (valid) {
       isSending.value = true;
-      // const params = {
-      //   code: form.code,
-      //   userKey: userKey,
-      //   fsId: loadData.item.fs_id,
-      //   version: '1.0.9',
-      // };
+      if (downOrPlay.value) {
+        confirmVideo(loadData.item);
+        return;
+      }
+
       if (!downOrPlay.value) {
         const result = loadData.isMobile
           ? await testGopeed()
@@ -698,33 +697,6 @@ const onSubmit = () => {
           return;
         }
       }
-      // if(downOrPlay.value){
-      //   userStore
-      //       .getCodeNum(params)
-      //       .then((res) => {
-      //         if (res.code === 200) {
-      //           if (res.data.data == 100) {
-      //             confirmVideo(loadData.item);
-      //           }  else if (res.data.data == 60) {
-      //             setTimeout(() => {
-      //               isSending.value = false;
-      //               ElMessage.error('今日播放次数已达上限，请明天再来！');
-      //             }, 2000);
-      //           } else if (res.data.data == 50) {
-      //             setTimeout(() => {
-      //               isSending.value = false;
-      //               ElMessage.error(
-      //                   '验证码错误,一个验证码只能播放一个文件,请重新获取!'
-      //               );
-      //             }, 1000);
-      //           }
-      //         }
-      //       })
-      //       .catch(() => {
-      //         isSending.value = false;
-      //       });
-      //   return;
-      // }
 
       if (parseInt(loadData.item.size) > loadData.fileSize) {
         ElMessage.error('文件大于10G下载速度较慢，请登录卡密使用快速下载！');
@@ -732,30 +704,6 @@ const onSubmit = () => {
         return false;
       }
       confirm(loadData.item);
-      // userStore
-      //   .getCodeNum(params)
-      //   .then((res) => {
-      //     if (res.code === 200) {
-      //       if (res.data.data == 100) {
-      //         confirm(loadData.item);
-      //       }  else if (res.data.data == 60) {
-      //         setTimeout(() => {
-      //           isSending.value = false;
-      //           ElMessage.error('今日下载次数已达上限，请明天再来！');
-      //         }, 1000);
-      //       } else if (res.data.data == 50) {
-      //         setTimeout(() => {
-      //           isSending.value = false;
-      //           ElMessage.error(
-      //             '验证码错误,一个验证码只能下载一个文件,请重新获取!'
-      //           );
-      //         }, 1000);
-      //       }
-      //     }
-      //   })
-      //   .catch(() => {
-      //     isSending.value = false;
-      //   });
     }
   });
 };
@@ -982,7 +930,7 @@ function playShow() {
   loadData.playVideo = true;
 }
 
-function playVideo(item) {
+async function playVideo(item) {
   // console.log(item);
   // loadData.item = item;
   // form.playName = localStorage.getItem("searchName") + item.server_filename;
@@ -990,13 +938,15 @@ function playVideo(item) {
 
   loadData.item = item;
   form.code = '';
-  downOrPlay.value = true;
   loadData.loading = false;
   isSending.value = false;
   if (getToken()) {
+    downOrPlay.value = true;
+    // 生成播放直链期间按钮显示 loading 过渡状态
+    item.playLoading = true;
     confirmVideo(loadData.item);
   } else {
-    loadData.WeCharVisible = true;
+    loadData.playVideo = true;
   }
 }
 function handleBeforeClose() {
@@ -1006,8 +956,7 @@ function handleBeforeClose() {
   loadData.loading = false;
   loadData.infuseUrl = 'javascript:void(0)';
   loadData.maxUrl = 'javascript:void(0)';
-  loadData.vlcUrl = 'javascript:void(0)';
-  // loadData.potUrl = "javascript:void(0)";
+  loadData.potUrl = 'javascript:void(0)';
   if (loadData.player && loadData.player.video) loadData.player.video.src = '';
   loadData.player?.destroy();
 }
@@ -1016,8 +965,6 @@ async function confirmVideo(item) {
   const { fid, server_filename, duration, size } = item;
   loadData.title = server_filename;
   loadData.WeCharVisible = false;
-  loadData.maxNum = true;
-  loadData.loading = true;
   const params = {
     shareid: loadData.parseLinkParams.shareid,
     uk: loadData.parseLinkParams.uk,
@@ -1038,108 +985,31 @@ async function confirmVideo(item) {
   userStore
     .videoAdd(params)
     .then((res) => {
+      loadData.item.playLoading = false;
       if (res.code === 200) {
+        loadData.maxNum = true;
         if (!res.data.fileName) {
           ElMessage.error('视频播放失败,请更换资源或者下载后观看');
           loadData.loading = false;
           loadData.maxNum = false;
           return;
         }
-        let path =
-          'http://154.201.66.14:5244/d/videob/' +
-          encodeURI('我的资源/' + res.data.fileName);
-        loadData.videoUrl =
-          'https://play.gssource.com/dd/videob/' +
-          encodeURI('我的资源/' + res.data.fileName);
-        const signUrl = path;
-        loadData.infuseUrl = 'infuse://x-callback-url/play?url=' + signUrl;
+        let playPath =
+          'https://play.gssource.com/d/' +
+          encodeURI('百度网盘/我的资源/' + res.data.fileName);
+        loadData.infuseUrl = 'infuse://x-callback-url/play?url=' + playPath;
         loadData.maxUrl =
           'intent:' +
-          signUrl +
+          playPath +
           '#Intent;package=com.mxtech.videoplayer.ad;S.title=' +
           res.data.fileName +
           ';end';
-        loadData.vlcUrl = 'vlc://' + signUrl;
-        // loadData.potUrl = "potplayer://"+signUrl;
-        // const isPC = !/Android|iPhone|iPad|iPod|WAP|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        loadData.loading = false;
-        const option = {
-          id: '/baidu/我的资源/' + res.data.fileName,
-          container: '#video-player',
-          url: loadData.videoUrl,
-          title: res.data.fileName,
-          volume: 1.0,
-          autoplay: true,
-          autoSize: false,
-          autoMini: true,
-          loop: false,
-          flip: true,
-          playbackRate: true,
-          aspectRatio: true,
-          // "screenshot": true,
-          setting: true,
-          hotkey: true,
-          // pip: true,
-          mutex: true,
-          fullscreen: true,
-          // fullscreenWeb: true,
-          subtitleOffset: true,
-          miniProgressBar: false,
-          type: ext(res.data.fileName).toLowerCase().replace('.', ''),
-          playsInline: true,
-          theme: '#1890ff',
-          quality: [],
-          whitelist: [],
-          settings: [],
-          moreVideoAttr: {
-            'webkit-playsinline': true,
-            playsInline: true,
-            crossOrigin: 'anonymous',
-          },
-          customType: {
-            // 如果返回的视频是 HLS (m3u8) 格式，需要这个配置
-            m3u8: function (video, url) {
-              if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-              } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
-              }
-            },
-          },
-          lang: 'zh-cn',
-          i18n: {
-            'zh-cn': {
-              'Video load error': '此资源只能点击下面按钮在播放器内播放！',
-            },
-          },
-          lock: true,
-          fastForward: true,
-          // autoPlayback: true,
-          autoOrientation: true,
-          airplay: true,
-        };
-
-        const player = new Artplayer(option);
-        loadData.player = player;
-        loadData.player.on('ready', () => {});
-        loadData.player.on('video:ended', () => {});
-        loadData.player.on('error', () => {
-          loadData.player.notice.show =
-            '此资源只能点击下面按钮在播放器内播放！';
-          if (player.video.crossOrigin) {
-            console.log(
-              'Error detected. Trying to remove Cross-Origin attribute. Screenshot may not be available.',
-            );
-            loadData.player.video.crossOrigin = null;
-          }
-        });
+        loadData.potUrl = 'potplayer://' + playPath;
       }
     })
     .catch(() => {
-      loadData.loading = false;
       loadData.maxNum = false;
+      loadData.item.playLoading = false;
     });
 }
 
@@ -1286,19 +1156,24 @@ async function handleParse() {
     }
   }
   .mobile_player {
-    cursor: pointer;
-    width: 530px;
-    height: 50px;
-    margin: auto;
     display: flex;
-    align-items: center;
-    img {
-      margin-left: 5px;
-      width: 40px;
-      height: 40px;
-    }
-    span {
-      margin-left: 5px;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    .player-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      img {
+        width: 46px;
+        height: 46px;
+      }
+      .player-name {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #606266;
+      }
     }
   }
 }
@@ -1320,23 +1195,97 @@ async function handleParse() {
     }
   }
   .mobile_player {
-    cursor: pointer;
-    width: 530px;
-    height: 50px;
-    margin: auto;
-    margin-top: 20px;
     display: flex;
-    align-items: center;
-    img {
-      margin-left: 10px;
-      width: 50px;
-      height: 50px;
-    }
-    span {
-      margin-left: 5px;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 8px;
+    .player-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      img {
+        width: 56px;
+        height: 56px;
+      }
+      &:hover img {
+        transform: translateY(-4px) scale(1.06);
+      }
+      .player-name {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #606266;
+      }
     }
   }
 }
+/* ===== 播放器选择弹窗 ===== */
+.play-body {
+  padding: 4px 6px;
+}
+
+// 顶部警示
+.play-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #f56c6c;
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 108, 108, 0.12),
+    rgba(245, 108, 108, 0.05)
+  );
+  border: 1px solid rgba(245, 108, 108, 0.35);
+  .play-tip-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// 使用帮助链接
+.play-help {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  margin-bottom: 26px;
+  background: #f7f8fa;
+  border-radius: 8px;
+  .play-help-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 2px 0;
+    .play-help-arrow {
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    &:hover .play-help-arrow {
+      transform: translateX(3px);
+    }
+  }
+}
+
+// 移动端播放器标题
+.play-mobile-title {
+  margin-bottom: 14px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+}
+
 .app1 {
   width: 100%;
   //height: calc(100vh - 100px);
