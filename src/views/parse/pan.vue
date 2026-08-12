@@ -60,7 +60,7 @@
       </div>
       <el-table
         class="wp-table"
-        :row-style="{ height: '50px' }"
+        :row-style="rowStyle"
         v-if="tableShow"
         element-loading-text="数据正在加载中..."
         v-loading="loading"
@@ -382,9 +382,12 @@ function handleSearch(value) {
         const uniqueArray = Array.from(
           new Set(res.data.map((item) => JSON.stringify(item))),
         ).map((item) => JSON.parse(item));
+        // 先全部渲染
         tableData.value = uniqueArray;
         sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
         window.scrollTo({ top: 0, behavior: 'instant' });
+        // 再过滤：异步移除无效或总大小小于 5M 的夸克链接
+        filterQuarkLinks(uniqueArray);
       }
       // total.value = res.data.Memory_get_usage;
       loading.value = false;
@@ -450,6 +453,59 @@ function goParse(row) {
   //     }
   //   })
   // }
+}
+
+// 行样式：无效链接标记 leaving 后淡出
+function rowStyle({ row }) {
+  return {
+    height: '50px',
+    opacity: row.leaving ? 0 : 1,
+    transition: row.leaving ? 'opacity 0.4s ease' : '',
+  };
+}
+
+// 渲染后再过滤：把页面里无效或过小的夸克链接移除（调用 /quark/getToken 校验）
+async function filterQuarkLinks(list) {
+  const MIN_SIZE = 5 * 1024 * 1024; // 5M
+  // 遍历副本，避免边遍历边 splice 导致跳过元素
+  for (const item of list.slice()) {
+    // 非夸克链接直接跳过
+    if (!item.url || !String(item.url).includes('quark')) continue;
+    let invalid = false;
+    try {
+      const match = item.url.match(/\/s\/(\w+)/);
+      const pwdId = match ? match[1] : null;
+      if (!pwdId) continue;
+      const info = extractQuarkInfo(item.url);
+      const res = await userStore.getToken({
+        pwd_id: pwdId,
+        passcode: info.password,
+      });
+      if (res.code !== 200 || !res.data) {
+        invalid = true; // 链接无效
+      } else {
+        const totalSize = res.data?.data?.share.size;
+        if (totalSize < MIN_SIZE) invalid = true; // 总大小小于 5M
+      }
+    } catch (e) {
+      // 校验异常时保留，避免误伤可用链接
+      invalid = false;
+    }
+    if (invalid) {
+      const idx = tableData.value.indexOf(item);
+      if (idx > -1) {
+        // 先标记 leaving 触发淡出动画，动画结束后再真正移除
+        tableData.value[idx].leaving = true;
+        setTimeout(() => {
+          const i = tableData.value.indexOf(item);
+          if (i > -1) {
+            tableData.value.splice(i, 1);
+            sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+          }
+        }, 400);
+      }
+    }
+  }
 }
 
 function extractQuarkInfo(text) {

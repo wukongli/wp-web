@@ -389,6 +389,42 @@
             </el-tooltip>
             <span class="player-name">MX Player</span>
           </div>
+          <div
+            v-if="loadData.isAndroid || loadData.isIos"
+            class="player-item"
+            @click="openUrl(loadData.vlcUrl)"
+          >
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="vlc播放器"
+              placement="top"
+            >
+              <img :src="vlc" alt="VLC" />
+            </el-tooltip>
+            <span class="player-name">VLC</span>
+          </div>
+        </div>
+        <!-- 视频播放链接：复制后手动添加到播放器 -->
+        <div class="play-url-box">
+          <span class="play-url-label">视频播放链接（复制后手动添加到播放器）</span>
+          <div class="play-url-row">
+            <el-input
+              v-model="loadData.playUrl"
+              readonly
+              placeholder="点击播放后自动生成"
+              class="play-url-input"
+            />
+            <el-tooltip content="复制链接" placement="top">
+              <el-button
+                type="primary"
+                plain
+                circle
+                :icon="CopyDocument"
+                @click="copyPlayUrl"
+              />
+            </el-tooltip>
+          </div>
         </div>
       </div>
     </el-dialog>
@@ -400,6 +436,7 @@ import { useRoute } from 'vue-router';
 import useUserStore from '@/store/modules/user';
 import img from '@/assets/images/文件夹.png';
 import { ElMessage } from 'element-plus';
+import { CopyDocument } from '@element-plus/icons-vue';
 import MySvg from '@/components/icon/Svg.vue';
 const userStore = useUserStore();
 import Hls from 'hls.js';
@@ -436,6 +473,7 @@ import logo from '@/assets/img/deep.jpg';
 import infuse from '@/assets/logo/infuse.png';
 import mobilePlayer from '@/assets/logo/mxplayer.png';
 import pot from '@/assets/logo/potplayer.png';
+import vlc from '@/assets/logo/vlc.png';
 const qrCodeList = ref([
   kuaituQrCode,
   ucQrCode,
@@ -494,6 +532,8 @@ const loadData = reactive({
   infuseUrl: 'javascript:void(0)',
   maxUrl: 'javascript:void(0)',
   potUrl: 'javascript:void(0)',
+  vlcUrl: 'javascript:void(0)',
+  playUrl: '',
   isWindows: false,
   isMac: false,
   isIos: false,
@@ -632,6 +672,33 @@ function openUrl(url) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+// 复制视频播放链接，供手动添加到播放器
+async function copyPlayUrl() {
+  if (!loadData.playUrl) {
+    ElMessage.warning('请先点击播放生成链接');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(loadData.playUrl);
+    ElMessage.success('链接已复制，可手动添加到播放器');
+  } catch (e) {
+    // 剪贴板 API 不可用时回退
+    const ta = document.createElement('textarea');
+    ta.value = loadData.playUrl;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      ElMessage.success('链接已复制，可手动添加到播放器');
+    } catch (err) {
+      ElMessage.error('复制失败，请手动选择链接复制');
+    }
+    document.body.removeChild(ta);
+  }
 }
 
 async function downLoad(item) {
@@ -957,6 +1024,8 @@ function handleBeforeClose() {
   loadData.infuseUrl = 'javascript:void(0)';
   loadData.maxUrl = 'javascript:void(0)';
   loadData.potUrl = 'javascript:void(0)';
+  loadData.vlcUrl = 'javascript:void(0)';
+  loadData.playUrl = '';
   if (loadData.player && loadData.player.video) loadData.player.video.src = '';
   loadData.player?.destroy();
 }
@@ -1005,6 +1074,8 @@ async function confirmVideo(item) {
           res.data.fileName +
           ';end';
         loadData.potUrl = 'potplayer://' + playPath;
+        loadData.vlcUrl = 'vlc://' + playPath;
+        loadData.playUrl = playPath;
       }
     })
     .catch(() => {
@@ -1284,6 +1355,29 @@ async function handleParse() {
   font-size: 15px;
   font-weight: 600;
   color: #303133;
+}
+
+// 视频播放链接 + 复制按钮
+.play-url-box {
+  margin-top: 22px;
+  .play-url-label {
+    display: block;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 13px;
+    color: #909399;
+  }
+  .play-url-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .play-url-input {
+      flex: 1;
+      :deep(.el-input__inner) {
+        font-size: 12px;
+      }
+    }
+  }
 }
 
 .app1 {
