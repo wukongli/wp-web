@@ -68,7 +68,7 @@
       <div class="table-wrapper" v-if="tableShow">
         <el-table
           class="wp-table"
-          :row-style="{ height: '50px' }"
+          :row-style="rowStyle"
           element-loading-text="数据正在加载中..."
           v-loading="loading"
           :data="tableData"
@@ -413,6 +413,8 @@ function handleSearch(value) {
         tableData.value = uniqueArray;
         sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
         window.scrollTo({ top: 0, behavior: 'instant' });
+        // 再过滤：异步移除无效或总大小小于 5M 的夸克链接
+        filterQuarkLinks(uniqueArray);
       }
       // total.value = res.data.Memory_get_usage;
       loading.value = false;
