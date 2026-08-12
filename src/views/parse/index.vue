@@ -389,10 +389,11 @@
             </el-tooltip>
             <span class="player-name">MX Player</span>
           </div>
-          <div
+          <a
             v-if="loadData.isAndroid || loadData.isIos"
             class="player-item"
-            @click="openUrl(loadData.vlcUrl)"
+            :href="loadData.vlcUrl"
+            style="text-decoration: none; color: inherit"
           >
             <el-tooltip
               class="box-item"
@@ -403,7 +404,7 @@
               <img :src="vlc" alt="VLC" />
             </el-tooltip>
             <span class="player-name">VLC</span>
-          </div>
+          </a>
         </div>
         <!-- 视频播放链接：复制后手动添加到播放器 -->
         <div class="play-url-box">
@@ -1074,7 +1075,18 @@ async function confirmVideo(item) {
           res.data.fileName +
           ';end';
         loadData.potUrl = 'potplayer://' + playPath;
-        loadData.vlcUrl = 'vlc://' + playPath;
+        if (loadData.isAndroid) {
+          // 安卓 VLC：Chrome 官方 intent:// 格式（intent: 全 URL 形式 Chrome 不认）
+          loadData.vlcUrl =
+            'intent://' +
+            playPath.replace(/^https?:\/\//, '') +
+            '#Intent;scheme=https;type=video/*;package=org.videolan.vlc;S.title=' +
+            encodeURIComponent(res.data.fileName) +
+            ';end';
+        } else {
+          // iOS 已验证 vlc:// 可正常唤起
+          loadData.vlcUrl = 'vlc://' + playPath;
+        }
         loadData.playUrl = playPath;
       }
     })

@@ -500,7 +500,10 @@ async function filterQuarkLinks(list) {
           const i = tableData.value.indexOf(item);
           if (i > -1) {
             tableData.value.splice(i, 1);
-            sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+            sessionStorage.setItem(
+              'tableData',
+              JSON.stringify(tableData.value),
+            );
           }
         }, 400);
       }
