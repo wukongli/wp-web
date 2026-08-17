@@ -2,9 +2,9 @@
   <div class="app-container home">
     <div class="content">
       <div class="logo">
-        <div class="share-login" href="">
+        <div class="header-actions">
           <el-button
-            style="margin: 10px 20px"
+            style="margin: 0"
             type="success"
             @click="$router.push('/webDav')"
             >webDav</el-button
@@ -12,17 +12,11 @@
           <el-button
             @click="$router.push('/vip/login')"
             v-if="!loginData.login"
-            style="margin: 10px 0"
+            style="margin: 0"
             type="primary"
             icon="user"
             >登录</el-button
           >
-        </div>
-        <a class="logo-title">
-          <img :src="logo" alt="" />
-          <span>网盘资源一键转存平台</span>
-        </a>
-        <div class="user">
           <div v-if="loginData.login" class="avatar-container">
             <el-dropdown class="right-menu-item hover-effect" trigger="click">
               <div class="avatar-wrapper">
@@ -41,6 +35,10 @@
             </el-dropdown>
           </div>
         </div>
+        <a class="logo-title">
+          <img :src="logo" alt="" />
+          <span>网盘资源一键转存平台</span>
+        </a>
       </div>
 
       <div class="header-search">
@@ -825,16 +823,17 @@ async function filterQuarkLinks(list) {
           background-clip: text;
         }
       }
-      .user {
+      .header-actions {
         position: absolute;
-        right: 0;
+        right: 20px;
         top: -10px;
-        font-size: 18px;
-        font-weight: bold;
-        color: #337ecc;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 10;
         .avatar-container {
-          //margin-right: 40px;
-
+          display: flex;
+          align-items: center;
           .avatar-wrapper {
             position: relative;
             .user-avatar {
@@ -853,12 +852,6 @@ async function filterQuarkLinks(list) {
             }
           }
         }
-      }
-      .share-login {
-        position: absolute;
-        right: 20px;
-        top: -22px;
-        font-size: 18px;
       }
     }
   }
