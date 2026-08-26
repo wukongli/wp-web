@@ -12,7 +12,7 @@
           ></a
         >
         <a class="logo-title">
-          <img :src="logo" alt="" />
+          <!-- <img :src="logo" alt="" /> -->
           <span>爱看资源 - 云端资源搜索专家</span>
         </a>
         <div class="user">
@@ -98,7 +98,7 @@
                   style="margin-left: 10px"
                   v-if="scope.row.url.includes('baidu')"
                   type="success"
-                  >下载极快</el-tag
+                  >在线播放</el-tag
                 >
                 <span style="margin-left: 10px">
                   {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
