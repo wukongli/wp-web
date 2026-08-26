@@ -165,7 +165,7 @@
             size="small"
             style="margin-top: 5px"
           >
-            <span v-if="scope.row.status === 0">下载</span>
+            <span v-if="scope.row.status === 0">{{getToken() ? '快速下载' : '下 载'}}</span>
             <span v-if="scope.row.status === 1">下载中</span>
             <span v-if="scope.row.status === 2">已下载</span>
           </el-button>
@@ -809,6 +809,7 @@ async function confirm(item) {
         item.loading = false;
         item.disable = false;
         loadData.WeCharVisible = false;
+        loadData.noLimit = false;
         if (res.data.error_code === 31066) {
           item.status = 0;
           ElMessage.error('文件名含有特殊字符，请修改一下文件名重新下载！');
