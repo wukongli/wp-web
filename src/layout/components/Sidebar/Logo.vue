@@ -60,7 +60,7 @@ defineProps({
   },
 });
 
-const title = ref('爱看资源');
+const title = ref('awhitecat');
 const settingsStore = useSettingsStore();
 const sideTheme = computed(() => settingsStore.sideTheme);
 </script>

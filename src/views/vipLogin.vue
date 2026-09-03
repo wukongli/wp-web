@@ -14,7 +14,7 @@
       :rules="loginRules"
       class="login-form"
     >
-      <h3 class="title">爱看资源平台</h3>
+      <h3 class="title">awhitecat平台</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
