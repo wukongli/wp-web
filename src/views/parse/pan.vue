@@ -36,7 +36,7 @@
           </div>
         </div>
         <a class="logo-title">
-          <img :src="logo" alt="" />
+<!--          <img :src="logo" alt="" />-->
           <span>网盘资源一键转存平台</span>
         </a>
       </div>
@@ -77,7 +77,7 @@
                 <MySvg
                   style="float: left; margin-top: 10px"
                   :iconName="'icon-wenjianjia'"
-                  size="40"
+                  size="30"
                 ></MySvg>
                 <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
                 <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
@@ -112,24 +112,24 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column width="90px" prop="time" label="更新时间">
+          <el-table-column min-width="40%"  prop="time" label="更新时间">
             <template #default="scope">
-              {{ scope.row.time }}
+              <div>
+                <div>{{ scope.row.time.split(' ')[0] }}</div>
+                <div>{{ scope.row.time.split(' ')[1] }}</div>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column align="center" min-width="30%" label="操作">
+          <el-table-column align="center" width="100px" label="操作">
             <template #default="scope">
               <el-button
-                @click="addAllToDisk(scope.row)"
-                :type="scope.row.status == 2 ? 'danger' : 'primary'"
-                icon="videoPlay"
+                @click="copyLink(scope.row)"
+                type="primary"
                 size="small"
-                style="margin-top: 5px"
-                :loading="scope.row.loading"
+                icon="videoPlay"
+                style="margin-top: 5px;"
               >
-                <span v-if="scope.row.status === 0">添加到网盘</span>
-                <span v-if="scope.row.status === 1">添加中</span>
-                <span v-if="scope.row.status === 2">已添加</span>
+                <span>复制链接</span>
               </el-button>
             </template>
           </el-table-column>
@@ -546,129 +546,57 @@ const getTagType = (index) => {
   return types[index % types.length];
 };
 
-async function addAllToDisk(row) {
-  // 校验登录状态
-  if (!loginData.login) {
-    ElMessage.error('请登录后再添加');
+// 复制链接：不调用接口，直接把当前行的网盘分享链接复制到剪贴板
+function copyLink(row) {
+  let link = '';
+  if (row.url && row.url.includes('quark')) {
+    // 夸克网盘链接
+    const match = row.url.match(/\/s\/(\w+)/);
+    if (!match || !match[1]) {
+      ElMessage.error('夸克网盘链接解析失败');
+      return;
+    }
+    link = `https://pan.quark.cn/s/${match[1]}`;
+  } else if (row.url && row.url.includes('baidu')) {
+    // 百度网盘链接（带提取码时拼接 ?pwd= 保证可直接打开）
+    const linkInfo = SubmitLink(row.url);
+    if (!linkInfo || !linkInfo.url) {
+      ElMessage.error('百度网盘链接解析失败');
+      return;
+    }
+    link = `https://pan.baidu.com/s/${linkInfo.url}`;
+    if (linkInfo.pwd) {
+      link += `?pwd=${linkInfo.pwd}`;
+    }
+  } else {
+    ElMessage.error('不支持的网盘链接');
     return;
   }
+  copyToClipboard(link);
+}
 
-  row.loading = true;
-  row.status = 1;
-  const searchName = localStorage.getItem('searchName') || '';
-
-  try {
-    if (row.url.includes('quark')) {
-      // ========== 夸克网盘转存 ==========
-      const info = extractQuarkInfo(row.url);
-      const match = row.url.match(/\/s\/(\w+)/);
-      const pwdId = match ? match[1] : null;
-      if (!pwdId) {
-        ElMessage.error('夸克网盘链接解析失败');
-        row.loading = false;
-        row.status = 0;
-        return;
-      }
-
-      // 获取 token
-      const tokenRes = await userStore.getToken({
-        pwd_id: pwdId,
-        passcode: info.password,
-      });
-
-      if (tokenRes.code !== 200) {
-        ElMessage.error('获取夸克 token 失败');
-        row.loading = false;
-        row.status = 0;
-        return;
-      }
-
-      const stoken = tokenRes.data.sToken;
-      const list = tokenRes.data.data.list;
-      const firstFile = list[0];
-
-      // 一次性转存所有文件
-      const fidList = list.map((item) => item.fid);
-      const addRes = await userStore.quarkAdd({
-        pwd_id: pwdId,
-        fid_list: fidList,
-        stoken,
-        fileName: searchName + row.name,
-        duration: firstFile.duration || 0,
-        size: firstFile.size || 0,
-      });
-
-      if (addRes.code === 200) {
-        row.status = 2;
-        ElMessage.success('夸克转存成功');
-      } else {
-        row.status = 0;
-        // ElMessage.error('夸克转存失败');
-      }
-    } else if (row.url.includes('baidu')) {
-      // ========== 百度网盘转存 ==========
-      const linkInfo = SubmitLink(row.url);
-      if (!linkInfo || !linkInfo.url) {
-        ElMessage.error('百度网盘链接解析失败');
-        row.loading = false;
-        row.status = 0;
-        return;
-      }
-      const { url: shorturl, pwd } = linkInfo;
-
-      // 调用 parseCopyLink 获取文件列表和认证参数
-      const res = await userStore.parseCopyLink({
-        dir: '/',
-        root: '1',
-        shorturl,
-        pwd,
-      });
-
-      if (res.code !== 200 || parseInt(res.data.errno) !== 0) {
-        ElMessage.error('解析百度链接失败');
-        row.loading = false;
-        row.status = 0;
-        return;
-      }
-
-      const { list, seckey, shareid, uk } = res.data.data;
-      const firstFile = list[0];
-
-      const addRes = await userStore.baiduAdd({
-        shareid,
-        uk,
-        randsk: seckey,
-        sekey: seckey,
-        fsId: firstFile.fs_id,
-        fs_ids: [firstFile.fs_id],
-        path: firstFile.server_filename,
-        userKey,
-        size: firstFile.size,
-        pwd,
-        surl: shorturl,
-        url: `https://pan.baidu.com/s/${shorturl}`,
-        dir: '/',
-        fileNewName: searchName + row.name,
-        fileName: row.name,
-      });
-
-      if (addRes.code === 200) {
-        row.status = 2;
-        ElMessage.success('百度转存成功');
-      } else {
-        row.status = 0;
-        // ElMessage.error('百度转存失败');
-      }
-    } else {
-      ElMessage.error('不支持的网盘类型');
-      row.loading = false;
-      row.status = 0;
+// 复制文本到剪贴板（非 https 或剪贴板API不可用时降级为 execCommand）
+async function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      ElMessage.success('复制成功，已复制当前网盘链接');
+      return;
+    } catch (e) {
+      // 继续走降级方案
     }
-  } catch (err) {
-    row.status = 0;
-    ElMessage.error('转存失败：' + (err.message || '未知错误'));
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    ElMessage.success('复制成功，已复制当前网盘链接');
   } finally {
-    row.loading = false;
+    document.body.removeChild(ta);
   }
 }
 
@@ -861,16 +789,12 @@ async function filterQuarkLinks(list) {
   .home {
     width: 100%;
   }
+  // 移动端搜索结果不左右滑动：内容自动换行，不设置表格最小宽度
   :deep(.el-table .cell.el-tooltip) {
-    white-space: wrap;
-  }
-  // 移动端表格水平滚动
-  .table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    white-space: normal;
+    word-break: break-all;
   }
   :deep(.wp-table) {
-    min-width: 520px;
     font-size: 13px;
   }
   // 移动端操作列按钮优化
@@ -1096,6 +1020,12 @@ async function filterQuarkLinks(list) {
   height: 70%;
   width: 100%;
   margin-top: 25px;
+}
+// 更新时间列内容自动换行
+.wp-table :deep(.time-col .cell) {
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.5;
 }
 .el-pagination {
   margin: 35px auto 30px;

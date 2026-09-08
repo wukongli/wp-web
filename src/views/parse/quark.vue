@@ -72,16 +72,14 @@
         <template #default="scope">
           <el-button
             size="small"
-            @click="addToDisk(scope.row)"
+            @click="copyLink(scope.row)"
             v-if="!scope.row.dir"
-            :type="scope.row.status == 2 ? 'danger' : 'primary'"
+            type="primary"
             icon="videoPlay"
             style="margin-top: 5px"
             :loading="scope.row.loading"
           >
-            <span v-if="scope.row.status === 0">添加到网盘</span>
-            <span v-if="scope.row.status === 1">添加中</span>
-            <span v-if="scope.row.status === 2">已添加</span>
+            <span>复制链接</span>
           </el-button>
         </template>
       </el-table-column>
@@ -153,6 +151,35 @@
           >
         </span>
       </template>
+    </el-dialog>
+
+    <!-- 复制链接成功弹窗 -->
+    <el-dialog
+      class="copy-link-dialog"
+      title="分享链接已生成"
+      v-model="loadData.copyLinkVisible"
+      width="40%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div class="file-name">
+        文件名：{{ loadData.item ? loadData.item.file_name : '' }}
+      </div>
+      <div class="copy-link-row">
+        <el-input
+          v-model="loadData.copyLinkUrl"
+          readonly
+          class="copy-link-input"
+          placeholder="链接生成中..."
+        />
+        <el-button
+          type="primary"
+          icon="CopyDocument"
+          @click="copyDialogLink"
+          >复 制</el-button
+        >
+      </div>
+      <div class="copy-link-tip">夸克公开分享链接，永久有效，无需提取码</div>
     </el-dialog>
 
     <!--    赞助下载弹窗-->
@@ -266,6 +293,8 @@ const loadData = reactive({
   WeCharVisible: false,
   noLimit: false,
   errorDia: false,
+  copyLinkVisible: false,
+  copyLinkUrl: '',
   maxNum: false,
   // codeNum: '',
   tableLoading: true,
@@ -374,17 +403,37 @@ function parseList(item) {
  * @returns {Promise<void>}
  */
 
-function addToDisk(item) {
-  loadData.item = item;
-  form.code = '';
-  downOrPlay.value = true;
-  loadData.loading = false;
-  isSending.value = false;
-  if (getToken()) {
-    addToDiskNext(loadData.item);
-  } else {
-    ElMessage.error('请登录后再添加');
-  }
+// 复制链接：转存到平台夸克账号后生成新的公开永久分享链接
+function copyLink(item) {
+  item.loading = true;
+  const params = {
+    pwd_id: route.query.shorturl,
+    passcode: route.query.pwd || '',
+    fid_list: [item.fid],
+    fileName: item.file_name,
+  };
+  userStore
+    .quarkSaveAndShare(params)
+    .then((res) => {
+      if (res.code === 200) {
+        const { shareUrl } = res.data || {};
+        if (!shareUrl) {
+          ElMessage.error('未获取到分享链接，请稍后重试');
+          return;
+        }
+        loadData.item = item;
+        loadData.copyLinkUrl = shareUrl;
+        loadData.copyLinkVisible = true;
+      } else {
+        ElMessage.error(res.msg || '复制链接失败，请稍后重试');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('复制链接失败，请稍后重试');
+    })
+    .finally(() => {
+      item.loading = false;
+    });
 }
 
 async function noLimit() {
@@ -399,35 +448,39 @@ async function noLimit() {
   confirm(loadData.item);
 }
 
-async function addToDiskNext(item) {
-  const { fid, file_name, duration, size } = item;
-  item.loading = true;
-  item.status = 1;
-  const params = {
-    pwd_id: route.query.shorturl,
-    fid_list: [fid],
-    stoken: loadData.stoken,
-    fileName: localStorage.getItem('searchName') + file_name,
-    duration: duration,
-    size: size,
-  };
-  loadData.loading = true;
-  userStore
-    .quarkAdd(params)
-    .then((res) => {
-      console.log(res);
-      item.loading = false;
-      if (res.code === 200) {
-        item.status = 2;
-        ElMessage.success('添加成功');
-      } else {
-        item.status = 0;
-      }
-    })
-    .catch(() => {
-      item.status = 0;
-    });
+// 复制文本到剪贴板（非 https 或剪贴板API不可用时降级为 execCommand）
+async function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch (e) {
+      // 继续走降级方案
+    }
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } finally {
+    document.body.removeChild(ta);
+  }
 }
+
+// 复制弹窗中的完整链接
+async function copyDialogLink() {
+  if (!loadData.copyLinkUrl) {
+    ElMessage.warning('链接为空，请重新生成');
+    return;
+  }
+  await copyToClipboard(loadData.copyLinkUrl);
+  ElMessage.success('复制成功，链接已复制到剪贴板');
+}
+
 function ext(path) {
   return path.split('.').pop() ?? '';
 }
@@ -755,6 +808,50 @@ async function handleParse() {
       margin: 0;
       color: red;
     }
+  }
+}
+.copy-link-row {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  .copy-link-input {
+    flex: 1;
+    :deep(.el-input__inner) {
+      font-size: 13px;
+    }
+  }
+}
+.copy-link-tip {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #67c23a;
+}
+@media only screen and (max-width: 767px) {
+  // 复制弹窗移动端适配：撑满宽度、内容不贴边
+  .copy-link-dialog :deep(.el-dialog__body) {
+    padding: 0 16px 20px;
+  }
+  .copy-link-row {
+    flex-direction: column;
+    align-items: stretch;
+    .copy-link-input {
+      width: 100%;
+    }
+    .el-button {
+      width: 100%;
+      margin-left: 0;
+      min-height: 40px;
+    }
+  }
+  .copy-link-tip {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .file-name {
+    word-break: break-all;
   }
 }
 </style>

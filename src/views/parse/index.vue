@@ -119,17 +119,15 @@
         </template>
         <template #default="scope">
           <el-button
-            @click="addToDisk(scope.row)"
+            @click="copyLink(scope.row)"
             v-if="!parseInt(scope.row.isdir)"
-            :type="scope.row.status == 2 ? 'danger' : 'primary'"
+            type="primary"
             icon="videoPlay"
             size="small"
             style="margin-top: 5px"
             :loading="scope.row.loading"
           >
-            <span v-if="scope.row.status === 0">添加到网盘</span>
-            <span v-if="scope.row.status === 1">添加中</span>
-            <span v-if="scope.row.status === 2">已添加</span>
+            <span>复制链接</span>
           </el-button>
         </template>
       </el-table-column>
@@ -239,6 +237,37 @@
           <!--          >重 试</el-button>-->
         </span>
       </template>
+    </el-dialog>
+
+    <!-- 复制链接成功弹窗 -->
+    <el-dialog
+      class="copy-link-dialog"
+      title="分享链接已生成"
+      v-model="loadData.copyLinkVisible"
+      width="40%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <div class="file-name">
+        文件名：{{ loadData.item ? loadData.item.server_filename : '' }}
+      </div>
+      <div class="copy-link-row">
+        <el-input
+          v-model="loadData.copyLinkUrl"
+          readonly
+          class="copy-link-input"
+          placeholder="链接生成中..."
+        />
+        <el-button
+          type="primary"
+          icon="CopyDocument"
+          @click="copyDialogLink"
+          >复 制</el-button
+        >
+      </div>
+      <div class="copy-link-tip">
+        提取码：{{ loadData.copyLinkPwd }}（链接已自动带上提取码）
+      </div>
     </el-dialog>
 
     <!--    赞助下载弹窗-->
@@ -385,7 +414,6 @@ import {
   getFilesize,
   getIconClass,
   timestampToTime,
-  userKey,
   formatToYMD,
   showPlay,
   baiduShowPlay,
@@ -401,7 +429,6 @@ import yao from '@/assets/images/yaoyao.png';
 const qrCodeList = ref([front, duli, yao, duli2, iron]);
 const qrCode = ref('');
 import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
-import { getToken } from '@/utils/auth';
 import { decrypt } from '@/utils/jsencrypt';
 import logo from '@/assets/img/deep.jpg';
 import infuse from '@/assets/logo/infuse.png';
@@ -445,6 +472,9 @@ const loadData = reactive({
   playVideo: false,
   noLimit: false,
   errorDia: false,
+  copyLinkVisible: false,
+  copyLinkUrl: '',
+  copyLinkPwd: '',
   // codeNum: '',
   tableLoading: true,
   fileSize: 100698669056,
@@ -590,17 +620,44 @@ function init() {
 }
 init();
 
-function addToDisk(item) {
-  loadData.item = item;
-  form.code = '';
-  downOrPlay.value = true;
-  loadData.loading = false;
-  isSending.value = false;
-  if (getToken()) {
-    addToDiskNext(loadData.item);
-  } else {
-    ElMessage.error('请登录后再添加');
-  }
+// 复制链接：转存到平台VIP百度账号后生成新的分享链接，并复制「链接?pwd=提取码」
+function copyLink(item) {
+  item.loading = true;
+  const params = {
+    shareid: loadData.parseLinkParams.shareid,
+    uk: loadData.parseLinkParams.uk,
+    sekey: loadData.parseLinkParams.seckey,
+    items: [
+      {
+        fsId: item.fs_id,
+        fileName: item.server_filename,
+        size: item.size,
+      },
+    ],
+  };
+  userStore
+    .baiduSaveAndShare(params)
+    .then((res) => {
+      if (res.code === 200) {
+        const { shareUrl, pwd } = res.data || {};
+        if (!shareUrl) {
+          ElMessage.error('未获取到分享链接，请稍后重试');
+          return;
+        }
+        loadData.item = item;
+        loadData.copyLinkUrl = pwd ? `${shareUrl}?pwd=${pwd}` : shareUrl;
+        loadData.copyLinkPwd = pwd || '';
+        loadData.copyLinkVisible = true;
+      } else {
+        ElMessage.error(res.msg || '复制链接失败，请稍后重试');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('复制链接失败，请稍后重试');
+    })
+    .finally(() => {
+      item.loading = false;
+    });
 }
 function handleBeforeClose() {
   isSending.value = false;
@@ -615,45 +672,37 @@ function handleBeforeClose() {
   loadData.player?.destroy();
 }
 
-async function addToDiskNext(item) {
-  const { fid, server_filename, duration, size } = item;
-  // loadData.title = server_filename;
-  // loadData.WeCharVisible = false;
-  // loadData.maxNum = true;
-  item.loading = true;
-  item.status = 1;
-  const params = {
-    shareid: loadData.parseLinkParams.shareid,
-    uk: loadData.parseLinkParams.uk,
-    randsk: loadData.parseLinkParams.seckey,
-    sekey: loadData.parseLinkParams.seckey,
-    fsId: loadData.item.fs_id,
-    fs_ids: [loadData.item.fs_id],
-    path: loadData.item.server_filename,
-    userKey: userKey,
-    size: loadData.item.size,
-    pwd: loadData.query.pwd,
-    surl: loadData.query.shorturl,
-    url: `https://pan.baidu.com/s/${loadData.query.shorturl}`,
-    dir: loadData.parseLinkParams.dir,
-    // fileNewName: item.path.replace("我的资源","").replaceAll("/",""),
-    fileNewName: localStorage.getItem('searchName') + item.server_filename,
-    fileName: item.server_filename,
-  };
-  userStore
-    .baiduAdd(params)
-    .then((res) => {
-      item.loading = false;
-      if (res.code === 200) {
-        item.status = 2;
-        ElMessage.success('添加成功');
-      } else {
-        item.status = 0;
-      }
-    })
-    .catch(() => {
-      item.status = 0;
-    });
+// 复制文本到剪贴板（非 https 或剪贴板API不可用时降级为 execCommand）
+async function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch (e) {
+      // 继续走降级方案
+    }
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } finally {
+    document.body.removeChild(ta);
+  }
+}
+
+// 复制弹窗中的完整链接
+async function copyDialogLink() {
+  if (!loadData.copyLinkUrl) {
+    ElMessage.warning('链接为空，请重新生成');
+    return;
+  }
+  await copyToClipboard(loadData.copyLinkUrl);
+  ElMessage.success('复制成功，提取码：' + loadData.copyLinkPwd);
 }
 
 function ext(path) {
@@ -901,6 +950,50 @@ function handleSelectionChange(selection) {
       margin: 0;
       color: red;
     }
+  }
+}
+.copy-link-row {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  .copy-link-input {
+    flex: 1;
+    :deep(.el-input__inner) {
+      font-size: 13px;
+    }
+  }
+}
+.copy-link-tip {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #67c23a;
+}
+@media only screen and (max-width: 767px) {
+  // 复制弹窗移动端适配：撑满宽度、内容不贴边
+  .copy-link-dialog :deep(.el-dialog__body) {
+    padding: 0 16px 20px;
+  }
+  .copy-link-row {
+    flex-direction: column;
+    align-items: stretch;
+    .copy-link-input {
+      width: 100%;
+    }
+    .el-button {
+      width: 100%;
+      margin-left: 0;
+      min-height: 40px;
+    }
+  }
+  .copy-link-tip {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .file-name {
+    word-break: break-all;
   }
 }
 </style>

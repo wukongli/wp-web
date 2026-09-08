@@ -21,6 +21,8 @@ import {
   searchNames,
   getXdUrls,
   baiduAddReq,
+  baiduSaveAndShare as baiduSaveAndShareReq,
+  quarkSaveAndShare as quarkSaveAndShareReq,
   quarkAddReq,
   getImgUrl,
   getPlayUrl,
@@ -108,6 +110,28 @@ const useUserStore = defineStore('user', {
     baiduAdd(parseLink) {
       return new Promise((resolve, reject) => {
         baiduAddReq(parseLink)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    baiduSaveAndShare(data) {
+      return new Promise((resolve, reject) => {
+        baiduSaveAndShareReq(data)
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    quarkSaveAndShare(data) {
+      return new Promise((resolve, reject) => {
+        quarkSaveAndShareReq(data)
           .then((res) => {
             resolve(res);
           })

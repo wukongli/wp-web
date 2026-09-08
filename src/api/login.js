@@ -122,6 +122,15 @@ export function baiduAddReq(data) {
     data: data,
   });
 }
+// 百度转存到平台VIP账号并生成新分享链接（复制链接用，与 wp-wechart 一致）
+export function baiduSaveAndShare(data) {
+  return request({
+    url: '/wp/baiduSaveAndShare',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
 export function getPlayUrl(data) {
   return request({
     url: '/wp/getPlayUrl',
@@ -231,6 +240,15 @@ export function quarkTransfer(data) {
 export function quarkAddReq(data) {
   return request({
     url: '/quark/change',
+    method: 'post',
+    timeout: 20000,
+    data: data,
+  });
+}
+// 夸克转存到平台VIP账号并生成新的永久公开分享链接（复制链接用，与 wp-wechart 一致）
+export function quarkSaveAndShare(data) {
+  return request({
+    url: '/quark/saveAndShare',
     method: 'post',
     timeout: 20000,
     data: data,
