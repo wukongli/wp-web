@@ -612,20 +612,39 @@ function cancel() {
   open.value = false;
   reset();
 };
+/** 管理员角色的账号可分配的角色 */
+const ADMIN_ASSIGNABLE_ROLES = ["爱看资源", "在线观看"];
+/** 当前登录账号是否超级管理员 */
+function isSuperAdmin() {
+  return store.state.value.user.name === "admin";
+};
+/** 当前登录账号是否拥有「管理员」角色 */
+function hasAdminRole(roles) {
+  const myRoles = store.state.value.user.roles || [];
+  const adminRole = roles.find(e => e.roleName === "管理员");
+  // /getInfo 返回的角色标识可能是角色标识(roleKey)，也可能是角色名称，两种都比对
+  return myRoles.includes("管理员") || myRoles.includes("admin") || (!!adminRole && myRoles.includes(adminRole.roleKey));
+};
+/** 按当前登录账号计算可选角色 */
+function getSelectableRoles(roles) {
+  // 超级管理员可选全部角色
+  if (isSuperAdmin()) {
+    return roles;
+  }
+  // 管理员角色的账号只能分配下列角色
+  if (hasAdminRole(roles)) {
+    return roles.filter(e => ADMIN_ASSIGNABLE_ROLES.includes(e.roleName));
+  }
+  // 其他账号不能分配「管理员」角色
+  return roles.filter(e => e.roleName !== "管理员");
+};
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
   getUser().then(response => {
     postOptions.value = response.posts;
-    const username = store.state.value.user.name;
-    if(username === "admin"){
-      roleOptions.value = response.roles;
-    }else{
-      roleOptions.value = response.roles.filter(e=>{
-        return e.roleName !== "管理员";
-      });
-    }
-    data.form.roleIds = [response.roles[0].roleId];
+    roleOptions.value = getSelectableRoles(response.roles);
+    data.form.roleIds = roleOptions.value.length ? [roleOptions.value[0].roleId] : [];
     open.value = true;
     title.value = "添加用户";
     form.value.password = initPassword.value;
@@ -641,14 +660,7 @@ function handleUpdate(row) {
     // }
     form.value = response.data;
     postOptions.value = response.posts;
-    const username = store.state.value.user.name;
-    if(username === "admin"){
-      roleOptions.value = response.roles;
-    }else{
-      roleOptions.value = response.roles.filter(e=>{
-        return e.roleName !== "管理员";
-      });
-    }
+    roleOptions.value = getSelectableRoles(response.roles);
     form.value.postIds = response.postIds;
     form.value.roleIds = response.roleIds;
     open.value = true;
