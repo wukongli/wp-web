@@ -419,7 +419,7 @@ import yao from '@/assets/images/yaoyao.png';
 import duli2 from '@/assets/images/独立2.png';
 import zhizhuxia from '@/assets/images/zhizhuxia.png';
 import loading from '@/assets/img/loading.gif';
-import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import xiaochengxu from '@/assets/qrCode/qk.png';
 import kuaituQrCode from '@/assets/qrCode/kuaitu.png';
 import ucQrCode from '@/assets/qrCode/uc.png';
 import xunleiQrCode from '@/assets/qrCode/xunlei.png';
@@ -515,7 +515,7 @@ const hasDirData = computed(() => {
   return loadData.tableData && loadData.tableData.some((item) => !item.dir);
 });
 onMounted(() => {
-  // qrCode.value = xiaochengxu;
+  qrCode.value = xiaochengxu;
   loadData.isAdmin = localStorage.getItem('role') === 'admin';
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -675,7 +675,7 @@ async function downLoad(item) {
     if (res.code === 200) {
       // localStorage.setItem('token', res.data.token);
       loadData.downType = res.data.type;
-      qrCode.value = res.data.qrCodeUrl;
+      // qrCode.value = res.data.qrCodeUrl;
       loadData.qrTitle = res.data.qrTitle;
       loadData.shareUrl = res.data.shareUrl;
       form.code = '';

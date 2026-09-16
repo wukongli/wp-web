@@ -461,7 +461,7 @@ import duli from '@/assets/images/独立开发者.png';
 import duli2 from '@/assets/images/独立2.png';
 import yao from '@/assets/images/yaoyao.png';
 const qrCode = ref('');
-import xiaochengxu from '@/assets/images/xiaochengxu.jpg';
+import xiaochengxu from '@/assets/qrCode/qk.png';
 import kuaituQrCode from '@/assets/qrCode/kuaitu.png';
 import ucQrCode from '@/assets/qrCode/uc.png';
 import xunleiQrCode from '@/assets/qrCode/xunlei.png';
@@ -558,7 +558,7 @@ const hasDirData = computed(() => {
 });
 onMounted(() => {
   // const randomItem = qrCodeList.value[Math.floor(Math.random() * qrCodeList.value.length)];
-  // qrCode.value = xiaochengxu;
+  qrCode.value = xiaochengxu;
   const isMobile = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     const isMobileUserAgent =
@@ -718,7 +718,7 @@ async function downLoad(item) {
       loadData.downType = res.data.type;
       loadData.qrTitle = res.data.qrTitle;
       loadData.shareUrl = res.data.shareUrl;
-      qrCode.value = res.data.qrCodeUrl;
+      // qrCode.value = res.data.qrCodeUrl;
       form.code = '';
       // if (loadData.downType === 0) {
       //   loadData.qrTitle = 'UC浏览器扫码保存后即可获取';
