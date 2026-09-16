@@ -31,128 +31,109 @@
     <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
     <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <!--    <el-tag style="float: right;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
-    <el-table
+    <!-- 工具栏：接管原先放在「操作」列表头里的「返回上一级」 -->
+    <div class="file-toolbar">
+      <el-button size="small" icon="back" @click="goBack()">返回上一级</el-button>
+      <span
+        v-if="loadData.bread"
+        class="file-toolbar__bread"
+        :title="loadData.bread"
+      >
+        {{ loadData.bread }}
+      </span>
+    </div>
+
+    <!-- 文件卡片栅格：替代原 el-table -->
+    <div
       v-loading="loadData.tableLoading"
       element-loading-text="数据正在加载中..."
-      :data="loadData.tableData"
-      max-height="100%"
-      style="width: 100%; cursor: pointer; font-size: 14px; font-weight: 600"
-      class="wp-table"
-      @selection-change="handleSelectionChange"
+      class="file-card-grid"
     >
-      <!--        <el-table-column type="selection" width="50" align="center" />-->
-      <el-table-column
-        show-overflow-tooltip
-        prop="file_name"
-        label="文件名"
-        min-width="40%"
+      <div
+        v-for="item in fileCards"
+        :key="item.key"
+        class="file-card"
+        :class="{ 'is-dir': item.isDir }"
+        @click="onCardClick(item.row)"
       >
-        <template #default="scope">
-          <div
-            style="
-              min-height: 70px;
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              line-height: normal;
-            "
-            @click="parseList(scope.row)"
+        <div class="file-card__cover">
+          <el-image
+            v-if="item.thumbUrl"
+            class="file-card__thumb"
+            :src="item.thumbUrl"
+            fit="cover"
+            :preview-src-list="[item.thumbUrl]"
+            hide-on-click-modal
+            preview-teleported
+            @click.stop
           >
-            <MySvg
-              v-if="!scope.row.big_thumbnail"
-              :iconName="transQuarkIcon(scope.row)"
-              size="50"
-            ></MySvg>
-            <el-image
-              style="width: 110px; height: 50px"
-              v-if="scope.row.big_thumbnail"
-              :src="scope.row.big_thumbnail"
-              fit="cover"
-              :preview-src-list="[scope.row.big_thumbnail]"
-              hide-on-click-modal
-              preview-teleported
-            >
-            </el-image>
-            <div
-              style="
-                font-size: 16px;
-                font-weight: bold;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              "
-            >
-              {{
-                scope.row.file_name
-                  .replace('夸克', '')
-                  .replace('群', '')
-                  .replace('加', '')
-                  .replace('网盘', '')
-                  .replace('影视', '')
-                  .replace('更新', '')
-              }}
-            </div>
+            <!-- 空地址 / 403 / 混合内容时替换掉 EP 默认的「加载失败」灰块 -->
+            <template #error>
+              <div class="file-card__fallback">
+                <MySvg :iconName="item.icon" width="56px" height="56px" />
+              </div>
+            </template>
+          </el-image>
+          <div v-else class="file-card__fallback">
+            <MySvg :iconName="item.icon" width="56px" height="56px" />
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        v-if="!hasDirData"
-        min-width="20%"
-        prop="updated_at"
-        label="时间"
+        </div>
+
+        <div class="file-card__body">
+          <div class="file-card__title" :title="item.name">{{ item.name }}</div>
+          <div v-if="item.meta" class="file-card__meta" :title="item.meta">
+            {{ item.meta }}
+          </div>
+
+          <div class="file-card__actions">
+            <el-button
+              icon="menu"
+              size="small"
+              type="warning"
+              v-if="!item.isDir"
+              title="开通快速下载（不限大小/次数）"
+              @click.stop="vipDownLoad(item.row)"
+              >快速下载</el-button
+            >
+            <el-button
+              size="small"
+              type="success"
+              icon="videoPlay"
+              v-if="item.canPlay"
+              title="在线播放"
+              @click.stop="playShow(item.row)"
+              >播放</el-button
+            >
+            <el-button
+              icon="download"
+              size="small"
+              v-if="!item.isDir"
+              :type="item.row.status == 2 ? 'danger' : 'primary'"
+              :disabled="item.row.disable"
+              :loading="item.row.loading"
+              title="下载到本地下载器"
+              @click.stop="downLoad(item.row)"
+            >
+              <span v-if="item.row.status === 0">{{
+                getToken() ? '快速下载' : '下 载'
+              }}</span>
+              <span v-if="item.row.status === 1">下载中</span>
+              <span v-if="item.row.status === 2">已下载</span>
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="
+          !loadData.tableLoading &&
+          !(loadData.tableData && loadData.tableData.length)
+        "
+        class="file-card-grid__empty"
       >
-        <template #default="scope">
-          {{
-            moment(parseInt(scope.row.updated_at)).format('YYYY-MM-DD HH:mm:ss')
-          }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        v-if="hasDirData"
-        min-width="20%"
-        prop="size"
-        :formatter="getFilesize"
-        label="大小"
-      />
-      <el-table-column min-width="35%" align="right" label="操作">
-        <template #header>
-          <div class="back" @click="goBack()">返回上一级</div>
-        </template>
-        <template #default="scope">
-          <el-button
-            icon="menu"
-            style="margin-left: 12px; margin-top: 5px"
-            size="small"
-            @click="vipDownLoad(scope.row)"
-            v-if="!scope.row.dir"
-            :type="'warning'"
-            >快速下载</el-button
-          >
-          <el-button
-            size="small"
-            @click="playShow(scope.row)"
-            v-if="!scope.row.dir && showPlay(scope.row)"
-            :type="'success'"
-            icon="videoPlay"
-            style="margin-top: 5px"
-            >播放</el-button
-          >
-          <el-button
-            icon="download"
-            size="small"
-            v-if="!scope.row.dir"
-            :type="scope.row.status == 2 ? 'danger' : 'primary'"
-            @click="downLoad(scope.row)"
-            :disabled="scope.row.disable"
-            :loading="scope.row.loading"
-            style="margin-top: 5px"
-          >
-            <span v-if="scope.row.status === 0">{{getToken() ? '快速下载' : '下 载'}}</span>
-            <span v-if="scope.row.status === 1">下载中</span>
-            <span v-if="scope.row.status === 2">已下载</span>
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        暂无数据
+      </div>
+    </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
@@ -511,9 +492,45 @@ onBeforeRouteLeave((to, from) => {
 // }
 const iframeRef = ref(null);
 
-const hasDirData = computed(() => {
-  return loadData.tableData && loadData.tableData.some((item) => !item.dir);
-});
+// 卡片视图：一次性把每行预计算成卡片数据。
+// 放在 computed 里而不是模板里，是为了给 transQuarkIcon / showPlay / getFilesize /
+// moment 这几处在字段缺失时会抛错或渲染垃圾串的调用集中加兜底。
+const fileCards = computed(() =>
+  (loadData.tableData || []).map((row, index) => {
+    const dir = !!row.dir;
+    // transQuarkIcon / showPlay 内部都做 file_name.lastIndexOf，缺失时会抛 TypeError
+    const hasName = !!row.file_name;
+    const name = String(row.file_name || '')
+      .replace('夸克', '')
+      .replace('群', '')
+      .replace('加', '')
+      .replace('网盘', '')
+      .replace('影视', '')
+      .replace('更新', '');
+    // updated_at 是毫秒；缺失或为 0 时 moment 会给出 "Invalid date" / 1970-01-01
+    const ms = parseInt(row.updated_at, 10);
+    const time =
+      ms && !Number.isNaN(ms) ? moment(ms).format('YYYY-MM-DD HH:mm:ss') : '';
+    return {
+      row,
+      key: row.fid ?? index,
+      isDir: dir,
+      name: name || '未命名文件',
+      icon: hasName ? transQuarkIcon(row) : 'icon-wenjian',
+      // 文件夹一律不渲染缩略图：否则整卡点击与 el-image 灯箱互相打架
+      thumbUrl: dir ? '' : row.big_thumbnail || '',
+      // getFilesize 只用第三个参数，这里与表格 :formatter 的调用等价
+      meta: [getFilesize(row, null, row.size), time].filter(Boolean).join(' · '),
+      // showPlay 对文件夹返回的是真值字符串，所以必须先判 !dir 再调用
+      canPlay: !dir && hasName && !!showPlay(row),
+    };
+  })
+);
+
+function onCardClick(row) {
+  // 文件行保持原样：点击没有任何行为（parseList 对文件本就是空操作）
+  if (row && row.dir) parseList(row);
+}
 onMounted(() => {
   // qrCode.value = xiaochengxu;
   loadData.isAdmin = localStorage.getItem('role') === 'admin';
@@ -605,6 +622,8 @@ function goToIndex() {
 function parseList(item) {
   const { fid, dir } = item;
   if (dir) {
+    // loadData.bread 原先只在已废弃的 parseCopyLink 里赋值，quark 页一直是空串
+    loadData.bread = item.file_name || '';
     parseQuark({
       pid: fid,
     });
@@ -1177,6 +1196,8 @@ async function initToken() {
           const params = {
             dir: true,
             fid: data.data.data.list[0].fid,
+            // 带上名字，否则自动进入单文件夹时工具栏路径为空
+            file_name: data.data.data.list[0].file_name,
           };
           parseList(params);
         } else {
@@ -1448,23 +1469,6 @@ async function handleParse() {
       text-overflow: ellipsis; /* 用省略号表示被裁剪的文本 */
     }
   }
-  .wp-table {
-    min-height: 200px;
-    margin-top: 25px;
-    .back {
-      font-size: 15px;
-      font-weight: bold;
-      color: #000; /* 默认颜色 */
-      transition: color 0.3s ease; /* 可选：平滑过渡 */
-    }
-    .back:hover {
-      color: #67c23a; /* 滑过时变为红色，可换成任意颜色 */
-    }
-  }
-  .wp-table ::v-deep .el-table__body tr:hover > td {
-    //background-color: #c0ffe7 !important;
-    color: #409eff;
-  }
   .qr-title {
     margin-top: 20px;
     text-align: center;
@@ -1528,6 +1532,179 @@ async function handleParse() {
       margin: 0;
       color: red;
     }
+  }
+}
+
+/* ---------------- 文件卡片栅格（替代 el-table） ---------------- */
+/* 可用宽度 = 0.72W − 40（本页渲染在 pan.vue 的 .home 里，不是全宽）。
+   基准 1 列 → ≥768px 2 列 → ≥1200px 3 列 → ≥1600px 4 列，
+   四档下单卡宽度落在 248–450px，节奏一致 */
+.file-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  min-height: 24px;
+
+  &__bread {
+    min-width: 0; /* 允许被压缩，才能出省略号 */
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--el-text-color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.file-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+  /* .wp-table 原本的 min-height:200px 是 v-loading 遮罩唯一的高度来源，
+     换成栅格后必须自己提供，否则首屏/空数据时遮罩高度为 0，spinner 不可见
+     （EP 会自动加 el-loading-parent--relative，这里显式写出便于阅读） */
+  min-height: 240px;
+  position: relative;
+  box-sizing: border-box;
+
+  &__empty {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+.file-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* grid 子项默认 min-width:auto，超长文件名会撑破轨道 */
+  box-sizing: border-box;
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  /* 让封面被圆角裁切；el-image 必须 preview-teleported，否则灯箱一起被裁 */
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+
+  /* 只有文件夹卡片可点：文件行的点击在今天就是空操作，给指针是误导 */
+  &.is-dir {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__cover {
+    position: relative;
+    flex: none;
+    width: 100%;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--el-fill-color-light);
+    overflow: hidden;
+  }
+  &__thumb {
+    display: block; /* el-image 根元素默认 inline-block */
+    width: 100%;
+    height: 100%;
+  }
+  /* 缩略图加载失败（空地址 / 403 / 混合内容）时替换 EP 默认的灰色「加载失败」块 */
+  &__fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px 14px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--el-text-color-primary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  &__meta {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap; /* getFilesize 的 1TB 分支会返回约 30 字符 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap; /* 三个按钮最宽约 262px，窄档位必须折行而不是溢出 */
+    align-items: center;
+    gap: 8px;
+    margin-top: auto; /* 操作行贴底，同一行卡片按钮纵向对齐 */
+    padding-top: 12px;
+
+    .el-button {
+      margin: 0; /* 去掉原来的 margin-left:12px / margin-top:5px */
+    }
+    /* 抵消 EP 的 .el-button+.el-button{margin-left:12px}，避免与 gap 叠加成 20px */
+    .el-button + .el-button {
+      margin-left: 0;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .file-toolbar {
+    margin-top: 18px;
+  }
+  .file-card-grid {
+    gap: 12px;
+  }
+  .file-card__cover {
+    height: 170px; /* 单列很宽，140px 显扁 */
+  }
+}
+@media (min-width: 768px) {
+  .file-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .file-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1600px) {
+  .file-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 </style>

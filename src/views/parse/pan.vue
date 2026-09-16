@@ -58,61 +58,64 @@
           >重置</el-button
         >
       </div>
-      <el-table
-        class="wp-table"
-        :row-style="rowStyle"
+      <!-- 搜索结果：响应式卡片栅格（3 / 2 / 1 列） -->
+      <div
         v-if="tableShow"
-        element-loading-text="数据正在加载中..."
+        class="wp-card-grid"
         v-loading="loading"
-        :data="tableData"
+        element-loading-text="数据正在加载中..."
       >
-        <el-table-column prop="name" show-overflow-tooltip label="名字">
-          <template #default="scope">
-            <div @click="goParse(scope.row)">
-              <MySvg
-                style="float: left; margin-top: 10px"
-                :iconName="'icon-wenjianjia'"
-                size="40"
-              ></MySvg>
-              <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
-              <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
-              <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
-              <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
+        <div
+          v-for="(item, index) in tableData"
+          :key="item.url ?? index"
+          class="wp-card"
+          :class="[
+            'wp-card--' + platformOf(item),
+            { 'is-leaving': item.leaving },
+          ]"
+          :style="cardStyle(item)"
+          @click="goParse(item)"
+        >
+          <div class="wp-card__head">
+            <span class="wp-card__icon">
+              <MySvg iconName="icon-wenjianjia" width="26px" height="26px" />
+            </span>
+            <el-tag
+              v-if="platformOf(item) === 'quark'"
+              class="wp-card__badge"
+              type="danger"
+              size="small"
+              >下载很快</el-tag
+            >
+            <el-tag
+              v-else-if="platformOf(item) === 'baidu'"
+              class="wp-card__badge"
+              type="success"
+              size="small"
+              >在线播放</el-tag
+            >
+            <el-tag v-else class="wp-card__badge" type="info" size="small"
+              >其他资源</el-tag
+            >
+          </div>
 
-              <div
-                style="
-                  min-height: 70px;
-                  display: flex;
-                  align-items: center;
-                  flex-wrap: wrap;
-                  line-height: normal;
-                "
-              >
-                <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('quark')"
-                  type="danger"
-                  >下载很快</el-tag
-                >
-                <el-tag
-                  style="margin-left: 10px"
-                  v-if="scope.row.url.includes('baidu')"
-                  type="success"
-                  >在线播放</el-tag
-                >
-                <span style="margin-left: 10px">
-                  {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
-                </span>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column width="110px" prop="time" label="更新时间">
-          <template #default="scope">
-            {{ scope.row.time }}
-          </template>
-        </el-table-column>
-      </el-table>
+          <div class="wp-card__title" :title="displayName(item)">
+            {{ displayName(item) }}
+          </div>
+
+          <div class="wp-card__time">
+            <el-icon class="wp-card__time-icon"><Clock /></el-icon>
+            <span>{{ item.time }}</span>
+          </div>
+        </div>
+
+        <div
+          v-if="!loading && !(tableData && tableData.length)"
+          class="wp-card-grid__empty"
+        >
+          暂无资源，换个关键词试试
+        </div>
+      </div>
       <el-pagination
         v-if="tableShow"
         layout="prev, pager, next"
@@ -243,7 +246,7 @@ const router = useRouter();
 const loginData = reactive({ login: false });
 import { ElMessageBox } from 'element-plus';
 
-import { Search } from '@element-plus/icons-vue';
+import { Search, Clock } from '@element-plus/icons-vue';
 const tagHeader = ref([
   '少儿',
   '小学',
@@ -408,13 +411,22 @@ function getList() {
 }
 
 function goParse(row) {
+  const platform = platformOf(row);
+
+  // 校验前置：避免把结果列表清空之后才发现链接不可用
+  if (platform === 'other') {
+    ElMessage.error('暂不支持该链接类型');
+    return;
+  }
+  if (platform === 'quark' && String(row.url).length <= 23) {
+    ElMessage.error('文件已失效！');
+    return;
+  }
+
   tableShow.value = false;
   showComponent.value = true;
-  if (row.url.includes('quark')) {
-    if (row.url.length <= 23) {
-      ElMessage.error('文件已失效！');
-      return;
-    }
+
+  if (platform === 'quark') {
     const match = row.url.match(/\/s\/(\w+)/);
     const pwdId = match ? match[1] : null;
     const info = extractQuarkInfo(row.url);
@@ -425,7 +437,7 @@ function goParse(row) {
         pwd: info.password,
       },
     });
-  } else if (row.url.includes('baidu')) {
+  } else if (platform === 'baidu') {
     const { url, pwd } = SubmitLink(row.url);
     router.push({
       path: '/source/parse/index',
@@ -455,12 +467,28 @@ function goParse(row) {
   // }
 }
 
-// 行样式：无效链接标记 leaving 后淡出
-function rowStyle({ row }) {
+// 平台判定：url 可能缺失，统一在这里兜底
+function platformOf(row) {
+  const url = row && row.url ? String(row.url) : '';
+  if (url.includes('quark')) return 'quark';
+  if (url.includes('baidu')) return 'baidu';
+  return 'other';
+}
+
+// 卡片标题：沿用表格原有展示规则（replace 只去第一处，保持行为一致）
+function displayName(row) {
+  const name = String((row && row.name) || '')
+    .replace('夸克', '')
+    .replace('百度', '');
+  return name || '未命名资源';
+}
+
+// 卡片样式：替代原 rowStyle，保留 leaving 淡出
+function cardStyle(row) {
+  const leaving = !!(row && row.leaving);
   return {
-    height: '50px',
-    opacity: row.leaving ? 0 : 1,
-    transition: row.leaving ? 'opacity 0.4s ease' : '',
+    opacity: leaving ? 0 : 1,
+    transition: leaving ? 'opacity 0.4s ease, transform 0.25s ease' : '',
   };
 }
 
@@ -651,10 +679,6 @@ const getTagType = (index) => {
     0 0 0 2px #0773e2,
     0 2px 8px 0 rgba(0, 0, 0, 0.16) !important;
 }
-:deep(.wp-table .el-table__body tr:hover > td) {
-  width: auto !important;
-}
-
 //.app-container{
 //  width: 100%;
 //  height: 100%;
@@ -754,9 +778,6 @@ const getTagType = (index) => {
 @media only screen and (max-width: 767px) {
   .home {
     width: 100%;
-  }
-  :deep(.el-table .cell.el-tooltip) {
-    white-space: wrap;
   }
   .tag {
     .tag-header {
@@ -961,20 +982,143 @@ const getTagType = (index) => {
     font-size: 15px;
   }
 }
-.wp-table ::v-deep .el-table__body tr:hover > td {
-  //background-color: #c0ffe7 !important;
-  width: 100%;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  color: #409eff;
-}
-.wp-table {
-  font-size: 15px;
-  font-weight: bold;
-  height: 70%;
+/* ---------------- 搜索结果卡片栅格 ---------------- */
+/* 基准 2 列；≤767px 1 列；≥992px 3 列 —— 全部复用文件既有断点，不新增 */
+.wp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
   width: 100%;
   margin-top: 25px;
+  /* v-loading 遮罩是 absolute inset:0，容器必须有真实高度，否则空数据/首屏
+     加载时遮罩高度为 0，spinner 与文案不可见（el-table 原本提供了高度） */
+  min-height: 240px;
+  position: relative;
+  box-sizing: border-box;
+
+  &__empty {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+.wp-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 关键：grid 子项默认 min-width:auto，超长标题会撑破轨道 */
+  padding: 14px 16px;
+  box-sizing: border-box;
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    opacity 0.4s ease;
+
+  &:hover {
+    border-color: var(--el-color-primary-light-5);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+
+  /* 淡出中的卡片不可再点击，避免点进即将消失的失效链接 */
+  &.is-leaving {
+    pointer-events: none;
+  }
+
+  /* 平台色条：用 Element Plus 语义色，不随主题色变，任何主题下都可读 */
+  &--quark {
+    border-left: 3px solid var(--el-color-danger);
+  }
+  &--baidu {
+    border-left: 3px solid var(--el-color-success);
+  }
+  &--other {
+    border-left: 3px solid var(--el-border-color);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  /* 用 margin 而非 flex gap，规避 Safari < 14.1 的 flex gap 兼容问题 */
+  &__icon {
+    flex: none;
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+  &__badge {
+    flex: none;
+    margin-left: auto; /* 徽章靠右，头部形成「图标 —— 平台」两端对齐 */
+  }
+
+  &__title {
+    /* flex:1 把多余空间吃掉，令同一行内各卡片的时间戳底部对齐；
+       栅格行本身会拉伸子项等高，所以不需要再给标题设 min-height
+       （移动端单列时没有同行卡片可拉伸，设了只会平白多出空白） */
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--el-text-color-primary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--el-border-color-lighter);
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+
+    &-icon {
+      flex: none;
+      margin-right: 6px;
+    }
+    span {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .wp-card-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .wp-card {
+    padding: 12px 14px;
+  }
+}
+@media (min-width: 992px) {
+  .wp-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .el-pagination {
   display: flex;
