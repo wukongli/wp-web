@@ -37,7 +37,7 @@
       {{
         getToken()
           ? '打开夸克APP扫码登录后-点击生成webDav'
-          : '请登陆后再扫码生成webDav'
+          : '扫码联系管理员开通权限'
       }}
     </div>
     <template #footer>
@@ -116,11 +116,16 @@ onMounted(() => {
   }
   getWebDav(params).then((res) => {
     if (res.code === 200) {
-      user.name = res.data.name;
-      user.password = res.data.password;
-      user.storageId = res.data.storageId;
-      user.davUserId = res.data.davUserId;
-      user.id = res.data.id;
+      if(res.data){
+        user.name = res.data.name;
+        user.password = res.data.password;
+        user.storageId = res.data.storageId;
+        user.davUserId = res.data.davUserId;
+        user.id = res.data.id;
+      }else{
+        handleDialogClose();
+      }
+
     }
   });
 });
@@ -136,11 +141,11 @@ function generateCode() {
     callback: (action) => {
       if (action === 'confirm') {
         quarkShow.value = true;
-        if (!getToken()) {
-          setTimeout(() => {
-            router.push({ path: '/vip/login' });
-          }, 2000);
-        }
+        // if (!getToken()) {
+        //   setTimeout(() => {
+        //     router.push({ path: '/vip/login' });
+        //   }, 2000);
+        // }
         if (user.storageId) {
           axios.post(
             'https://play.gssource.com/api/admin/storage/delete?id=' +
@@ -160,12 +165,12 @@ function generateCode() {
         if (user.id) {
           delWebDav(user.id);
         }
-        user.mountPath = generatePath();
+        localStorage.setItem("davPath",generatePath())
         axios
           .post(
             'https://play.gssource.com/api/admin/storage/create',
             {
-              mount_path: user.mountPath,
+              mount_path: localStorage.getItem("davPath"),
               order: 0,
               remark: '',
               cache_expiration: 0,
@@ -192,7 +197,8 @@ function generateCode() {
               const match = response.data.message.match(srcRegex);
               if (match) {
                 qrCode.value = match[1];
-                user.storageId = response.data.data.id;
+                // user.storageId = response.data.data.id;
+                localStorage.setItem("storageId",response.data.data.id)
               }
             }
           })
@@ -205,6 +211,7 @@ function generateCode() {
 }
 
 async function handleDialogClose() {
+  const storageId = localStorage.getItem("storageId");
   const header = {
     'Content-Type': 'application/json',
     Authorization:
@@ -215,11 +222,10 @@ async function handleDialogClose() {
     // 第一个请求：disable
     const disableRes = await axios.post(
       'https://play.gssource.com/api/admin/storage/disable?id=' +
-        user.storageId,
+        storageId,
       {},
       { headers: header },
     );
-    console.log('响应数据:', disableRes.data);
     if (disableRes.data.code !== 200) {
       quarkShow.value = false;
       loading.value = false;
@@ -235,20 +241,25 @@ async function handleDialogClose() {
   try {
     // 第二个请求：enable
     const enableRes = await axios.post(
-      'https://play.gssource.com/api/admin/storage/enable?id=' + user.storageId,
+      'https://play.gssource.com/api/admin/storage/enable?id=' + storageId,
       {},
       { headers: header },
     );
-    console.log('响应数据:', enableRes.data);
     if (enableRes.data.code !== 200) {
       await axios.post(
         'https://play.gssource.com/api/admin/storage/delete?id=' +
-          user.storageId,
+          storageId,
         {},
         { headers: header },
       );
-      user.storageId = null;
-      ElMessage.error(enableRes.data.message);
+      // user.storageId = null;
+      localStorage.removeItem("storageId");
+      if(enableRes.data.message.includes("设备数超限")){
+        ElMessage.error("登录设备数超、请在夸克app设置-账号与安全-登录设备-解绑旧设备后再扫码生成webDav");
+      }else{
+        ElMessage.error(enableRes.data.message);
+      }
+
       quarkShow.value = false;
       loading.value = false;
       return false;
@@ -264,10 +275,10 @@ async function handleDialogClose() {
     const createRes = await axios.post(
       'https://play.gssource.com/api/admin/user/create',
       {
-        id: parseInt(user.mountPath.slice(-4)),
-        username: 'admin' + user.mountPath,
+        id: parseInt(localStorage.getItem("davPath").slice(-4)),
+        username: 'admin' + localStorage.getItem("davPath"),
         password: '123456',
-        base_path: '/' + user.mountPath,
+        base_path: '/' + localStorage.getItem("davPath"),
         role: 0,
         permission: 256,
         disabled: false,
@@ -278,15 +289,15 @@ async function handleDialogClose() {
     );
     console.log('响应数据:', createRes.data);
     if (createRes.data.code === 200) {
-      user.name = 'admin' + user.mountPath;
+      user.name = 'admin' + localStorage.getItem("davPath");
       user.password = '123456';
-      user.davUserId = parseInt(user.mountPath.slice(-4));
+      user.davUserId = parseInt(localStorage.getItem("davPath").slice(-4));
       const params = {
-        name: 'admin' + user.mountPath,
+        name: 'admin' + localStorage.getItem("davPath"),
         password: '123456',
         type: 1,
-        storageId: user.storageId,
-        davUserId: parseInt(user.mountPath.slice(-4)),
+        storageId: storageId,
+        davUserId: parseInt(localStorage.getItem("davPath").slice(-4)),
       };
       addWebDav(params).then((res) => {
         if (res.code === 200) {

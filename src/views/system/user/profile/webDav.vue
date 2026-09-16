@@ -51,7 +51,7 @@
           网盘生成WebDAV挂载工具
         </h1>
         <p class="hero-desc">
-          智能网盘挂载，一键生成WebDAV链接，轻松享受4K观影体验
+          夸克网盘挂载，一键生成WebDAV链接，支持网易爆米花、vidhub、infuse直连、轻松享受4K观影体验
         </p>
 <!--        <div class="platform-tags">-->
 <!--          <span class="tag tag-support">夸克网盘已支持</span>-->
