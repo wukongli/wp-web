@@ -780,13 +780,6 @@ const getTagType = (index) => {
     width: 100%;
   }
   .tag {
-    .tag-header {
-      margin-left: 8%;
-      margin-top: 20px;
-      cursor: pointer;
-      width: 80px !important;
-      height: 30px !important;
-    }
     .block {
       border-radius: 12px;
       background-color: var(--theme-other_background);
@@ -858,22 +851,6 @@ const getTagType = (index) => {
     width: 600px !important;
   }
   .tag {
-    width: 70%;
-    .tag-header {
-      width: 100px !important;
-      height: 40px !important;
-      margin-left: 20px;
-      margin-top: 20px;
-    }
-    /* 鼠标悬停效果 */
-    .tag-inner:hover {
-      transform: scale(1.55);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 10;
-
-      /* 晃动动画 */
-      animation: shake 0.5s ease infinite;
-    }
     .block {
       border-radius: 12px;
       background-color: var(--theme-other_background);
@@ -944,42 +921,89 @@ const getTagType = (index) => {
 }
 
 .tag {
-  margin: 30px auto 0;
-  .tag-header {
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* 过渡效果 */
-    transition: all 0.3s ease;
-  }
-  .tag-header:hover {
-    transform: scale(1.55);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10;
+  /* 两组标签（分类 + 热搜）共用一套 flex 换行 + gap 布局，
+     替代原先散落各处的 margin-left / margin-top：
+     行列间距均匀、换行后行尾不再参差 */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* 每行标签整体居中。flex 默认 flex-start，行尾短的那行会靠左留空，
+     整块看着偏左；居中和页面「标题居中、搜索框居中」的语言一致 */
+  justify-content: center;
+  gap: 12px;
+  /* 宽度对齐上方搜索组（600px 输入框 + 70 + 80 两个按钮 + 两处 10px 间距 = 770px），
+     两块占用同样宽度、同样居中，视觉上是一根中轴 */
+  max-width: 770px;
+  margin: 50px auto 0;
 
-    /* 晃动动画 */
-    animation: shake 0.5s ease infinite;
+  .tag-header {
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 16px; /* 胶囊形，和右侧 round 的热搜标签统一 */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  /* 原先是 scale(1.55) + shake 无限抖动：缩放过大容易盖住相邻标签，
+     而且 shake 这个 @keyframes 全项目都没定义，本来就不生效 */
+  .tag-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   }
 
   .tag-title {
-    margin-top: 35px;
+    flex: 0 0 100%; /* 独占一行，把分类和热搜两组分开 */
+    margin: 20px 0 20px;
+    text-align: center; /* 标签行已居中，标题跟着居中才不会显得脱节 */
     span {
-      margin-left: 28px;
-      font-size: 25px;
-      font-weight: bold;
+      margin-left: 0; /* 原先 28px，让它和标签左边缘错开 */
+      font-size: 16px;
+      font-weight: 600;
     }
   }
+
   .tag-inner {
-    margin-left: 20px;
-    margin-top: 25px;
+    margin: 0;
     cursor: pointer;
-    /* 基础样式 */
     border: 1px solid var(--el-border-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* 过渡效果 */
-    transition: all 0.3s ease;
-    font-size: 15px;
+    padding: 0 14px; /* 与 .tag-header 的横向内边距对齐 */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    font-size: 14px;
+  }
+  .tag-inner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  }
+}
+
+/* 移动端：标签整体收一档，一屏能多放几个。
+   必须写在上面 .tag 基类之后 —— 同优先级下靠后的规则才生效 */
+@media only screen and (max-width: 767px) {
+  .tag {
+    gap: 8px;
+    margin-top: 22px;
+
+    .tag-header {
+      height: 28px;
+      padding: 0 12px;
+      font-size: 13px;
+      border-radius: 14px;
+    }
+    .tag-inner {
+      padding: 0 12px;
+      font-size: 13px;
+    }
+    .tag-title span {
+      font-size: 15px;
+    }
   }
 }
 /* ---------------- 搜索结果卡片栅格 ---------------- */
@@ -1002,10 +1026,19 @@ const getTagType = (index) => {
     text-align: center;
     font-size: 14px;
     color: var(--el-text-color-secondary);
+    /* 空态也给一层底，避免整块白底显得像页面没加载出来 */
+    background-color: var(--el-fill-color-lighter);
+    border: 1px dashed var(--el-border-color-lighter);
+    border-radius: 10px;
   }
 }
 
 .wp-card {
+  /* 卡片底色：默认中性灰，按平台在下方 --quark / --baidu / --other 覆盖。
+     统一用半透明色叠加在 --el-bg-color 之上，不写死色值，深浅主题下都不糊字 */
+  --wp-card-tint: rgba(144, 147, 153, 0.1);
+  --wp-card-tint-hover: rgba(144, 147, 153, 0.16);
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1013,6 +1046,12 @@ const getTagType = (index) => {
   padding: 14px 16px;
   box-sizing: border-box;
   background-color: var(--el-bg-color);
+  /* 左上角向内淡出的平台色，比整块纯色底更透气 */
+  background-image: linear-gradient(
+    135deg,
+    var(--wp-card-tint) 0%,
+    transparent 70%
+  );
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
@@ -1026,6 +1065,12 @@ const getTagType = (index) => {
 
   &:hover {
     border-color: var(--el-color-primary-light-5);
+    /* 悬停时底色加深一档，与上浮动效呼应 */
+    background-image: linear-gradient(
+      135deg,
+      var(--wp-card-tint-hover) 0%,
+      transparent 70%
+    );
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
@@ -1038,15 +1083,19 @@ const getTagType = (index) => {
     pointer-events: none;
   }
 
-  /* 平台色条：用 Element Plus 语义色，不随主题色变，任何主题下都可读 */
+  /* 平台底色：用 Element Plus 语义色，不随主题色变，任何主题下都可读。
+     原先左上角还压了一条 3px 的平台色条，现已去掉，平台区分只靠底色 + 右上角徽章 */
   &--quark {
-    border-left: 3px solid var(--el-color-danger);
+    --wp-card-tint: rgba(245, 108, 108, 0.14);
+    --wp-card-tint-hover: rgba(245, 108, 108, 0.2);
   }
   &--baidu {
-    border-left: 3px solid var(--el-color-success);
+    --wp-card-tint: rgba(103, 194, 58, 0.14);
+    --wp-card-tint-hover: rgba(103, 194, 58, 0.2);
   }
   &--other {
-    border-left: 3px solid var(--el-border-color);
+    --wp-card-tint: rgba(64, 158, 255, 0.12);
+    --wp-card-tint-hover: rgba(64, 158, 255, 0.18);
   }
 
   &__head {

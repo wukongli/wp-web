@@ -31,9 +31,8 @@
     <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
     <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <!--    <el-tag style="float: right;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
-    <!-- 工具栏：接管原先放在「操作」列表头里的「返回上一级」 -->
+    <!-- 工具栏：面包屑靠左、返回按钮靠右 -->
     <div class="file-toolbar">
-      <el-button size="small" icon="back" @click="goBack()">返回上一级</el-button>
       <span
         v-if="loadData.bread"
         class="file-toolbar__bread"
@@ -41,6 +40,14 @@
       >
         {{ loadData.bread }}
       </span>
+      <el-button
+        class="file-toolbar__back"
+        size="small"
+        icon="back"
+        @click="goBack()"
+      >
+        返回
+      </el-button>
     </div>
 
     <!-- 文件卡片栅格：替代原 el-table -->
@@ -70,12 +77,16 @@
             <!-- 空地址 / 403 / 混合内容时替换掉 EP 默认的「加载失败」灰块 -->
             <template #error>
               <div class="file-card__fallback">
-                <MySvg :iconName="item.icon" width="56px" height="56px" />
+                <span class="file-card__filetype">
+                  <MySvg :iconName="item.icon" width="62%" height="62%" />
+                </span>
               </div>
             </template>
           </el-image>
           <div v-else class="file-card__fallback">
-            <MySvg :iconName="item.icon" width="56px" height="56px" />
+            <span class="file-card__filetype">
+              <MySvg :iconName="item.icon" width="62%" height="62%" />
+            </span>
           </div>
         </div>
 
@@ -221,17 +232,17 @@
 
     <!--    赞助下载弹窗-->
     <el-dialog title="提示" v-model="loadData.vipDown" min-width="40%">
-      <img class="qr-code" :src="qrCode" alt="" />
+<!--      <img class="qr-code" :src="qrCode" alt="" />-->
       <div class="file-name">文件名：{{ loadData.item.file_name }}</div>
       <div class="qr-title">
-        快速下载无需验证码,不限文件大小，不限下载次数！
+        快速下载无需验证码、直接下载！
       </div>
       <!--      <div class="qr-title">想做网盘影视会员副业的可以联系我！</div>-->
       <template #footer>
         <span class="dialog-footer">
           <el-button type="primary"
             ><a href="https://vip.ainsource.com" target="_blank"
-              >点击开通快速下载</a
+              >点击开通</a
             ></el-button
           >
           <!--          <el-button type="primary">开通快速下载联系管理员</el-button>-->
@@ -639,7 +650,7 @@ function parseCopyLink(params) {
     loadData.parseLinkParams.dir = '/';
   } else {
     loadData.parseLinkParams.dir = params.dir;
-    loadData.rootBackTitle = '返回上一级';
+    loadData.rootBackTitle = '返回';
   }
   // 获取文件列表
   userStore
@@ -1547,6 +1558,7 @@ async function handleParse() {
   min-height: 24px;
 
   &__bread {
+    flex: 1; /* 吃掉剩余宽度，把返回按钮顶到最右 */
     min-width: 0; /* 允许被压缩，才能出省略号 */
     font-size: 15px;
     font-weight: bold;
@@ -1554,6 +1566,59 @@ async function handleParse() {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  /* 返回按钮：默认 el-button 是白底灰边，放在工具栏里几乎看不出是操作入口。
+     改成主题色渐变胶囊 + 同色投影，hover 上浮，让它成为工具栏唯一的视觉落点。
+     选择器带 scoped 属性后是 (0,3,0)，压得住 .el-button:hover 这类 (0,2,0)，不需要 !important。
+     面包屑为空（根目录）时靠 margin-left: auto 顶到最右 */
+  &__back {
+    flex: none;
+    margin-left: auto;
+    height: 32px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background-color: var(--el-color-primary); /* 不支持渐变时的兜底 */
+    background-image: linear-gradient(
+      135deg,
+      var(--el-color-primary-light-3) 0%,
+      var(--el-color-primary) 100%
+    );
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-image: linear-gradient(
+        135deg,
+        var(--el-color-primary) 0%,
+        var(--el-color-primary-dark-2) 100%
+      );
+      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.5);
+    }
+    /* 上浮只给 hover：点击后按钮会保持 :focus，跟着上浮会像卡住了一样 */
+    &:hover {
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(64, 158, 255, 0.4);
+    }
+
+    /* 箭头 hover 时向左轻移 2px，暗示"往回退一层" */
+    :deep(.el-icon) {
+      transition: transform 0.2s ease;
+    }
+    &:hover :deep(.el-icon) {
+      transform: translateX(-2px);
+    }
   }
 }
 
@@ -1611,7 +1676,9 @@ async function handleParse() {
     position: relative;
     flex: none;
     width: 100%;
-    height: 140px;
+    /* 统一 16:9。原先固定 140px（移动端 170px）高度，卡片越宽封面越扁：
+       视频缩略图被 fit=cover 越裁越多，非视频的图标占比也随宽度漂移 */
+    aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1623,13 +1690,34 @@ async function handleParse() {
     width: 100%;
     height: 100%;
   }
-  /* 缩略图加载失败（空地址 / 403 / 混合内容）时替换 EP 默认的灰色「加载失败」块 */
+  /* 缩略图加载失败（空地址 / 403 / 混合内容）时替换 EP 默认的灰色「加载失败」块；
+     非视频文件也走这里，所以两者共用同一套底色 */
   &__fallback {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    /* 没有缩略图时铺一层淡蓝渐变，避免封面是一条空灰，
+       视觉重量与视频缩略图对齐 */
+    background-image: linear-gradient(
+      135deg,
+      rgba(64, 158, 255, 0.14) 0%,
+      rgba(64, 158, 255, 0.03) 62%,
+      transparent 100%
+    );
+  }
+  /* 图标尺寸跟随封面宽度（约 24%），任何断点下图标与封面的比例都一致；
+     原先固定 56px，宽卡片上显得又小又空 */
+  &__filetype {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(52px, 24%, 92px);
+    aspect-ratio: 1;
+    border-radius: 18%;
+    background-color: var(--el-bg-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   }
 
   &__body {
@@ -1685,11 +1773,46 @@ async function handleParse() {
   .file-toolbar {
     margin-top: 18px;
   }
-  .file-card-grid {
-    gap: 12px;
+  /* 窄屏按钮收一档，给左侧面包屑留出更多宽度 */
+  .file-toolbar__back {
+    height: 30px;
+    padding: 0 14px;
+    font-size: 13px;
   }
-  .file-card__cover {
-    height: 170px; /* 单列很宽，140px 显扁 */
+  .file-card-grid {
+    gap: 10px;
+  }
+
+  /* 单列全宽时封面 16:9 会吃掉卡片近六成高度（375 屏上约 188px），
+     一屏只放得下两张卡。这里把卡片转成横向列表：封面缩成左侧固定宽度，
+     文字与按钮排到右边，卡高从约 330px 降到约 140px */
+  .file-card {
+    flex-direction: row;
+    align-items: stretch;
+
+    &__cover {
+      width: 104px;
+      align-self: stretch; /* 封面撑满卡高，右侧不留白 */
+      aspect-ratio: auto; /* 高度交给拉伸决定，避免与 16:9 打架 */
+    }
+    &__filetype {
+      width: 46px; /* 封面收窄后 24% 会低于可读下限，直接给固定值 */
+    }
+    &__body {
+      padding: 10px 12px 12px;
+    }
+    &__title {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    &__meta {
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    &__actions {
+      gap: 6px;
+      padding-top: 8px;
+    }
   }
 }
 @media (min-width: 768px) {
