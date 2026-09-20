@@ -37,101 +37,97 @@
     <!--    ><a href="https://vip.aifenxiang.net.cn" target="_blank">获取卡密</a></el-button>-->
     <!--    <el-tag v-show="!multiple" style="margin-left:30px;" type="danger">有想做网盘影视会员副业的可以联系我！</el-tag>-->
     <!--    <el-tag style="margin-left:30px;" type="danger">注意：下载器请设置端口：127.0.0.1:9999</el-tag>-->
-    <el-table
+    <!-- 工具栏：面包屑靠左、返回按钮靠右 -->
+    <div class="file-toolbar">
+      <span
+        v-if="loadData.bread"
+        class="file-toolbar__bread"
+        :title="loadData.bread"
+      >
+        {{ loadData.bread }}
+      </span>
+      <el-button
+        class="file-toolbar__back"
+        size="small"
+        icon="back"
+        @click="goBack()"
+      >
+        返回
+      </el-button>
+    </div>
+
+    <!-- 文件卡片栅格：替代原 el-table -->
+    <div
       v-loading="loadData.tableLoading"
       element-loading-text="数据正在加载中..."
-      :data="loadData.tableData"
-      max-height="100%"
-      style="
-        width: 100%;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        overflow: auto;
-      "
-      class="wp-table"
-      @selection-change="handleSelectionChange"
+      class="file-card-grid"
     >
-      <!--        <el-table-column type="selection" width="50" align="center" />-->
-      <el-table-column
-        show-overflow-tooltip
-        prop="server_filename"
-        label="文件名"
-        min-width="40%"
+      <div
+        v-for="item in fileCards"
+        :key="item.key"
+        class="file-card"
+        :class="{ 'is-dir': item.isDir }"
+        @click="onCardClick(item.row)"
       >
-        <template #default="scope">
-          <div
-            @click="parseList(scope.row)"
-            style="
-              min-height: 70px;
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              line-height: normal;
-            "
+        <div class="file-card__cover">
+          <el-image
+            v-if="item.thumbUrl"
+            class="file-card__thumb"
+            :src="item.thumbUrl"
+            fit="cover"
+            :preview-src-list="[item.thumbUrl]"
+            hide-on-click-modal
+            preview-teleported
+            @click.stop
           >
-            <MySvg
-              v-if="!scope.row.thumbs"
-              :iconName="getIconClass(scope.row)"
-            ></MySvg>
-            <el-image
-              style="width: 110px; height: 50px"
-              v-if="scope.row.thumbs"
-              :src="scope.row.thumbs.url3"
-              fit="cover"
-              :preview-src-list="[scope.row.thumbs.url3]"
-              hide-on-click-modal
-              preview-teleported
-            >
-            </el-image>
-            <div>{{ scope.row.server_filename }}</div>
+            <!-- 空地址 / 403 / 混合内容时替换掉 EP 默认的「加载失败」灰块 -->
+            <template #error>
+              <div class="file-card__fallback">
+                <span class="file-card__filetype">
+                  <MySvg :iconName="item.icon" width="62%" height="62%" />
+                </span>
+              </div>
+            </template>
+          </el-image>
+          <div v-else class="file-card__fallback">
+            <span class="file-card__filetype">
+              <MySvg :iconName="item.icon" width="62%" height="62%" />
+            </span>
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        v-if="!hasDirData"
-        prop="server_mtime"
-        :formatter="timestampToTime"
-        min-width="20%"
-        label="时间"
-      />
-      <!--        <el-table-column prop="updated_at" label="修改时间">-->
-      <!--          <template #default="{row}">-->
-      <!--            {{ timestampToTime(row.server_mtime) }}-->
-      <!--          </template>-->
-      <!--        </el-table-column>-->
-      <el-table-column
-        v-if="hasDirData"
-        min-width="20%"
-        prop="size"
-        :formatter="getFilesize"
-        label="大小"
-      />
-      <!--        <el-table-column label="剩余下载次数"-->
-      <!--          >{{-->
-      <!--            parseInt(loadData.codeNum) > 5 ? '无限' : loadData.codeNum-->
-      <!--          }}-->
-      <!--          次</el-table-column-->
-      <!--        >-->
-      <el-table-column align="right" min-width="35%" label="操作">
-        <template #header>
-          <div class="back" @click="goBack()">返回上一级</div>
-        </template>
-        <template #default="scope">
-          <el-button
-            @click="copyLink(scope.row)"
-            v-if="!parseInt(scope.row.isdir)"
-            type="primary"
-            icon="videoPlay"
-            size="small"
-            style="margin-top: 5px"
-            :loading="scope.row.loading"
-          >
-            <span>复制链接</span>
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        </div>
+
+        <div class="file-card__body">
+          <div class="file-card__title" :title="item.name">{{ item.name }}</div>
+          <div v-if="item.meta" class="file-card__meta" :title="item.meta">
+            {{ item.meta }}
+          </div>
+
+          <div class="file-card__actions">
+            <el-button
+              v-if="!item.isDir"
+              type="primary"
+              icon="videoPlay"
+              size="small"
+              title="转存到平台账号并生成分享链接"
+              :loading="item.row.loading"
+              @click.stop="copyLink(item.row)"
+            >
+              <span>复制链接</span>
+            </el-button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="
+          !loadData.tableLoading &&
+          !(loadData.tableData && loadData.tableData.length)
+        "
+        class="file-card-grid__empty"
+      >
+        暂无数据
+      </div>
+    </div>
     <!-- 提示安装下载器弹窗 -->
     <el-dialog title="提示" v-model="loadData.dialogVisible" width="40%">
       <div class="down-title">
@@ -244,29 +240,44 @@
       class="copy-link-dialog"
       title="分享链接已生成"
       v-model="loadData.copyLinkVisible"
-      width="40%"
+      width="520px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <div class="file-name">
-        文件名：{{ loadData.item ? loadData.item.server_filename : '' }}
-      </div>
-      <div class="copy-link-row">
-        <el-input
-          v-model="loadData.copyLinkUrl"
-          readonly
-          class="copy-link-input"
-          placeholder="链接生成中..."
-        />
-        <el-button
-          type="primary"
-          icon="CopyDocument"
-          @click="copyDialogLink"
-          >复 制</el-button
-        >
-      </div>
-      <div class="copy-link-tip">
-        提取码：{{ loadData.copyLinkPwd }}（链接已自动带上提取码）
+      <div class="cl">
+        <div class="cl-file">
+          <el-icon class="cl-file__icon"><Document /></el-icon>
+          <span
+            class="cl-file__name"
+            :title="loadData.item ? loadData.item.server_filename : ''"
+            >{{ loadData.item ? loadData.item.server_filename : '' }}</span
+          >
+        </div>
+
+        <div class="cl-field">
+          <div class="cl-field__label">分享链接</div>
+          <el-input
+            v-model="loadData.copyLinkUrl"
+            readonly
+            class="cl-field__input"
+            placeholder="链接生成中..."
+          >
+            <template #append>
+              <el-button
+                type="primary"
+                icon="CopyDocument"
+                @click="copyDialogLink"
+                >复制</el-button
+              >
+            </template>
+          </el-input>
+        </div>
+
+        <div class="cl-tip">
+          <span class="cl-tip__label">提取码</span>
+          <span class="cl-tip__pwd">{{ loadData.copyLinkPwd }}</span>
+          <span class="cl-tip__desc">链接已自动带上提取码，粘贴即可访问</span>
+        </div>
       </div>
     </el-dialog>
 
@@ -503,6 +514,41 @@ onBeforeRouteLeave((to, from) => {
 const hasDirData = computed(() => {
   return loadData.tableData && loadData.tableData.some((item) => !item.dir);
 });
+
+// 卡片视图：一次性把每行预计算成卡片数据。
+// 放在 computed 里而不是模板里，是为了给 getIconClass / getFilesize / timestampToTime
+// 这几处在字段缺失时会抛错或渲染垃圾串的调用集中加兜底。
+const fileCards = computed(() =>
+  (loadData.tableData || []).map((row, index) => {
+    const dir = parseInt(row.isdir) === 1;
+    // getIconClass 内部会做 server_filename.lastIndexOf，缺失时会抛 TypeError
+    const hasName = !!row.server_filename;
+    // server_mtime 是秒；timestampToTime 内部 *1000，缺失时会产出
+    // "NaN-NaN-NaN NaN:NaN:NaN"，为 0 时是 1970-01-01 —— 两种都不显示
+    const sec = parseInt(row.server_mtime, 10);
+    const time =
+      sec && !Number.isNaN(sec) ? timestampToTime(row, null, sec) : '';
+    // thumbs 可能是「只有 icon、url 为空串」的对象，所以判的是 URL 字符串而非对象本身
+    const thumb = row.thumbs && row.thumbs.url3;
+    return {
+      row,
+      key: row.fs_id ?? index,
+      isDir: dir,
+      name: row.server_filename || '未命名文件',
+      icon: hasName ? getIconClass(row) : 'icon-wenjian',
+      // 文件夹一律不渲染缩略图：否则整卡点击与 el-image 灯箱互相打架
+      thumbUrl: dir ? '' : thumb || '',
+      // getFilesize 只用第三个参数，这里与表格 :formatter 的调用等价
+      meta: [getFilesize(row, null, row.size), time].filter(Boolean).join(' · '),
+    };
+  })
+);
+
+function onCardClick(row) {
+  // 文件行保持原样：点击没有任何行为（parseList 对文件本就是空操作）
+  if (row && parseInt(row.isdir) === 1) parseList(row);
+}
+
 function getList() {
   // const userCode = Cookies.get('code');
   const data = Object.assign({ index: 0 }, route.query);
@@ -725,12 +771,15 @@ function handleSelectionChange(selection) {
   :deep(.dia-code) {
     width: 80%;
   }
+  // 移动端弹窗统一留白：外留 24px、内留 16px。
+  // 原先是 width:96% + body padding:0 —— 390px 屏上外留白只有 8px，
+  // 内容还直接贴到弹窗左右边缘（分享链接弹窗有自己更高优先级的规则，
+  // 所以只有其它弹窗暴露出来）。
   :deep(.el-dialog) {
-    width: 96% !important;
+    width: calc(100% - 48px) !important;
   }
   :deep(.el-dialog__body) {
-    padding: 0;
-    padding-bottom: 20px;
+    padding: 0 16px 20px;
   }
 
   /* 使用深度选择器修改局部 loading 样式 */
@@ -952,48 +1001,477 @@ function handleSelectionChange(selection) {
     }
   }
 }
-.copy-link-row {
+/* ========== 分享链接弹窗 ========== */
+.copy-link-dialog {
+  // 桌面用 width="520px"；窄屏由 max-width 兜住并撑出左右 24px 留白。
+  // 刻意不用 CSS min()：旧版 Android WebView / 微信内置浏览器（Chrome < 79）
+  // 不支持 min()，会让 .el-dialog 的 width: var(--el-dialog-width) 整条失效、
+  // 退化成 width:auto 满屏 —— 表现就是「两边一点留白都没有」。
+  max-width: calc(100% - 48px);
+
+  :deep(.el-dialog__header) {
+    padding: 16px 20px 14px;
+    margin-right: 0;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+  :deep(.el-dialog__title) {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  :deep(.el-dialog__body) {
+    padding: 18px 20px 20px;
+  }
+}
+
+.cl {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--el-text-color-regular);
+}
+
+/* 文件名：浅底卡片 + 图标，跟弹窗标题拉开层级 */
+.cl-file {
   display: flex;
-  align-items: center;
-  margin-top: 20px;
-  gap: 10px;
-  .copy-link-input {
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: var(--el-fill-color-light);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+
+  &__icon {
+    flex: none;
+    margin-top: 3px;
+    font-size: 15px;
+    color: var(--el-color-primary);
+  }
+
+  &__name {
     flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* 链接：输入框与复制按钮拼成一体 */
+.cl-field {
+  margin-top: 16px;
+
+  &__label {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
+
+  &__input {
     :deep(.el-input__inner) {
       font-size: 13px;
     }
+
+    :deep(.el-input-group__append) {
+      padding: 0;
+      background-color: var(--el-color-primary);
+      border-radius: 0 var(--el-input-border-radius) var(--el-input-border-radius)
+        0;
+      box-shadow: none;
+
+      .el-button {
+        height: 100%;
+        margin: 0;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 0 var(--el-input-border-radius)
+          var(--el-input-border-radius) 0;
+        font-size: 13px;
+        color: #fff;
+
+        &:hover,
+        &:focus {
+          background-color: var(--el-color-primary-light-3);
+          color: #fff;
+        }
+      }
+    }
   }
 }
-.copy-link-tip {
-  margin-top: 12px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  color: #67c23a;
-}
-@media only screen and (max-width: 767px) {
-  // 复制弹窗移动端适配：撑满宽度、内容不贴边
-  .copy-link-dialog :deep(.el-dialog__body) {
-    padding: 0 16px 20px;
+
+/* 提取码 / 说明 */
+.cl-tip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 13px;
+
+  &__label {
+    color: var(--el-text-color-secondary);
   }
-  .copy-link-row {
-    flex-direction: column;
-    align-items: stretch;
-    .copy-link-input {
-      width: 100%;
-    }
-    .el-button {
-      width: 100%;
-      margin-left: 0;
-      min-height: 40px;
-    }
+
+  &__pwd {
+    padding: 2px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--el-color-primary);
+    background-color: var(--el-color-primary-light-9);
+    border: 1px dashed var(--el-color-primary-light-5);
+    border-radius: 6px;
+    user-select: all;
   }
-  .copy-link-tip {
-    font-size: 13px;
+
+  &__desc {
+    color: var(--el-text-color-secondary);
     line-height: 1.6;
   }
+
+  &__icon {
+    flex: none;
+    font-size: 15px;
+    color: var(--el-color-success);
+  }
+
+  &--ok {
+    .cl-tip__desc {
+      color: var(--el-text-color-regular);
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  // 宽度/留白由 .copy-link-dialog 的 max-width 控制，这里只收紧内边距与字号
+  .copy-link-dialog {
+    :deep(.el-dialog__header) {
+      padding: 14px 16px 12px;
+    }
+    :deep(.el-dialog__body) {
+      padding: 16px 16px 18px;
+    }
+  }
+  .cl-field__input :deep(.el-input-group__append) .el-button {
+    padding: 0 12px;
+  }
+  .cl-tip {
+    gap: 6px;
+    &__desc {
+      font-size: 12px;
+    }
+  }
+  // 赞助下载等其它弹窗仍在用 .file-name，长文件名别撑破
   .file-name {
     word-break: break-all;
+  }
+}
+.file-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  min-height: 24px;
+
+  &__bread {
+    flex: 1; /* 吃掉剩余宽度，把返回按钮顶到最右 */
+    min-width: 0; /* 允许被压缩，才能出省略号 */
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--el-text-color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* 返回按钮：默认 el-button 是白底灰边，放在工具栏里几乎看不出是操作入口。
+     改成主题色渐变胶囊 + 同色投影，hover 上浮，让它成为工具栏唯一的视觉落点。
+     选择器带 scoped 属性后是 (0,3,0)，压得住 .el-button:hover 这类 (0,2,0)，不需要 !important。
+     面包屑为空（根目录）时靠 margin-left: auto 顶到最右 */
+  &__back {
+    flex: none;
+    margin-left: auto;
+    height: 32px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background-color: var(--el-color-primary); /* 不支持渐变时的兜底 */
+    background-image: linear-gradient(
+      135deg,
+      var(--el-color-primary-light-3) 0%,
+      var(--el-color-primary) 100%
+    );
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.4);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-image: linear-gradient(
+        135deg,
+        var(--el-color-primary) 0%,
+        var(--el-color-primary-dark-2) 100%
+      );
+      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.5);
+    }
+    /* 上浮只给 hover：点击后按钮会保持 :focus，跟着上浮会像卡住了一样 */
+    &:hover {
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(64, 158, 255, 0.4);
+    }
+
+    /* 箭头 hover 时向左轻移 2px，暗示"往回退一层" */
+    :deep(.el-icon) {
+      transition: transform 0.2s ease;
+    }
+    &:hover :deep(.el-icon) {
+      transform: translateX(-2px);
+    }
+  }
+}
+
+.file-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+  /* .wp-table 原本的 min-height:200px 是 v-loading 遮罩唯一的高度来源，
+     换成栅格后必须自己提供，否则首屏/空数据时遮罩高度为 0，spinner 不可见
+     （EP 会自动加 el-loading-parent--relative，这里显式写出便于阅读） */
+  min-height: 240px;
+  position: relative;
+  box-sizing: border-box;
+
+  &__empty {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+.file-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* grid 子项默认 min-width:auto，超长文件名会撑破轨道 */
+  box-sizing: border-box;
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  /* 让封面被圆角裁切；el-image 必须 preview-teleported，否则灯箱一起被裁 */
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+
+  /* 只有文件夹卡片可点：文件行的点击在今天就是空操作，给指针是误导 */
+  &.is-dir {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__cover {
+    position: relative;
+    flex: none;
+    width: 100%;
+    /* 统一 16:9。原先固定 140px（移动端 170px）高度，卡片越宽封面越扁：
+       视频缩略图被 fit=cover 越裁越多，非视频的图标占比也随宽度漂移 */
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--el-fill-color-light);
+    overflow: hidden;
+  }
+  &__thumb {
+    display: block; /* el-image 根元素默认 inline-block */
+    width: 100%;
+    height: 100%;
+  }
+  /* 缩略图加载失败（空地址 / 403 / 混合内容）时替换 EP 默认的灰色「加载失败」块；
+     非视频文件也走这里，所以两者共用同一套底色 */
+  &__fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 没有缩略图时铺一层淡蓝渐变，避免封面是一条空灰，
+       视觉重量与视频缩略图对齐 */
+    background-image: linear-gradient(
+      135deg,
+      rgba(64, 158, 255, 0.14) 0%,
+      rgba(64, 158, 255, 0.03) 62%,
+      transparent 100%
+    );
+  }
+  /* 图标尺寸跟随封面宽度（约 24%），任何断点下图标与封面的比例都一致；
+     原先固定 56px，宽卡片上显得又小又空 */
+  &__filetype {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(52px, 24%, 92px);
+    aspect-ratio: 1;
+    border-radius: 18%;
+    background-color: var(--el-bg-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px 14px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--el-text-color-primary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  &__meta {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap; /* getFilesize 的 1TB 分支会返回约 30 字符 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap; /* 三个按钮最宽约 262px，窄档位必须折行而不是溢出 */
+    align-items: center;
+    gap: 8px;
+    margin-top: auto; /* 操作行贴底，同一行卡片按钮纵向对齐 */
+    padding-top: 12px;
+
+    .el-button {
+      margin: 0; /* 去掉原来的 margin-left:12px / margin-top:5px */
+    }
+    /* 抵消 EP 的 .el-button+.el-button{margin-left:12px}，避免与 gap 叠加成 20px */
+    .el-button + .el-button {
+      margin-left: 0;
+    }
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .file-toolbar {
+    margin-top: 18px;
+  }
+  /* 窄屏按钮收一档，给左侧面包屑留出更多宽度 */
+  .file-toolbar__back {
+    height: 30px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  .file-card-grid {
+    gap: 10px;
+  }
+
+  /* 单列全宽时封面 16:9 会吃掉卡片近六成高度（375 屏上约 188px），
+     一屏只放得下两张卡。这里把卡片转成横向列表：封面缩成左侧固定宽度，
+     文字与按钮排到右边，卡高从约 330px 降到约 140px */
+  .file-card {
+    flex-direction: row;
+    align-items: stretch;
+
+    &__cover {
+      width: 104px;
+      align-self: stretch; /* 封面撑满卡高，右侧不留白 */
+      aspect-ratio: auto; /* 高度交给拉伸决定，避免与 16:9 打架 */
+    }
+    &__filetype {
+      width: 46px; /* 封面收窄后 24% 会低于可读下限，直接给固定值 */
+    }
+    &__body {
+      padding: 10px 12px 12px;
+    }
+    &__title {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    &__meta {
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    /* 登录后第三个按钮文案会变成「快速下载」，叠加播放按钮后三个按钮总宽超出
+       卡片正文宽度，原来 flex-wrap: wrap 会折成两行。这里改成不折行 + 允许按钮
+       收缩，并把左右内边距从 11px 收到 6px，390(iPhone12)/375/360 都能排成一行；
+       只有 ≤340 的极端窄屏才让文字出省略号，不会折行也不会溢出卡片 */
+    &__actions {
+      flex-wrap: nowrap;
+      gap: 6px;
+      padding-top: 8px;
+
+      .el-button {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding-left: 6px;
+        padding-right: 6px;
+        overflow: hidden;
+      }
+      /* 图标不许被压扁，只让文字收缩 */
+      :deep(.el-button > .el-icon) {
+        flex: none;
+      }
+      /* EP 把默认插槽包在 <span> 里，文字超长时出省略号而不是撑破按钮 */
+      :deep(.el-button > span) {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+@media (min-width: 768px) {
+  .file-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .file-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1600px) {
+  .file-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 </style>

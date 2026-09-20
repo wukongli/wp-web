@@ -63,101 +63,127 @@
           >重置</el-button
         >
       </div>
-      <div class="table-wrapper" v-if="tableShow">
-        <el-table
-          class="wp-table"
-          :row-style="rowStyle"
-          element-loading-text="数据正在加载中..."
-          v-loading="loading"
-          :data="tableData"
-        >
-          <el-table-column prop="name" show-overflow-tooltip label="名字">
-            <template #default="scope">
-              <div @click="goParse(scope.row)">
-                <MySvg
-                  style="float: left; margin-top: 10px"
-                  :iconName="'icon-wenjianjia'"
-                  size="30"
-                ></MySvg>
-                <!--              <el-tag v-if="scope.row.url.includes('quark')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="success">下载极快</el-tag>-->
-                <!--              <el-tag v-if="scope.row.url.includes('baidu')" style="float:left;margin-left: 1%;margin-top: 22px;"  type="danger">下载很快</el-tag>-->
-                <!--              <el-tag v-if="!scope.row.url.includes('quark') && !scope.row.url.includes('baidu')" else style="margin-left: 50px;margin-top: 10px;"  type="danger">下载速度一般</el-tag>-->
-                <!--              <el-tag style="float:left;margin-left: 2%;margin-top: 10px;">在线播放</el-tag>-->
-
-                <div
-                  style="
-                    min-height: 70px;
-                    display: flex;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    line-height: normal;
-                  "
-                >
-                  <el-tag
-                    style="margin-left: 10px"
-                    v-if="scope.row.url.includes('quark')"
-                    type="success"
-                    >夸克网盘</el-tag
-                  >
-                  <el-tag
-                    style="margin-left: 10px"
-                    v-if="scope.row.url.includes('baidu')"
-                    type="danger"
-                    >百度网盘</el-tag
-                  >
-                  <span style="margin-left: 10px">
-                    {{ scope.row.name.replace('夸克', '').replace('百度', '') }}
-                  </span>
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column min-width="40%"  prop="time" label="更新时间">
-            <template #default="scope">
-              <div>
-                <div>{{ scope.row.time.split(' ')[0] }}</div>
-                <div>{{ scope.row.time.split(' ')[1] }}</div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column align="center" width="100px" label="操作">
-            <template #default="scope">
-              <el-button
-                @click="copyLink(scope.row)"
-                type="primary"
-                size="small"
-                icon="videoPlay"
-                style="margin-top: 5px;"
-              >
-                <span>复制链接</span>
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+      <!-- 微信小程序码：只在首页（未搜索）出现，跟着 tagShow 走。
+           ≥768px 由 CSS 提到右下角固定悬浮，滚动时始终可见，打开页面第一眼就在；
+           窄屏留在文档流里跟在搜索框下方 —— 手机上固定悬浮会压住加载更多和底部声明，
+           而且手机也扫不了自己屏幕上的码，没必要常驻 -->
+      <div v-if="tagShow" class="mp">
+        <div class="mp__card">
+          <img class="mp__code" :src="miniProgramQr" alt="微信小程序码" />
+          <div class="mp__text">
+            <div class="mp__title">微信小程序</div>
+            <div class="mp__desc">微信扫一扫，手机上继续用</div>
+          </div>
+        </div>
       </div>
-      <el-pagination
+      <!-- 搜索结果：响应式卡片栅格（3 / 2 / 1 列），替代原 el-table -->
+      <div
         v-if="tableShow"
-        layout="prev, pager, next"
-        :total="100"
-        v-model:current-page="queryParams.pageNum"
-        v-model:page-size="queryParams.pageSize"
-        background
-        size="large"
-        @size-change="getList"
-        @current-change="getList"
-        class="custom-pagination"
-      />
-      <div v-if="tagShow" class="tag">
-        <el-tag
-          class="tag-header"
-          size="small"
-          v-for="(item, index) in tagHeader"
-          :key="item"
-          effect="dark"
-          @click="handleSearch(item)"
+        class="wp-card-grid"
+        v-loading="loading"
+        element-loading-text="数据正在加载中..."
+      >
+        <div
+          v-for="(item, index) in tableData"
+          :key="item.url ?? index"
+          class="wp-card"
+          :class="['wp-card--' + platformOf(item), { 'is-leaving': item.leaving }]"
+          :style="cardStyle(item)"
+          @click="goParse(item)"
         >
-          {{ item }}
-        </el-tag>
+          <div class="wp-card__head">
+            <span class="wp-card__icon">
+              <MySvg iconName="icon-wenjianjia" width="26px" height="26px" />
+            </span>
+            <el-tag
+              v-if="platformOf(item) === 'quark'"
+              class="wp-card__badge"
+              type="danger"
+              size="small"
+              >夸克网盘</el-tag
+            >
+            <el-tag
+              v-else-if="platformOf(item) === 'baidu'"
+              class="wp-card__badge"
+              type="success"
+              size="small"
+              >百度网盘</el-tag
+            >
+            <el-tag v-else class="wp-card__badge" type="info" size="small"
+              >其他资源</el-tag
+            >
+          </div>
+
+          <div class="wp-card__title" :title="displayName(item)">
+            {{ displayName(item) }}
+          </div>
+
+          <div class="wp-card__time">
+            <el-icon class="wp-card__time-icon"><Clock /></el-icon>
+            <span>{{ item.time }}</span>
+          </div>
+
+          <!-- 原表格「操作」列：保留复制链接入口。
+               @click.stop 是必须的，否则点按钮会顺带触发整卡的 goParse 跳转 -->
+          <div class="wp-card__actions">
+            <el-button
+              type="primary"
+              size="small"
+              icon="videoPlay"
+              title="复制当前网盘分享链接"
+              @click.stop="copyLink(item)"
+            >
+              <span>复制链接</span>
+            </el-button>
+          </div>
+        </div>
+
+        <div
+          v-if="!loading && !(tableData && tableData.length)"
+          class="wp-card-grid__empty"
+        >
+          暂无资源，换个关键词试试
+        </div>
+      </div>
+      <!-- 列表底部：滚到这里点一下加载下一页，替代原来的分页条 -->
+      <div v-if="tableShow && tableData && tableData.length" class="load-more">
+        <el-button
+          v-if="!noMore"
+          class="load-more__btn"
+          :loading="loadingMore"
+          @click="loadMore"
+        >
+          {{ loadingMore ? '加载中…' : '加载更多' }}
+        </el-button>
+        <span v-else class="load-more__end">已经到底啦</span>
+      </div>
+      <div v-if="tagShow" class="tag">
+        <div class="tag-cats">
+          <div
+            v-for="(cat, ci) in categories"
+            :key="cat.key"
+            class="tag-cat"
+            :class="'tag-cat--' + cat.key"
+          >
+            <div class="tag-cat__head">
+              <span class="tag-cat__no">{{ pad2(ci) }}</span>
+              <span class="tag-cat__title">{{ cat.title }}</span>
+            </div>
+            <div class="tag-cat__body">
+              <el-tag
+                v-for="t in cat.tags"
+                :key="t"
+                class="tag-cat__item"
+                size="small"
+                @click="handleSearch(t)"
+              >
+                {{ t }}
+              </el-tag>
+            </div>
+          </div>
+        </div>
+        <!--        <div class="block">-->
+
         <!--        <div class="block">-->
         <!--          <div class="nav">电视剧</div>-->
         <!--          <div class="content">-->
@@ -223,21 +249,21 @@
         <!--            </div>-->
         <!--          </div>-->
         <!--        </div>-->
-        <div class="tag-title">
-          <span>近期热搜：</span>
-        </div>
-        <el-tag
-          class="tag-inner"
-          size="large"
-          v-for="(item, index) in tv.concat(movie).concat(anime)"
-          :key="item.value"
-          effect="dark"
-          :type="getTagType(index)"
-          round
-          @click="handleSearch(item.title)"
-        >
-          {{ item.title }}
-        </el-tag>
+<!--        <div class="tag-title">-->
+<!--          <span>近期热搜：</span>-->
+<!--        </div>-->
+<!--        <el-tag-->
+<!--          class="tag-inner"-->
+<!--          size="large"-->
+<!--          v-for="(item, index) in tv.concat(movie).concat(anime)"-->
+<!--          :key="item.value"-->
+<!--          effect="dark"-->
+<!--          :type="getTagType(index)"-->
+<!--          round-->
+<!--          @click="handleSearch(item.title)"-->
+<!--        >-->
+<!--          {{ item.title }}-->
+<!--        </el-tag>-->
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
@@ -251,6 +277,8 @@
 import { onActivated, onDeactivated, watch } from 'vue';
 import logo from '@/assets/img/deep.jpg';
 import userLogo from '@/assets/logo/img.png';
+// 首页挂的微信小程序码（和 quark/index 验证码弹窗用的 xiaochengxu.jpg 不是同一张，别混）
+import miniProgramQr from '@/assets/images/xiaochengxu-home.jpg';
 import {
   formatterTime,
   getIconClass,
@@ -266,32 +294,133 @@ const router = useRouter();
 const loginData = reactive({ login: false });
 import { ElMessageBox } from 'element-plus';
 
-import { Search } from '@element-plus/icons-vue';
-const tagHeader = ref([
-  '少儿',
-  '小学',
-  '初中',
-  '高中',
-  '大学',
-  '四六级',
-  '考研',
-  '考公',
-  '教资',
-  '英语',
-  '电影',
-  '动漫',
-  '美剧',
-  '软件',
-  '电子书',
-  '编程',
-  '剪辑',
-  '设计',
+import { Search, Clock } from '@element-plus/icons-vue';
+/* 首页分类导航：7 个板块。
+   板块里的标签文案会直接当作搜索关键词提交，所以都取"能搜到东西"的通用词，
+   不要写成长句 */
+const categories = ref([
+  {
+    key: 'study',
+    title: '学习考证',
+    tags: [
+      '考研',
+      '考公',
+      '教资',
+      '会计',
+      '经济师',
+      '建造师',
+      '四六级',
+      '雅思托福',
+      '专升本',
+      '成人高考',
+      '护士证',
+      '职业资格题库',
+      '学习笔记',
+    ],
+  },
+  {
+    key: 'office',
+    title: '办公技能',
+    tags: [
+      'PPT模板',
+      'Excel模板',
+      'Word简历',
+      '合同模板',
+      'PS教程',
+      'PR教程',
+      'AI教程',
+      'CAD教程',
+      'Python教程',
+      '自媒体运营',
+      '视频剪辑',
+      '直播话术',
+      '文案素材',
+    ],
+  },
+  {
+    key: 'design',
+    title: '设计素材',
+    tags: [
+      '海报',
+      'Logo',
+      '插画',
+      '背景图',
+      '视频素材',
+      '音效',
+      '转场',
+      '片头片尾',
+      '字体包',
+      '笔刷',
+      '预设',
+      '滤镜',
+    ],
+  },
+  {
+    key: 'baby',
+    title: '育儿早教',
+    tags: [
+      '幼小衔接',
+      '拼音',
+      '数学',
+      '识字',
+      '绘本电子版',
+      '启蒙动画',
+      '早教课程',
+      '手抄报',
+      '手工',
+      '学习计划表',
+    ],
+  },
+  {
+    key: 'career',
+    title: '职场文书',
+    tags: [
+      '工作总结',
+      '述职报告',
+      '工作计划',
+      '合同模板',
+      '制度范本',
+      '活动方案',
+      '竞聘演讲稿',
+      '心得体会',
+    ],
+  },
+  {
+    key: 'life',
+    title: '兴趣生活',
+    tags: [
+      '健身计划',
+      '食谱',
+      '减脂餐',
+      '手账素材',
+      '表情包',
+      '壁纸',
+      '塔罗',
+      '占星',
+      '心理测试',
+      '情绪疗愈',
+    ],
+  },
+  {
+    key: 'novel',
+    title: '小说漫画影视',
+    tags: ['电子版小说', '漫画', '绘本', '短剧', '影视素材', '解说文案'],
+  },
 ]);
+
+/* 分类序号补零成 01~07，比 1~7 更整齐 */
+const pad2 = (i) => String(i + 1).padStart(2, '0');
+
 const options = ref([{ label: 123, value: 123 }]);
 const searchValue = ref('');
 const selectLoading = ref(false);
 const total = ref(0);
 const loading = ref(false);
+/* 「加载更多」专用状态：和首屏 loading 分开，
+   否则点加载更多会把整块结果栅格盖上遮罩 */
+const loadingMore = ref(false);
+/* 已经没有下一页了（返回条数不足一页，或已是最后一页） */
+const noMore = ref(false);
 const tableShow = ref(false);
 const tagShow = ref(true);
 const showComponent = ref(true);
@@ -339,9 +468,16 @@ onMounted(() => {
     tableShow.value = true;
     loading.value = true;
     tagShow.value = false;
+    /* 关键词存在 localStorage、列表存在 sessionStorage，两边要一起还原。
+       不还原关键词的话，刷新后列表还在、输入框却空了，
+       点「加载更多」会被"请输入关键词"挡下来 */
+    searchValue.value = localStorage.getItem('searchName') || '';
     setTimeout(() => {
       loading.value = false;
-      tableData.value = JSON.parse(cache);
+      tableData.value = JSON.parse(cache) || [];
+      /* 列表和「已经翻到第几页」必须一起还原。
+         只还原列表的话，重新进来点「加载更多」会从第 2 页重新拉，和缓存里的条目撞车 */
+      restoreListState();
     }, 1000);
   } else {
     tagShow.value = true;
@@ -391,6 +527,9 @@ function handleSearch(value) {
   tableShow.value = true;
   tagShow.value = false;
   showComponent.value = false;
+  /* 每次新搜索都从第一页重新开始，并清掉上一轮「到底了」的标记 */
+  noMore.value = false;
+  queryParams.value.pageNum = 1;
   if (value) {
     searchValue.value = value;
   }
@@ -402,33 +541,102 @@ function handleSearch(value) {
     })
     .then((res) => {
       if (res.code === 200) {
-        const uniqueArray = Array.from(
-          new Set(res.data.map((item) => JSON.stringify(item))),
-        ).map((item) => JSON.parse(item));
-        uniqueArray.forEach((item) => {
-          item.status = 0;
-        });
+        const raw = Array.isArray(res.data) ? res.data : [];
+        // 先全部渲染（同一次响应里的重复项在这里去掉）
+        const uniqueArray = uniqueByJson(raw, []);
         tableData.value = uniqueArray;
-        sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+        /* 用「原始条数」判断还有没有下一页：去重会让条数变少，
+           拿去重后的长度判断会把「还有下一页」误判成「到底了」 */
+        if (raw.length < queryParams.value.pageSize) noMore.value = true;
+        cacheListState();
         window.scrollTo({ top: 0, behavior: 'instant' });
         // 再过滤：异步移除无效或总大小小于 5M 的夸克链接
         filterQuarkLinks(uniqueArray);
       }
       // total.value = res.data.Memory_get_usage;
       loading.value = false;
+    })
+    .catch((err) => {
+      loading.value = false;
+      reportLoadError(err);
     });
 }
-function getList() {
+/* 列表状态统一落盘。列表、页码、「到底了」三者必须一起存：
+   少存任何一个，重新进页面后页码和列表就对不上，点「加载更多」会重复拉已有页 */
+function cacheListState() {
+  sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+  sessionStorage.setItem('tableDataPageNum', String(queryParams.value.pageNum));
+  sessionStorage.setItem('tableDataNoMore', noMore.value ? '1' : '0');
+}
+
+function restoreListState() {
+  const page = Number(sessionStorage.getItem('tableDataPageNum'));
+  queryParams.value.pageNum = page > 0 ? page : 1;
+  noMore.value = sessionStorage.getItem('tableDataNoMore') === '1';
+}
+
+/* 按 JSON 串去重，保留首次出现的顺序和原始对象引用。
+   保留引用很关键：filterQuarkLinks 靠 tableData.value.indexOf(item) 定位并移除条目，
+   这里若做一次 JSON.parse 往返造出新对象，indexOf 会全部落空、过滤静默失效 */
+function uniqueByJson(list, base) {
+  const seen = new Set(base.map((item) => JSON.stringify(item)));
+  const out = [];
+  for (const item of list) {
+    const key = JSON.stringify(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
+/* 请求失败的兜底提示。
+   业务错误码（500 / 601 / 其他）在 request.js 的响应拦截器里已经弹过提示，
+   这里再弹一次会重复；而网络层异常（超时 / 断网 / HTTP 状态码）那句 ElMessage
+   在拦截器里是被注释掉的、完全静默 —— 所以只补这一种，用 isAxiosError 区分 */
+function reportLoadError(err) {
+  if (err && err.isAxiosError) {
+    ElMessage.error('网络异常，请稍后重试');
+  }
+}
+
+/* 加载下一页并追加到列表尾部（替代原来的分页跳转） */
+function loadMore() {
+  // 双保险：el-button 的 loading 已经禁掉了点击，这里再挡一次防并发
+  if (loadingMore.value || noMore.value) return;
   if (!searchValue.value) {
     ElMessage.error('请输入关键词搜索！');
     return;
   }
-  loading.value = true;
+  loadingMore.value = true;
+  const nextPage = queryParams.value.pageNum + 1;
   userStore
-    .search({ keyword: searchValue.value, ...queryParams.value })
+    .search({
+      keyword: searchValue.value,
+      ...queryParams.value,
+      pageNum: nextPage,
+    })
     .then((res) => {
-      tableData.value = res.data;
-      loading.value = false;
+      if (res.code !== 200) {
+        reportLoadError(res);
+        return;
+      }
+      const raw = Array.isArray(res.data) ? res.data : [];
+      // 跨页去重：接口不同页之间会返回重复条目，base 传当前列表
+      const fresh = uniqueByJson(raw, tableData.value);
+      tableData.value = tableData.value.concat(fresh);
+      queryParams.value.pageNum = nextPage;
+      if (raw.length < queryParams.value.pageSize) noMore.value = true;
+      cacheListState();
+      /* 只校验这一页新增的条目。全量重跑的话，每条夸克链接都会再打一次
+         /quark/getToken，翻到第三页就是几十个请求 */
+      filterQuarkLinks(fresh);
+    })
+    .catch((err) => {
+      reportLoadError(err);
+    })
+    .finally(() => {
+      loadingMore.value = false;
     });
 }
 
@@ -538,6 +746,9 @@ function fixJsonString(str) {
 function resetQuery() {
   localStorage.removeItem('searchName');
   sessionStorage.removeItem('tableData');
+  // 列表、页码、「到底了」标记要一起清，否则下次进来会带着上一轮的页码
+  sessionStorage.removeItem('tableDataPageNum');
+  sessionStorage.removeItem('tableDataNoMore');
   window.location.href = '/source';
 }
 // 根据索引返回Element预设类型
@@ -600,12 +811,28 @@ async function copyToClipboard(text) {
   }
 }
 
-// 行样式：无效链接标记 leaving 后淡出
-function rowStyle({ row }) {
+// 平台判定：url 可能缺失，统一在这里兜底
+function platformOf(row) {
+  const url = row && row.url ? String(row.url) : '';
+  if (url.includes('quark')) return 'quark';
+  if (url.includes('baidu')) return 'baidu';
+  return 'other';
+}
+
+// 卡片标题：沿用表格原有展示规则（replace 只去第一处，保持行为一致）
+function displayName(row) {
+  const name = String((row && row.name) || '')
+    .replace('夸克', '')
+    .replace('百度', '');
+  return name || '未命名资源';
+}
+
+// 卡片样式：替代原 rowStyle 的行高/淡出，保留 leaving 淡出动画
+function cardStyle(row) {
+  const leaving = !!(row && row.leaving);
   return {
-    height: '50px',
-    opacity: row.leaving ? 0 : 1,
-    transition: row.leaving ? 'opacity 0.4s ease' : '',
+    opacity: leaving ? 0 : 1,
+    transition: leaving ? 'opacity 0.4s ease, transform 0.25s ease' : '',
   };
 }
 
@@ -645,10 +872,8 @@ async function filterQuarkLinks(list) {
           const i = tableData.value.indexOf(item);
           if (i > -1) {
             tableData.value.splice(i, 1);
-            sessionStorage.setItem(
-              'tableData',
-              JSON.stringify(tableData.value),
-            );
+            // 过滤掉条目后同步落盘（页码和「到底了」标记一并更新）
+            cacheListState();
           }
         }, 400);
       }
@@ -804,13 +1029,6 @@ async function filterQuarkLinks(list) {
     min-height: 28px;
   }
   .tag {
-    .tag-header {
-      margin-left: 8%;
-      margin-top: 20px;
-      cursor: pointer;
-      width: 80px !important;
-      height: 30px !important;
-    }
     .block {
       border-radius: 12px;
       background-color: var(--theme-other_background);
@@ -882,22 +1100,6 @@ async function filterQuarkLinks(list) {
     width: 600px !important;
   }
   .tag {
-    width: 70%;
-    .tag-header {
-      width: 100px !important;
-      height: 40px !important;
-      margin-left: 20px;
-      margin-top: 20px;
-    }
-    /* 鼠标悬停效果 */
-    .tag-inner:hover {
-      transform: scale(1.55);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 10;
-
-      /* 晃动动画 */
-      animation: shake 0.5s ease infinite;
-    }
     .block {
       border-radius: 12px;
       background-color: var(--theme-other_background);
@@ -968,44 +1170,314 @@ async function filterQuarkLinks(list) {
 }
 
 .tag {
-  margin: 30px auto 0;
-  .tag-header {
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* 过渡效果 */
-    transition: all 0.3s ease;
-  }
-  .tag-header:hover {
-    transform: scale(1.55);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10;
+  /* 两组标签（分类 + 热搜）共用一套 flex 换行 + gap 布局，
+     替代原先散落各处的 margin-left / margin-top：
+     行列间距均匀、换行后行尾不再参差 */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* 每行标签整体居中。flex 默认 flex-start，行尾短的那行会靠左留空，
+     整块看着偏左；居中和页面「标题居中、搜索框居中」的语言一致 */
+  justify-content: center;
+  gap: 12px;
+  /* 宽度对齐上方搜索组（600px 输入框 + 70 + 80 两个按钮 + 两处 10px 间距 = 770px），
+     两块占用同样宽度、同样居中，视觉上是一根中轴 */
+  max-width: 770px;
+  margin: 50px auto 0;
 
-    /* 晃动动画 */
-    animation: shake 0.5s ease infinite;
+  /* ---------------- 分类导航 ---------------- */
+  /* 7 个板块铺两列。flex: 0 0 100% 让它独占一行，
+     不参与父级 .tag 的标签流式换行 */
+  .tag-cats {
+    flex: 0 0 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .tag-cat {
+    /* 每个板块一个色相：底色是同色相的低透明度渐变，序号徽章取同色相深一档。
+       7 个色相保持同样的饱和节奏和透明度，所以彼此有区分度但不显花 */
+    --cat-tint: rgba(64, 158, 255, 0.13);
+    --cat-ink: #2b7cd3;
+
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 14px 16px 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 12px;
+    background-color: var(--el-bg-color);
+    /* 左上角向内淡出，比整块纯色底更透气 */
+    background-image: linear-gradient(
+      135deg,
+      var(--cat-tint) 0%,
+      transparent 58%
+    );
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition:
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+
+    &:hover {
+      border-color: var(--el-border-color);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    &__no {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 20px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--cat-ink);
+      background-color: var(--cat-tint);
+    }
+    &__title {
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--el-text-color-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &__body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    &__item {
+      margin: 0;
+      cursor: pointer;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 13px; /* 胶囊形，和下方 round 的热搜标签同一套语言 */
+      font-size: 13px;
+      color: var(--el-text-color-regular);
+      background-color: var(--el-bg-color);
+      border: 1px solid var(--el-border-color-lighter);
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+      &:hover {
+        color: var(--cat-ink);
+        border-color: var(--cat-ink);
+        background-color: var(--cat-tint);
+        transform: translateY(-1px);
+      }
+    }
+
+    /* 7 个板块排两列会剩下一个半空的末行，让最后一个横跨整行正好补满 */
+    &:last-child {
+      grid-column: 1 / -1;
+    }
+
+    &--study {
+      --cat-tint: rgba(64, 158, 255, 0.13);
+      --cat-ink: #2b7cd3;
+    }
+    &--office {
+      --cat-tint: rgba(103, 194, 58, 0.15);
+      --cat-ink: #4f9429;
+    }
+    &--design {
+      --cat-tint: rgba(140, 111, 255, 0.13);
+      --cat-ink: #6a4dd6;
+    }
+    &--baby {
+      --cat-tint: rgba(255, 169, 64, 0.16);
+      --cat-ink: #bd7412;
+    }
+    &--career {
+      --cat-tint: rgba(0, 184, 169, 0.13);
+      --cat-ink: #0a8b80;
+    }
+    &--life {
+      --cat-tint: rgba(255, 122, 180, 0.14);
+      --cat-ink: #c34585;
+    }
+    &--novel {
+      --cat-tint: rgba(245, 108, 108, 0.13);
+      --cat-ink: #c05252;
+    }
   }
 
   .tag-title {
-    margin-top: 35px;
+    flex: 0 0 100%; /* 独占一行，把分类和热搜两组分开 */
+    margin: 20px 0 20px;
+    text-align: center; /* 标签行已居中，标题跟着居中才不会显得脱节 */
     span {
-      margin-left: 28px;
-      font-size: 25px;
-      font-weight: bold;
+      margin-left: 0; /* 原先 28px，让它和标签左边缘错开 */
+      font-size: 16px;
+      font-weight: 600;
     }
   }
+
   .tag-inner {
-    margin-left: 20px;
-    margin-top: 25px;
+    margin: 0;
     cursor: pointer;
-    /* 基础样式 */
     border: 1px solid var(--el-border-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* 过渡效果 */
-    transition: all 0.3s ease;
-    font-size: 15px;
+    padding: 0 14px; /* 与上方分类板块的标签保持同一套横向呼吸感 */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    font-size: 14px;
+  }
+  .tag-inner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   }
 }
+
+/* 移动端：标签整体收一档，一屏能多放几个。
+   必须写在上面 .tag 基类之后 —— 同优先级下靠后的规则才生效 */
+@media only screen and (max-width: 767px) {
+  .tag {
+    gap: 8px;
+    margin-top: 22px;
+
+    /* 窄屏两列会把标签挤成一列一个字，改单列铺满 */
+    .tag-cats {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .tag-cat {
+      padding: 12px 14px 14px;
+
+      &__title {
+        font-size: 14px;
+      }
+      &__item {
+        height: 24px;
+        padding: 0 9px;
+        font-size: 12px;
+      }
+    }
+    .tag-inner {
+      padding: 0 12px;
+      font-size: 13px;
+    }
+    .tag-title span {
+      font-size: 15px;
+    }
+  }
+}
+
+/* ---------------- 首页微信小程序码 ---------------- */
+/* 移动端形态：跟在搜索框下方走正常文档流、居中、卡片贴着内容。
+   桌面形态在下面 @media (min-width: 768px) 里改成右下角固定悬浮 */
+.mp {
+  display: flex;
+  justify-content: center;
+  max-width: 770px;
+  margin: 28px auto 0;
+
+  /* inline-flex 让卡片贴着内容，不铺满整行 —— 铺满的话二维码和文案
+     只占左边一小半，右侧空一大片显得很散 */
+  &__card {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 12px;
+    background-color: var(--el-bg-color);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+  /* 小程序码是白底方图，给固定尺寸防止原图 344px 直接铺满 */
+  &__code {
+    flex: none;
+    display: block;
+    width: 84px;
+    height: 84px;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+  &__text {
+    min-width: 0; /* 允许被压缩，长文案才能正常换行 */
+  }
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--el-text-color-primary);
+  }
+  &__desc {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+/* 桌面/平板：脱离文档流固定在右下角。
+   fixed 之后元素不再占文档流的位置，所以放在搜索框后面也不会撑出空白；
+   滚到哪都看得见，打开页面第一眼就在视野里 */
+@media only screen and (min-width: 768px) {
+  .mp {
+    position: fixed;
+    right: 24px;
+    bottom: 32px;
+    /* 盖住页面内容，但低于 EP 的 popper（下拉菜单等从 2000 起） */
+    z-index: 1000;
+    max-width: none;
+    margin: 0;
+    animation: mp-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    &__card {
+      gap: 18px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
+      }
+    }
+    &__code {
+      width: 108px;
+      height: 108px;
+    }
+    &__title {
+      font-size: 16px;
+    }
+    &__desc {
+      font-size: 13px;
+    }
+  }
+}
+
+/* 入场：从下方淡入上浮，比静止出现更抓眼 */
+@keyframes mp-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .wp-table ::v-deep .el-table__body tr:hover > td {
   //background-color: #c0ffe7 !important;
   width: 100%;
@@ -1027,9 +1499,6 @@ async function filterQuarkLinks(list) {
   word-break: break-all;
   line-height: 1.5;
 }
-.el-pagination {
-  margin: 35px auto 30px;
-}
 .foot {
   margin-top: 10px;
   width: 100%;
@@ -1039,4 +1508,250 @@ async function filterQuarkLinks(list) {
   font-weight: bold;
   font-size: 12px;
 }
+
+.wp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-top: 25px;
+  /* v-loading 遮罩是 absolute inset:0，容器必须有真实高度，否则空数据/首屏
+     加载时遮罩高度为 0，spinner 与文案不可见（el-table 原本提供了高度） */
+  min-height: 240px;
+  position: relative;
+  box-sizing: border-box;
+
+  &__empty {
+    grid-column: 1 / -1;
+    padding: 60px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+    /* 空态也给一层底，避免整块白底显得像页面没加载出来 */
+    background-color: var(--el-fill-color-lighter);
+    border: 1px dashed var(--el-border-color-lighter);
+    border-radius: 10px;
+  }
+}
+
+.wp-card {
+  /* 卡片底色：默认中性灰，按平台在下方 --quark / --baidu / --other 覆盖。
+     统一用半透明色叠加在 --el-bg-color 之上，不写死色值，深浅主题下都不糊字 */
+  --wp-card-tint: rgba(144, 147, 153, 0.1);
+  --wp-card-tint-hover: rgba(144, 147, 153, 0.16);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 关键：grid 子项默认 min-width:auto，超长标题会撑破轨道 */
+  padding: 14px 16px;
+  box-sizing: border-box;
+  background-color: var(--el-bg-color);
+  /* 左上角向内淡出的平台色，比整块纯色底更透气 */
+  background-image: linear-gradient(
+    135deg,
+    var(--wp-card-tint) 0%,
+    transparent 70%
+  );
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    opacity 0.4s ease;
+
+  &:hover {
+    border-color: var(--el-color-primary-light-5);
+    /* 悬停时底色加深一档，与上浮动效呼应 */
+    background-image: linear-gradient(
+      135deg,
+      var(--wp-card-tint-hover) 0%,
+      transparent 70%
+    );
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+
+  /* 淡出中的卡片不可再点击，避免点进即将消失的失效链接 */
+  &.is-leaving {
+    pointer-events: none;
+  }
+
+  /* 平台底色：用 Element Plus 语义色，不随主题色变，任何主题下都可读。
+     原先左上角还压了一条 3px 的平台色条，现已去掉，平台区分只靠底色 + 右上角徽章 */
+  &--quark {
+    --wp-card-tint: rgba(245, 108, 108, 0.14);
+    --wp-card-tint-hover: rgba(245, 108, 108, 0.2);
+  }
+  &--baidu {
+    --wp-card-tint: rgba(103, 194, 58, 0.14);
+    --wp-card-tint-hover: rgba(103, 194, 58, 0.2);
+  }
+  &--other {
+    --wp-card-tint: rgba(64, 158, 255, 0.12);
+    --wp-card-tint-hover: rgba(64, 158, 255, 0.18);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  /* 用 margin 而非 flex gap，规避 Safari < 14.1 的 flex gap 兼容问题 */
+  &__icon {
+    flex: none;
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+  &__badge {
+    flex: none;
+    margin-left: auto; /* 徽章靠右，头部形成「图标 —— 平台」两端对齐 */
+  }
+
+  &__title {
+    /* flex:1 把多余空间吃掉，令同一行内各卡片的时间戳底部对齐；
+       栅格行本身会拉伸子项等高，所以不需要再给标题设 min-height
+       （移动端单列时没有同行卡片可拉伸，设了只会平白多出空白） */
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--el-text-color-primary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+
+    &-icon {
+      flex: none;
+      margin-right: 6px;
+    }
+    span {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* 原表格「操作」列改造：虚线分隔线落在这一行，
+     卡片底部形成「图标+平台 / 标题 / 时间 / 操作」的稳定结构 */
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--el-border-color-lighter);
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .wp-card-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .wp-card {
+    padding: 12px 14px;
+  }
+}
+@media (min-width: 992px) {
+  .wp-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+/* ---------------- 列表底部：加载更多 ---------------- */
+/* 替代原来的分页条。滚到列表底部后点一下继续加载下一页 */
+.load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  margin: 28px auto 30px;
+
+  /* 默认「浅底 + 主色描边」，hover 才填成实心主色：
+     不和顶部搜索按钮抢视觉，点下去又有明确反馈 */
+  &__btn {
+    min-width: 168px;
+    height: 40px;
+    padding: 0 28px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-color-primary);
+    background-color: var(--el-color-primary-light-9);
+    border: 1px solid var(--el-color-primary-light-7);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-color: var(--el-color-primary);
+      border-color: var(--el-color-primary);
+      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.35);
+    }
+    /* 上浮只给 hover：点完按钮会保持 :focus，跟着上浮会像卡住了一样 */
+    &:hover {
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  /* 「已经到底啦」：两侧各拉一条细线，避免一行孤零零的文字显得突兀 */
+  &__end {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--el-text-color-placeholder);
+
+    &::before,
+    &::after {
+      content: '';
+      width: 48px;
+      height: 1px;
+      background-color: var(--el-border-color-lighter);
+    }
+  }
+}
+
+/* 移动端：按钮铺满一栏、加高触控区。
+   必须写在 .load-more 基类之后 —— 同优先级下靠后的规则才生效 */
+@media only screen and (max-width: 767px) {
+  .load-more {
+    margin: 22px auto 24px;
+
+    &__btn {
+      width: 100%;
+      max-width: 340px;
+      min-width: 0;
+      height: 44px;
+    }
+  }
+}
+
 </style>
