@@ -104,7 +104,6 @@
 
           <div class="file-card__actions">
             <el-button
-              icon="menu"
               size="small"
               type="warning"
               v-if="!item.isDir"
@@ -1792,9 +1791,33 @@ async function handleParse() {
       margin-top: 4px;
       font-size: 11px;
     }
+    /* 登录后第三个按钮文案会变成「快速下载」，叠加播放按钮后三个按钮总宽超出
+       卡片正文宽度，原来 flex-wrap: wrap 会折成两行。这里改成不折行 + 允许按钮
+       收缩，并把左右内边距从 11px 收到 6px，390(iPhone12)/375/360 都能排成一行；
+       只有 ≤340 的极端窄屏才让文字出省略号，不会折行也不会溢出卡片 */
     &__actions {
+      flex-wrap: nowrap;
       gap: 6px;
       padding-top: 8px;
+
+      .el-button {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding-left: 6px;
+        padding-right: 6px;
+        overflow: hidden;
+      }
+      /* 图标不许被压扁，只让文字收缩 */
+      :deep(.el-button > .el-icon) {
+        flex: none;
+      }
+      /* EP 把默认插槽包在 <span> 里，文字超长时出省略号而不是撑破按钮 */
+      :deep(.el-button > span) {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 }

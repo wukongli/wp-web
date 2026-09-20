@@ -13,7 +13,11 @@
         >
         <a class="logo-title">
           <!-- <img :src="logo" alt="" /> -->
-          <span>爱看资源 - 云端资源搜索专家</span>
+          <!-- 品牌名与口号拆成两级：整串 21 字都用 26px 渐变字，
+               窄屏会被 nowrap 截成省略号，层级也拉不开 -->
+          <span class="logo-title__name">万能教程库</span>
+          <span class="logo-title__sep">·</span>
+          <span class="logo-title__slogan">学习办公生活，资料教程全都有</span>
         </a>
         <div class="user">
           <div v-if="loginData.login" class="avatar-container">
@@ -116,29 +120,47 @@
           暂无资源，换个关键词试试
         </div>
       </div>
-      <el-pagination
-        v-if="tableShow"
-        layout="prev, pager, next"
-        :total="100"
-        v-model:current-page="queryParams.pageNum"
-        v-model:page-size="queryParams.pageSize"
-        background
-        size="large"
-        @size-change="getList"
-        @current-change="getList"
-        class="custom-pagination"
-      />
-      <div v-if="tagShow" class="tag">
-        <el-tag
-          class="tag-header"
-          size="small"
-          v-for="(item, index) in tagHeader"
-          :key="item"
-          effect="dark"
-          @click="handleSearch(item)"
+      <!-- 列表底部：滚动到这里点一下加载下一页，替代原来的分页条 -->
+      <div
+        v-if="tableShow && tableData && tableData.length"
+        class="load-more"
+      >
+        <el-button
+          v-if="!noMore"
+          class="load-more__btn"
+          :loading="loadingMore"
+          @click="loadMore"
         >
-          {{ item }}
-        </el-tag>
+          {{ loadingMore ? '加载中…' : '加载更多' }}
+        </el-button>
+        <span v-else class="load-more__end">已经到底啦</span>
+      </div>
+      <div v-if="tagShow" class="tag">
+        <!-- 分类导航：7 个板块，点板块内任意标签直接发起搜索 -->
+        <div class="tag-cats">
+          <div
+            v-for="(cat, ci) in categories"
+            :key="cat.key"
+            class="tag-cat"
+            :class="'tag-cat--' + cat.key"
+          >
+            <div class="tag-cat__head">
+              <span class="tag-cat__no">{{ pad2(ci) }}</span>
+              <span class="tag-cat__title">{{ cat.title }}</span>
+            </div>
+            <div class="tag-cat__body">
+              <el-tag
+                v-for="t in cat.tags"
+                :key="t"
+                class="tag-cat__item"
+                size="small"
+                @click="handleSearch(t)"
+              >
+                {{ t }}
+              </el-tag>
+            </div>
+          </div>
+        </div>
         <!--        <div class="block">-->
         <!--          <div class="nav">电视剧</div>-->
         <!--          <div class="content">-->
@@ -204,21 +226,21 @@
         <!--            </div>-->
         <!--          </div>-->
         <!--        </div>-->
-        <div class="tag-title">
-          <span>近期热搜：</span>
-        </div>
-        <el-tag
-          class="tag-inner"
-          size="large"
-          v-for="(item, index) in tv.concat(movie).concat(anime)"
-          :key="item.value"
-          effect="dark"
-          :type="getTagType(index)"
-          round
-          @click="handleSearch(item.title)"
-        >
-          {{ item.title }}
-        </el-tag>
+<!--        <div class="tag-title">-->
+<!--          <span>近期热搜：</span>-->
+<!--        </div>-->
+<!--        <el-tag-->
+<!--          class="tag-inner"-->
+<!--          size="large"-->
+<!--          v-for="(item, index) in tv.concat(movie).concat(anime)"-->
+<!--          :key="item.value"-->
+<!--          effect="dark"-->
+<!--          :type="getTagType(index)"-->
+<!--          round-->
+<!--          @click="handleSearch(item.title)"-->
+<!--        >-->
+<!--          {{ item.title }}-->
+<!--        </el-tag>-->
       </div>
       <!-- 子组件将在此处渲染 -->
       <router-view v-if="showComponent"> </router-view>
@@ -247,31 +269,131 @@ const loginData = reactive({ login: false });
 import { ElMessageBox } from 'element-plus';
 
 import { Search, Clock } from '@element-plus/icons-vue';
-const tagHeader = ref([
-  '少儿',
-  '小学',
-  '初中',
-  '高中',
-  '大学',
-  '四六级',
-  '考研',
-  '考公',
-  '教资',
-  '英语',
-  '电影',
-  '动漫',
-  '美剧',
-  '软件',
-  '电子书',
-  '编程',
-  '剪辑',
-  '设计',
+/* 首页分类导航：7 个板块。
+   板块里的标签文案会直接当作搜索关键词提交，所以都取"能搜到东西"的通用词，
+   不要写成长句 */
+const categories = ref([
+  {
+    key: 'study',
+    title: '学习考证',
+    tags: [
+      '考研',
+      '考公',
+      '教资',
+      '会计',
+      '经济师',
+      '建造师',
+      '四六级',
+      '雅思托福',
+      '专升本',
+      '成人高考',
+      '护士证',
+      '职业资格题库',
+      '学习笔记',
+    ],
+  },
+  {
+    key: 'office',
+    title: '办公技能',
+    tags: [
+      'PPT模板',
+      'Excel模板',
+      'Word简历',
+      '合同模板',
+      'PS教程',
+      'PR教程',
+      'AI教程',
+      'CAD教程',
+      'Python教程',
+      '自媒体运营',
+      '视频剪辑',
+      '直播话术',
+      '文案素材',
+    ],
+  },
+  {
+    key: 'design',
+    title: '设计素材',
+    tags: [
+      '海报',
+      'Logo',
+      '插画',
+      '背景图',
+      '视频素材',
+      '音效',
+      '转场',
+      '片头片尾',
+      '字体包',
+      '笔刷',
+      '预设',
+      '滤镜',
+    ],
+  },
+  {
+    key: 'baby',
+    title: '育儿早教',
+    tags: [
+      '幼小衔接',
+      '拼音',
+      '数学',
+      '识字',
+      '绘本电子版',
+      '启蒙动画',
+      '早教课程',
+      '手抄报',
+      '手工',
+      '学习计划表',
+    ],
+  },
+  {
+    key: 'career',
+    title: '职场文书',
+    tags: [
+      '工作总结',
+      '述职报告',
+      '工作计划',
+      '合同模板',
+      '制度范本',
+      '活动方案',
+      '竞聘演讲稿',
+      '心得体会',
+    ],
+  },
+  {
+    key: 'life',
+    title: '兴趣生活',
+    tags: [
+      '健身计划',
+      '食谱',
+      '减脂餐',
+      '手账素材',
+      '表情包',
+      '壁纸',
+      '塔罗',
+      '占星',
+      '心理测试',
+      '情绪疗愈',
+    ],
+  },
+  {
+    key: 'novel',
+    title: '小说漫画影视',
+    tags: ['电子版小说', '漫画', '绘本', '短剧', '影视素材', '解说文案'],
+  },
 ]);
+
+/* 分类序号补零成 01~07，比 1~7 更整齐 */
+const pad2 = (i) => String(i + 1).padStart(2, '0');
 const options = ref([{ label: 123, value: 123 }]);
 const searchValue = ref('');
 const selectLoading = ref(false);
 const total = ref(0);
 const loading = ref(false);
+/* 「加载更多」专用状态：和首屏 loading 分开，
+   否则点加载更多会把整块结果栅格盖上遮罩 */
+const loadingMore = ref(false);
+/* 已经没有下一页了（返回条数不足一页，或已是最后一页） */
+const noMore = ref(false);
 const tableShow = ref(false);
 const tagShow = ref(true);
 const showComponent = ref(true);
@@ -319,9 +441,16 @@ onMounted(() => {
     tableShow.value = true;
     loading.value = true;
     tagShow.value = false;
+    /* 关键词存在 localStorage、列表存在 sessionStorage，两边要一起还原。
+       不还原关键词的话，刷新后列表还在、输入框却空了，
+       点「加载更多」会被"请输入关键词"挡下来（分页时代同样存在，只是不明显） */
+    searchValue.value = localStorage.getItem('searchName') || '';
     setTimeout(() => {
       loading.value = false;
-      tableData.value = JSON.parse(cache);
+      tableData.value = JSON.parse(cache) || [];
+      /* 列表和「已经翻到第几页」必须一起还原。
+         只还原列表的话，重新进来点「加载更多」会从第 2 页重新拉，和缓存里的条目撞车 */
+      restoreListState();
     }, 1000);
   } else {
     tagShow.value = true;
@@ -371,6 +500,9 @@ function handleSearch(value) {
   tableShow.value = true;
   tagShow.value = false;
   showComponent.value = false;
+  /* 每次新搜索都从第一页重新开始，并清掉上一轮「到底了」的标记 */
+  noMore.value = false;
+  queryParams.value.pageNum = 1;
   if (value) {
     searchValue.value = value;
   }
@@ -382,31 +514,102 @@ function handleSearch(value) {
     })
     .then((res) => {
       if (res.code === 200) {
-        const uniqueArray = Array.from(
-          new Set(res.data.map((item) => JSON.stringify(item))),
-        ).map((item) => JSON.parse(item));
-        // 先全部渲染
+        const raw = Array.isArray(res.data) ? res.data : [];
+        // 先全部渲染（同一次响应里的重复项在这里去掉）
+        const uniqueArray = uniqueByJson(raw, []);
         tableData.value = uniqueArray;
-        sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+        /* 用「原始条数」判断还有没有下一页：去重会让条数变少，
+           拿去重后的长度判断会把「还有下一页」误判成「到底了」 */
+        if (raw.length < queryParams.value.pageSize) noMore.value = true;
+        cacheListState();
         window.scrollTo({ top: 0, behavior: 'instant' });
         // 再过滤：异步移除无效或总大小小于 5M 的夸克链接
         filterQuarkLinks(uniqueArray);
       }
       // total.value = res.data.Memory_get_usage;
       loading.value = false;
+    })
+    .catch((err) => {
+      loading.value = false;
+      reportLoadError(err);
     });
 }
-function getList() {
+/* 列表状态统一落盘。列表、页码、「到底了」三者必须一起存：
+   少存任何一个，重新进页面后页码和列表就对不上，点「加载更多」会重复拉已有页 */
+function cacheListState() {
+  sessionStorage.setItem('tableData', JSON.stringify(tableData.value));
+  sessionStorage.setItem('tableDataPageNum', String(queryParams.value.pageNum));
+  sessionStorage.setItem('tableDataNoMore', noMore.value ? '1' : '0');
+}
+
+function restoreListState() {
+  const page = Number(sessionStorage.getItem('tableDataPageNum'));
+  queryParams.value.pageNum = page > 0 ? page : 1;
+  noMore.value = sessionStorage.getItem('tableDataNoMore') === '1';
+}
+
+/* 按 JSON 串去重，保留首次出现的顺序和原始对象引用。
+   保留引用很关键：filterQuarkLinks 靠 tableData.value.indexOf(item) 定位并移除条目，
+   这里若做一次 JSON.parse 往返造出新对象，indexOf 会全部落空、过滤静默失效 */
+function uniqueByJson(list, base) {
+  const seen = new Set(base.map((item) => JSON.stringify(item)));
+  const out = [];
+  for (const item of list) {
+    const key = JSON.stringify(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
+/* 请求失败的兜底提示。
+   业务错误码（500 / 601 / 其他）在 request.js 的响应拦截器里已经弹过提示，
+   这里再弹一次会重复；而网络层异常（超时 / 断网 / HTTP 状态码）那句 ElMessage
+   在拦截器里是被注释掉的、完全静默 —— 所以只补这一种，用 isAxiosError 区分 */
+function reportLoadError(err) {
+  if (err && err.isAxiosError) {
+    ElMessage.error('网络异常，请稍后重试');
+  }
+}
+
+/* 加载下一页并追加到列表尾部（替代原来的分页跳转） */
+function loadMore() {
+  // 双保险：el-button 的 loading 已经禁掉了点击，这里再挡一次防并发
+  if (loadingMore.value || noMore.value) return;
   if (!searchValue.value) {
     ElMessage.error('请输入关键词搜索！');
     return;
   }
-  loading.value = true;
+  loadingMore.value = true;
+  const nextPage = queryParams.value.pageNum + 1;
   userStore
-    .search({ keyword: searchValue.value, ...queryParams.value })
+    .search({
+      keyword: searchValue.value,
+      ...queryParams.value,
+      pageNum: nextPage,
+    })
     .then((res) => {
-      tableData.value = res.data;
-      loading.value = false;
+      if (res.code !== 200) {
+        reportLoadError(res);
+        return;
+      }
+      const raw = Array.isArray(res.data) ? res.data : [];
+      // 跨页去重：接口不同页之间会返回重复条目，base 传当前列表
+      const fresh = uniqueByJson(raw, tableData.value);
+      tableData.value = tableData.value.concat(fresh);
+      queryParams.value.pageNum = nextPage;
+      if (raw.length < queryParams.value.pageSize) noMore.value = true;
+      cacheListState();
+      /* 只校验这一页新增的条目。全量重跑的话，每条夸克链接都会再打一次
+         /quark/getToken，翻到第三页就是几十个请求 */
+      filterQuarkLinks(fresh);
+    })
+    .catch((err) => {
+      reportLoadError(err);
+    })
+    .finally(() => {
+      loadingMore.value = false;
     });
 }
 
@@ -528,10 +731,8 @@ async function filterQuarkLinks(list) {
           const i = tableData.value.indexOf(item);
           if (i > -1) {
             tableData.value.splice(i, 1);
-            sessionStorage.setItem(
-              'tableData',
-              JSON.stringify(tableData.value),
-            );
+            // 过滤掉条目后同步落盘（页码和「到底了」标记一并更新）
+            cacheListState();
           }
         }, 400);
       }
@@ -637,6 +838,9 @@ function resetQuery() {
   // router.push({ path: '/source' });
   localStorage.removeItem('searchName');
   sessionStorage.removeItem('tableData');
+  // 列表、页码、「到底了」标记要一起清，否则下次进来会带着上一轮的页码
+  sessionStorage.removeItem('tableDataPageNum');
+  sessionStorage.removeItem('tableDataNoMore');
   window.location.href = '/source';
 }
 // 根据索引返回Element预设类型
@@ -708,12 +912,14 @@ const getTagType = (index) => {
         display: flex;
         align-items: center; /* 垂直居中 */
         justify-content: center; /* 水平居中 */
+        gap: 10px;
         vertical-align: middle;
         img {
           width: 120px;
           height: 80px;
         }
-        span {
+        /* 品牌名：保留原来的五色渐变大字 */
+        &__name {
           //width: auto;
           height: 80px !important;
           margin-top: 0;
@@ -721,8 +927,6 @@ const getTagType = (index) => {
           font-weight: bold !important;
           line-height: 80px;
           white-space: nowrap; /* 禁止换行 */
-          overflow: hidden; /* 隐藏溢出内容 */
-          text-overflow: ellipsis; /* 溢出显示省略号... */
           background: linear-gradient(
             90deg,
             #33cc33,
@@ -734,6 +938,31 @@ const getTagType = (index) => {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+        }
+        /* 口号：跟品牌名用同一套五色渐变，整块标题统一成品牌色。
+           必须写成带父级的 .logo-title__slogan ——
+           原来那条 .logo-title span（0,1,1）会盖住单独的类选择器 */
+        &__slogan {
+          font-size: 14px;
+          font-weight: normal !important;
+          line-height: 1.4;
+          white-space: nowrap;
+          background: linear-gradient(
+            90deg,
+            #33cc33,
+            #ff9900,
+            #ff0000,
+            #3399ff,
+            #cc33ff
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        &__sep {
+          font-size: 14px;
+          line-height: 1;
+          color: var(--el-text-color-placeholder);
         }
       }
       .user {
@@ -778,6 +1007,15 @@ const getTagType = (index) => {
 @media only screen and (max-width: 767px) {
   .home {
     width: 100%;
+    /* 375px 屏上内容宽约 335px，「品牌名 + 口号」放不下，只留品牌名。
+       这里必须写成 .content .logo .logo-title 的完整层级 ——
+       基类同样是 4 层（0,4,0），层级写少了会被基类压住 */
+    .content .logo .logo-title {
+      &__slogan,
+      &__sep {
+        display: none;
+      }
+    }
   }
   .tag {
     .block {
@@ -936,24 +1174,137 @@ const getTagType = (index) => {
   max-width: 770px;
   margin: 50px auto 0;
 
-  .tag-header {
-    margin: 0;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    height: 32px;
-    padding: 0 14px;
-    border-radius: 16px; /* 胶囊形，和右侧 round 的热搜标签统一 */
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease;
+  /* ---------------- 分类导航 ---------------- */
+  /* 7 个板块铺两列。flex: 0 0 100% 让它独占一行，
+     不参与父级 .tag 的标签流式换行 */
+  .tag-cats {
+    flex: 0 0 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
-  /* 原先是 scale(1.55) + shake 无限抖动：缩放过大容易盖住相邻标签，
-     而且 shake 这个 @keyframes 全项目都没定义，本来就不生效 */
-  .tag-header:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+
+  .tag-cat {
+    /* 每个板块一个色相：底色是同色相的低透明度渐变，序号徽章取同色相深一档。
+       7 个色相保持同样的饱和节奏和透明度，所以彼此有区分度但不显花 */
+    --cat-tint: rgba(64, 158, 255, 0.13);
+    --cat-ink: #2b7cd3;
+
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 14px 16px 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 12px;
+    background-color: var(--el-bg-color);
+    /* 左上角向内淡出，比整块纯色底更透气 */
+    background-image: linear-gradient(
+      135deg,
+      var(--cat-tint) 0%,
+      transparent 58%
+    );
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition:
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+
+    &:hover {
+      border-color: var(--el-border-color);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    &__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    &__no {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 20px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--cat-ink);
+      background-color: var(--cat-tint);
+    }
+    &__title {
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--el-text-color-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &__body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    &__item {
+      margin: 0;
+      cursor: pointer;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 13px; /* 胶囊形，和下方 round 的热搜标签同一套语言 */
+      font-size: 13px;
+      color: var(--el-text-color-regular);
+      background-color: var(--el-bg-color);
+      border: 1px solid var(--el-border-color-lighter);
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+      &:hover {
+        color: var(--cat-ink);
+        border-color: var(--cat-ink);
+        background-color: var(--cat-tint);
+        transform: translateY(-1px);
+      }
+    }
+
+    /* 7 个板块排两列会剩下一个半空的末行，让最后一个横跨整行正好补满 */
+    &:last-child {
+      grid-column: 1 / -1;
+    }
+
+    &--study {
+      --cat-tint: rgba(64, 158, 255, 0.13);
+      --cat-ink: #2b7cd3;
+    }
+    &--office {
+      --cat-tint: rgba(103, 194, 58, 0.15);
+      --cat-ink: #4f9429;
+    }
+    &--design {
+      --cat-tint: rgba(140, 111, 255, 0.13);
+      --cat-ink: #6a4dd6;
+    }
+    &--baby {
+      --cat-tint: rgba(255, 169, 64, 0.16);
+      --cat-ink: #bd7412;
+    }
+    &--career {
+      --cat-tint: rgba(0, 184, 169, 0.13);
+      --cat-ink: #0a8b80;
+    }
+    &--life {
+      --cat-tint: rgba(255, 122, 180, 0.14);
+      --cat-ink: #c34585;
+    }
+    &--novel {
+      --cat-tint: rgba(245, 108, 108, 0.13);
+      --cat-ink: #c05252;
+    }
   }
 
   .tag-title {
@@ -971,7 +1322,7 @@ const getTagType = (index) => {
     margin: 0;
     cursor: pointer;
     border: 1px solid var(--el-border-color);
-    padding: 0 14px; /* 与 .tag-header 的横向内边距对齐 */
+    padding: 0 14px; /* 与上方分类板块的标签保持同一套横向呼吸感 */
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
       transform 0.2s ease,
@@ -991,11 +1342,22 @@ const getTagType = (index) => {
     gap: 8px;
     margin-top: 22px;
 
-    .tag-header {
-      height: 28px;
-      padding: 0 12px;
-      font-size: 13px;
-      border-radius: 14px;
+    /* 窄屏两列会把标签挤成一列一个字，改单列铺满 */
+    .tag-cats {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .tag-cat {
+      padding: 12px 14px 14px;
+
+      &__title {
+        font-size: 14px;
+      }
+      &__item {
+        height: 24px;
+        padding: 0 9px;
+        font-size: 12px;
+      }
     }
     .tag-inner {
       padding: 0 12px;
@@ -1169,10 +1531,80 @@ const getTagType = (index) => {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-.el-pagination {
+/* ---------------- 列表底部：加载更多 ---------------- */
+/* 替代原来的分页条。滚到列表底部后点一下继续加载下一页 */
+.load-more {
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin: 35px auto 30px;
+  min-height: 40px;
+  margin: 28px auto 30px;
+
+  /* 默认「浅底 + 主色描边」，hover 才填成实心主色：
+     不和顶部搜索按钮抢视觉，点下去又有明确反馈 */
+  &__btn {
+    min-width: 168px;
+    height: 40px;
+    padding: 0 28px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-color-primary);
+    background-color: var(--el-color-primary-light-9);
+    border: 1px solid var(--el-color-primary-light-7);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-color: var(--el-color-primary);
+      border-color: var(--el-color-primary);
+      box-shadow: 0 6px 16px rgba(64, 158, 255, 0.35);
+    }
+    /* 上浮只给 hover：点完按钮会保持 :focus，跟着上浮会像卡住了一样 */
+    &:hover {
+      transform: translateY(-2px);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  /* 「已经到底啦」：两侧各拉一条细线，避免一行孤零零的文字显得突兀 */
+  &__end {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--el-text-color-placeholder);
+
+    &::before,
+    &::after {
+      content: '';
+      width: 48px;
+      height: 1px;
+      background-color: var(--el-border-color-lighter);
+    }
+  }
+}
+
+/* 移动端：按钮铺满一栏、加高触控区。
+   必须写在 .load-more 基类之后 —— 同优先级下靠后的规则才生效 */
+@media only screen and (max-width: 767px) {
+  .load-more {
+    margin: 22px auto 24px;
+
+    &__btn {
+      width: 100%;
+      max-width: 340px;
+      min-width: 0;
+      height: 44px;
+    }
+  }
 }
 .foot {
   margin-top: 10px;
