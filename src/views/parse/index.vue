@@ -187,7 +187,15 @@
       title="提示"
       v-model="loadData.WeCharVisible"
     >
-      <img class="qr-code" :src="qrCode" alt="" />
+      <el-image
+          class="qr-code"
+          :src="qrCode"
+          fit="contain"
+          :preview-src-list="qrCode ? [qrCode] : []"
+          hide-on-click-modal
+          preview-teleported
+      >
+      </el-image>
       <div v-if="loadData.shareUrl" style="text-align: center">
         <a
           :href="loadData.shareUrl"

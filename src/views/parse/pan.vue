@@ -511,6 +511,7 @@ function handleSearch(value) {
     .search({
       keyword: value ? value : searchValue.value,
       ...queryParams.value,
+      wechat:false,
     })
     .then((res) => {
       if (res.code === 200) {
