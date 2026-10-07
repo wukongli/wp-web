@@ -496,6 +496,22 @@ function logout() {
 }
 getLogin();
 function handleSearch(value) {
+
+  const keyword = value ? value : searchValue.value;
+
+  // 检测是否为网盘链接，是则直接解析
+  const isBaiduLink = /pan\.baidu\.com/i.test(keyword);
+  const isQuarkLink = /pan\.quark\.cn/i.test(keyword);
+
+  if (isBaiduLink || isQuarkLink) {
+    loading.value = false;
+    tableShow.value = false;
+    const row = { url: keyword };
+    goParse(row);
+    return;
+  }
+
+
   loading.value = true;
   tableShow.value = true;
   tagShow.value = false;
