@@ -61,7 +61,7 @@ import axios from 'axios';
 import { onMounted } from 'vue';
 import { getToken } from '@/utils/auth';
 import { blobValidate } from '@/utils/ruoyi';
-import yao from '@/assets/images/yaoyao.png';
+import yao from '@/assets/images/前端.png';
 import { ElMessage, ElMessageBox } from 'element-plus';
 const router = useRouter();
 const { proxy } = getCurrentInstance();
