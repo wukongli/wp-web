@@ -103,7 +103,10 @@
               v-if="!item.isDir"
               title="开通快速下载（不限大小/次数）"
               @click.stop="vipDownLoad(item.row)"
-              >快速下载</el-button
+              >
+              <el-icon><Present /></el-icon>
+              <span>vip</span>
+            </el-button
             >
             <el-button
               size="small"
@@ -1265,7 +1268,7 @@ async function testMotrix() {
     });
 }
 async function testGopeed() {
-  return fetch('http://127.0.0.1:16800/api/v1/tasks', {
+  return fetch('http://127.0.0.1:0/api/v1/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -109,8 +109,10 @@
               v-if="!item.isDir"
               title="开通快速下载（不限大小/次数）"
               @click.stop="vipDownLoad(item.row)"
-              >快速下载</el-button
             >
+              <el-icon><Present /></el-icon>
+              <span>vip</span>
+            </el-button>
             <el-button
               size="small"
               type="success"
@@ -291,23 +293,28 @@
         </span>
       </template>
     </el-dialog>
-    <!-- 到达每天下载次数弹窗 -->
+    <!-- 播放弹窗 -->
     <el-dialog
       :close-on-click-modal="false"
       class="play_dia"
       :before-close="handleBeforeClose"
       :title="loadData.title"
-      v-model="loadData.maxNum"
+      v-model="loadData.playDia"
+      width="480px"
     >
       <div class="play-body">
         <!-- 顶部警示 -->
         <div class="play-tip">
           <el-icon class="play-tip-icon"><WarningFilled /></el-icon>
-          <span>{{ loadData.diaHit }}</span>
+          <span class="play-tip-text">{{ loadData.diaHit }}</span>
         </div>
 
-        <!-- 选择播放器 -->
-        <div class="play-mobile-title">点击发送到播放器内播放</div>
+        <!-- 方式一：点击图标播放 -->
+        <div class="play-section-head">
+          <span class="play-section-no">1</span>
+          <span class="play-section-title">点击图标播放</span>
+        </div>
+        <div class="play-section-desc">点击下方图标，在对应播放器内打开</div>
         <div class="mobile_player">
           <div
             v-if="loadData.isIos || loadData.isMac"
@@ -371,9 +378,13 @@
             <span class="player-name">VLC</span>
           </a>
         </div>
-        <!-- 视频播放链接：复制后手动添加到播放器 -->
+        <!-- 方式二：复制链接播放 -->
+        <div class="play-section-head is-divided">
+          <span class="play-section-no">2</span>
+          <span class="play-section-title">复制链接播放</span>
+        </div>
+        <div class="play-section-desc">复制下方链接，手动添加到播放器</div>
         <div class="play-url-box">
-          <span class="play-url-label">视频播放链接（复制后手动添加到播放器）</span>
           <div class="play-url-row">
             <el-input
               v-model="loadData.playUrl"
@@ -383,6 +394,7 @@
             />
             <el-tooltip content="复制链接" placement="top">
               <el-button
+                class="play-copy-btn"
                 type="primary"
                 plain
                 :icon="CopyDocument"
@@ -398,7 +410,6 @@
             class="play-help-link"
             href="https://docs.qq.com/doc/DWlR0elZITll2VEZU?no_promotion=1"
             target="_blank"
-            type="success"
           >
             <span>播放器使用说明</span>
             <el-icon class="play-help-arrow"><ArrowRight /></el-icon>
@@ -407,7 +418,6 @@
             class="play-help-link"
             href="https://pan.quark.cn/s/c32f0125e825"
             target="_blank"
-            type="success"
           >
             <span>PC客户端下载地址</span>
             <el-icon class="play-help-arrow"><ArrowRight /></el-icon>
@@ -515,7 +525,7 @@ const loadData = reactive({
   url: '',
   codeUrl: qrCode,
   ckId: null,
-  maxNum: false,
+  playDia: false,
   infuseUrl: 'javascript:void(0)',
   maxUrl: 'javascript:void(0)',
   potUrl: 'javascript:void(0)',
@@ -1046,7 +1056,7 @@ async function playVideo(item) {
 function handleBeforeClose() {
   isSending.value = false;
   loadData.videoUrl = '';
-  loadData.maxNum = false;
+  loadData.playDia = false;
   loadData.loading = false;
   loadData.infuseUrl = 'javascript:void(0)';
   loadData.maxUrl = 'javascript:void(0)';
@@ -1083,11 +1093,11 @@ async function confirmVideo(item) {
     .then((res) => {
       loadData.item.playLoading = false;
       if (res.code === 200) {
-        loadData.maxNum = true;
+        loadData.playDia = true;
         if (!res.data.fileName) {
           ElMessage.error('视频播放失败,请更换资源或者下载后观看');
           loadData.loading = false;
-          loadData.maxNum = false;
+          loadData.playDia = false;
           return;
         }
         let playPath =
@@ -1117,7 +1127,7 @@ async function confirmVideo(item) {
       }
     })
     .catch(() => {
-      loadData.maxNum = false;
+      loadData.playDia = false;
       loadData.item.playLoading = false;
     });
 }
@@ -1239,9 +1249,20 @@ async function handleParse() {
   :deep(.el-dialog) {
     width: 96% !important;
   }
+  /* 播放弹窗在平板宽度下不要被 96% 撑得比桌面版还宽 */
+  :deep(.play_dia) {
+    max-width: 480px;
+  }
   :deep(.el-dialog__body) {
     padding: 0;
     padding-bottom: 20px;
+  }
+  /* 上面那条 padding:0 是给需要全出血的播放器弹窗准备的；
+     播放弹窗（方式一/方式二）内容不能贴边，保留留白。
+     上内边距不能为 0：el-dialog 的关闭按钮是 54×54 的透明触控区，
+     锚在 top:6px，比 54px 高的标题栏多探出 6px，顶上不留白会盖住提示条 */
+  :deep(.play_dia .el-dialog__body) {
+    padding: 16px 20px 20px;
   }
 
   /* 使用深度选择器修改局部 loading 样式 */
@@ -1264,24 +1285,15 @@ async function handleParse() {
       background-color: black !important;
     }
   }
+  /* 播放器图标组：此断点只覆盖尺寸，布局由文件末尾的基础块提供 */
   .mobile_player {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 20px;
     .player-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
       img {
-        width: 46px;
-        height: 46px;
+        width: 44px;
+        height: 44px;
       }
       .player-name {
-        margin-top: 6px;
         font-size: 12px;
-        color: #606266;
       }
     }
   }
@@ -1303,76 +1315,134 @@ async function handleParse() {
       background-color: black !important;
     }
   }
+  /* 播放器图标组：此断点只覆盖尺寸，布局与 hover 由文件末尾的基础块提供 */
   .mobile_player {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 32px;
     .player-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
       img {
         width: 56px;
         height: 56px;
       }
-      &:hover img {
-        transform: translateY(-4px) scale(1.06);
-      }
       .player-name {
-        margin-top: 8px;
         font-size: 13px;
-        color: #606266;
       }
     }
   }
 }
 /* ===== 播放器选择弹窗 ===== */
-/* 布局约定：警示条 → 播放器 → 播放链接 → 帮助链接，自上而下一条主线。
-   区块之间 20px、标题与内容之间 12px，除图标组自身居中外全部左对齐 */
+/* 布局约定：提示条 → 方式一（点图标）→ 方式二（复制链接）→ 帮助链接，
+   自上而下一条主线。区块之间 20px、标题与内容之间 12px；
+   全部左对齐（含播放器图标组），与上方标题、下方链接区共用同一条左边缘。
+
+   注意：本块位于文件末尾的两个 @media 之后，同权重时后声明者胜出。
+   因此 img 尺寸与 .player-name 字号只能写在 @media 里，本块不得重复声明。 */
 .play-body {
-  padding: 4px 6px 2px;
+  padding: 0 0 4px;
 }
 
-// 顶部警示：图标与文字左对齐，和下方小节标题共享同一条左边缘
+/* 顶部提示：微信绿。Element Plus 的 success(#67c23a) 是黄绿，和微信绿不是一回事，
+   这里直接用微信品牌绿 #07c160；文字压深一档保证可读性（约 4.8:1） */
 .play-tip {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 6px;
+  padding: 8px 12px;
   margin-bottom: 20px;
-  border-radius: 8px;
-  color: #f56c6c;
+  border-radius: 6px;
   font-size: 13px;
+  font-weight: 500;
   line-height: 1.5;
-  background: rgba(245, 108, 108, 0.08);
-  border: 1px solid rgba(245, 108, 108, 0.3);
+  color: #0a7d43;
+  background: #f0f9f4;
+  border: 1px solid #a8e6c4;
+  .play-tip-text {
+    flex: 1;
+  }
   .play-tip-icon {
     flex-shrink: 0;
-    margin-top: 2px; /* 与首行文字视觉对齐，文案换行时图标不会跟着飘 */
-    font-size: 16px;
+    margin-top: 1px; /* 与首行文字视觉对齐，文案换行时图标不会跟着飘 */
+    font-size: 14px;
+    color: #07c160;
   }
 }
 
-// 小节标题（播放器 / 播放链接共用同一套字号与左对齐）
-.play-mobile-title,
-.play-url-label {
-  display: block;
+/* 方式标题：序号徽标 + 标题，两种方式共用同一套左边缘与字号 */
+.play-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  /* 方式二及以后：与上一块之间拉一条分隔线 */
+  &.is-divided {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--el-border-color-lighter);
+  }
+  .play-section-no {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+  }
+  .play-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+}
+
+/* 方式说明：一行小字，说明该方式怎么用 */
+.play-section-desc {
   margin-bottom: 12px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--el-text-color-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--el-text-color-secondary);
 }
 
-// 播放器图标组与下一块之间留出区块间距
+/* 播放器图标组：左对齐，每个图标一张描边磁贴，带 hover 反馈 */
 .mobile_player {
-  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 12px;
+  .player-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: 12px 14px;
+    cursor: pointer;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 8px;
+    background: var(--el-bg-color);
+    transition: border-color var(--el-transition-duration-fast),
+      background-color var(--el-transition-duration-fast),
+      box-shadow var(--el-transition-duration-fast);
+    img {
+      display: block;
+    }
+    .player-name {
+      margin-top: 6px;
+      line-height: 1;
+      white-space: nowrap;
+      color: var(--el-text-color-regular);
+    }
+    &:hover {
+      border-color: var(--el-color-primary);
+      background: var(--el-color-primary-light-9);
+      box-shadow: var(--el-box-shadow-lighter);
+    }
+  }
 }
 
-// 播放链接 + 复制按钮
+/* 播放链接 + 复制按钮：浅底圆角输入框 + 同高的图标按钮 */
 .play-url-box {
   .play-url-row {
     display: flex;
@@ -1380,14 +1450,29 @@ async function handleParse() {
     gap: 8px;
     .play-url-input {
       flex: 1;
+      --el-input-height: 36px;
+      :deep(.el-input__wrapper) {
+        border-radius: 6px;
+        background-color: var(--el-fill-color-light);
+        box-shadow: 0 0 0 1px var(--el-border-color-lighter) inset;
+      }
       :deep(.el-input__inner) {
         font-size: 12px;
+        color: var(--el-text-color-regular);
       }
+    }
+    .play-copy-btn {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      font-size: 16px;
+      border-radius: 6px;
     }
   }
 }
 
-// 底部帮助链接：去掉整块灰底大卡片，改成一条分隔线 + 紧凑链接
+/* 底部帮助链接：一条分隔线 + 紧凑链接，颜色随面板主色（模板已去掉 type="success"） */
 .play-help {
   margin-top: 20px;
   padding-top: 14px;
@@ -1400,7 +1485,7 @@ async function handleParse() {
     font-weight: 500;
     .play-help-arrow {
       font-size: 13px;
-      transition: transform 0.2s;
+      transition: transform var(--el-transition-duration-fast);
     }
     &:hover .play-help-arrow {
       transform: translateX(3px);
